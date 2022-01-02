@@ -270,8 +270,6 @@ load("cp dataset full.Rdata", verbose = T)
 load("behav dataset month.Rdata", verbose = T)
 
 
-class(cp_raw)
-
 x <- left_join(cp_raw, neo_data_full, by = "sample_number")
 x %>%
  filter(time.x != time.y) %>%
