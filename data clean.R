@@ -83,7 +83,7 @@ twn_twsx %>%
   summarise(min = min(final_conc, na.rm = T) , max = max(final_conc, na.rm = T))
 
 range(twn_twsx$NEO_value, na.rm = T)
-# B. GN data ----
+# 1B. GN data ----
 gnx <- read.csv("Neo shared w Josh C/Updated GN results.csv") %>%
   filter(!is.na(sample_number)) %>%
   select(- Taken_From, - notes.for.josh, - SD) %>%
@@ -103,7 +103,7 @@ hi_cv_dups <- gnx %>%
   filter(n > 1) %>%
   pull(sample_number)
 
-# C. clean up n bind -----
+# 1C. clean up n bind -----
 
 leftover_dups_twns <- twn_twsx %>%
   filter(CV < 21) %>%
@@ -162,7 +162,7 @@ twns_thrice/ nrow(neo_data_no_info) # 2.3% assayed thrice
 
 #save(twn_tws, gn, neo_data_no_info, file = "cleaned neo values to merge.Rdata")
 
-# D. merge sample info with neo data ------
+# 1D. merge sample info with neo data ------
 
 load("cleaned neo values to merge.Rdata", verbose = T)
 load("/Users/nicolethompsongonzalez/Dropbox/2. R projects/Juvenile blues (diss)/Juvenile data and field/Data/3. Behavior data by month/Rdata files month/Juv LH month.Rdata", verbose = T)
@@ -249,7 +249,7 @@ names(neo_data_full)
 #save(cp_raw, file = "cp dataset full.Rdata")
 
 
-# Monthly rate of play -----
+# 3a. Monthly rate of play -----
 load("/Users/nicolethompsongonzalez/Dropbox/2. R projects/Juvenile blues (diss)/Rewrite chapter 3 2021/scripts of Juv social preferences for rewrite/data/juv monthly activity budgets.Rdata", verbose = T)
 nrow(act_budget)
 head(act_budget)
@@ -269,6 +269,8 @@ load("neo dataset full.Rdata", verbose = T)
 load("cp dataset full.Rdata", verbose = T)
 load("behav dataset month.Rdata", verbose = T)
 
+
+class(cp_raw)
 
 x <- left_join(cp_raw, neo_data_full, by = "sample_number")
 x %>%
