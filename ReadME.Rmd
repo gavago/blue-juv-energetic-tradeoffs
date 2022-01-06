@@ -1,0 +1,19 @@
+---
+title: "Juvenile energetic trade-offs analysis"
+author: "Nic TG"
+date: "1/6/2022"
+output: word_document
+---
+
+### Data Dictionary
+
+#### c-peptide data set variables
+
+1. 
+# draft of data dictionary:
+# cp_raw, neo_raw is biomarker data: are both at subject sample level
+# every row is a unique sample number, which is an subject sampled on a given date and time
+# behav dataset, is a unique subject-month of behavioral observation, and variables
+# in here are proportion of observed time in a given behavioral activity (giving grooming, playing, etc.)
+# or number of counts in a given month that a subject gave or received aggression.
+

@@ -21,19 +21,12 @@ behav_raw = robjects.r['behav_data_month']
 
 print(cp_raw.head())
 
-# dimension of a dataframe
-# inspecting/filtering rows
+# want to be able to:
+# check dimension of a dataframe
+# inspect dataframe in various ways, summarize, filter rows
 # merge by relevant key / observation level
-
 # Goal is to merge these 3 datasets together (behav observations will be repeated over different samples)
-# draft of data dictionary:
-# cp_raw, neo_raw is biomarker data: are both at subject sample level
-# every row is a unique sample number, which is an subject sampled on a given date and time
-# behav dataset, is a unique subject-month of behavioral observation, and variables
-# in here are proportion of observed time in a given behavioral activity (giving grooming, playing, etc.)
-# or number of counts in a given month that a subject gave or received aggression.
-
-
+# an observation will be an subject's urine sample value of neopterin and c-peptide paired with its rate of play/grooming that month
 
 # Ish to figure out:
 # function to get objects in working environment?
