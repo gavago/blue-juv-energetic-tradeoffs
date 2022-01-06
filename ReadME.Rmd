@@ -3,9 +3,8 @@ title: "Juvenile energetic trade-offs analysis"
 author: "Nic TG"
 date: "1/6/2022"
 output: 
-   prettydoc::html_pretty:
-    theme: cayman
-    highlight: github
+  html_document:
+    theme: lumen
     toc: true
     keep_md: true
 toc-title: "Contents"
