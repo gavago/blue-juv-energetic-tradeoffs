@@ -19,10 +19,7 @@ toc-title: "Contents"
 <font size = "2">
 In `cp_raw` every row is a unique urine sample, which is from a subject sampled on a given date and time.
 
-```{r, include= F, message = F}
-load("cp dataset full.Rdata", verbose = T)
-names(cp_raw)
-```
+
 
 
 `group`: chr, social group of juvenile subject  
