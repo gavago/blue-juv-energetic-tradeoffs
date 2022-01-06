@@ -3,11 +3,8 @@ title: "Juvenile energetic trade-offs analysis"
 author: "Nic TG"
 date: "1/6/2022"
 output: 
-  html_document:
-    theme: lumen
+  github_document:
     toc: true
-    keep_md: true
-toc-title: "Contents"
 
 ---
 
