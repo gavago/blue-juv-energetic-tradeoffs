@@ -41,6 +41,44 @@ stdsg_CP = pg.ml_ucp \* mean(SG)/sample SG
 
 #### Neopterin dataset variables:
 
+<font size = "2"> Like `cp_raw`, every row in `neo_data_full` is a
+unique urine sample, which is from a subject sampled on a given date and
+time. Many columns in these two datasets are shared.
+
+**Shared columns**:  
+`group`: chr, social group of juvenile subject  
+`subj`: chr, 4 character code of subject  
+`date`: Date, date of urine sample collection  
+`time`: POSIXlt, time of sample collection  
+`sample_number`: int, unique identifier of sample  
+`Cr`: num, creatinine value of sample  
+`SG`: num, specific gravity of sample, value is SG-1 \* 100 (e.g. 1.23 -
+1 \* 100 = 23)  
+**Unique to Neo**:  
+`month.name`: factor, 3 letter code for month  
+`mum`: factor, 3 letter code for juv’s mum, can be optionally used as
+clustering variable in regression  
+`bday`: Date, subject’s birthday  
+`weaning`: Date, subject’s last day observed nursing from mother  
+`mid`: Date, the midday of each month, used for calculating monthly
+ages  
+`neo_value`: num, raw value of neopterin assay  
+`CV`: num, coefficient of variation of neopterin sample assayed in
+duplicate  
+`neo_plate_number`: num, immuno plate on which final value of sample was
+assayed  
+`neo_dilution`: int, a dilution factor X, sample was diluted 1:X for its
+final value  
+`neo_date_assayed`: Date, assay date of final neo value  
+`neo_note`: chr, any relevant note about sample when assayed for neo  
+`SG_corr_fac`: num, mean(SG)/sample SG  
+`neo_sg`: num, final value of neo to be used for analysis,
+`neo_sg = neo_value * neo_dilution * SG_corr_fac`
+
+</font>
+
+#### Behavioral dataset
+
 behav dataset, is a unique subject-month of behavioral observation, and
 variables. in here are proportion of observed time in a given behavioral
 activity (giving grooming, playing, etc.) or number of counts in a given
