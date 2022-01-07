@@ -3,7 +3,7 @@ library(readxl)
 library(magrittr)
 library(lubridate)
 
-# body condition moderate a relationship between play and immunity
+# energetic condition moderate a relationship between play and immunity
 # high condition, no relationship
 # low condition, neg relationship
 # play and cp, immunity and cp
