@@ -269,6 +269,9 @@ load("neo dataset full.Rdata", verbose = T)
 load("cp dataset full.Rdata", verbose = T)
 load("behav dataset month.Rdata", verbose = T)
 
+#write.csv(neo_data_full, file = "neo dataset full.csv", row.names = F)
+#write.csv(cp_raw, file = "cp dataset full.csv", row.names = F)
+#write.csv(behav_data_month, file = "behav dataset month.csv", row.names = F)
 
 x <- left_join(cp_raw, neo_data_full, by = "sample_number")
 x %>%
