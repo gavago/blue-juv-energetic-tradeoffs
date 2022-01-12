@@ -49,6 +49,8 @@ time. Many columns in these two datasets are shared.
 `group`: chr, social group of juvenile subject  
 `subj`: chr, 4 character code of subject  
 `date`: Date, date of urine sample collection  
+'month': num, month of urine sample collection
+'year': num, year of urine sample collection
 `time`: POSIXlt, time of sample collection  
 `sample_number`: int, unique identifier of sample  
 `Cr`: num, creatinine value of sample  

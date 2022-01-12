@@ -14,26 +14,20 @@ pd_cp_dataset = pd.read_csv("cp dataset full.csv", header=0, na_values='NA')
 pd_behav_dataset = pd.read_csv("behav dataset month.csv", header=0, na_values='NA')
 pd_neo_dataset = pd.read_csv("neo dataset full.csv", header=0, na_values='NA')
 
-#creates smaller sample DF to test on
-cp_mini= pd_cp_dataset.head()
-behav_mini = pd_behav_dataset.head()
-neo_mini = pd_neo_dataset.head()
+#creates a list of things we want to merge on between cp and neo datasets
+cp_neo_merge_list = ['group', 'subj', 'date', 'month', 'year', 'time', "sample_number", 'Cr', 'SG']
 
-print("neo mini\n", neo_mini.loc[:, 'sample_number'])
-print("cp mini\n", cp_mini.loc[:, 'sample_number'])
+#merges cp and neo
+biomarker_df = pd_cp_dataset.merge(pd_neo_dataset, on=cp_neo_merge_list)
 
-#merge on inner should find same columns between the 2
-inner = pd.merge(neo_mini, cp_mini, how='inner')
-print(inner)
+print(biomarker_df.columns)
+print(biomarker_df.loc[0:5, 'year'])
 
-df1 = cp_mini.merge(neo_mini, on="sample_number")
-print(df1)
 
 
 
 """
 problems:
-the merge is return an empty dataframe
 """
 
 
