@@ -20,8 +20,13 @@ cp_neo_merge_list = ['group', 'subj', 'date', 'month', 'year', 'time', "sample_n
 #merges cp and neo
 biomarker_df = pd_cp_dataset.merge(pd_neo_dataset, on=cp_neo_merge_list)
 
-print(biomarker_df.columns)
-print(biomarker_df.loc[0:5, 'year'])
+#merge biomarker and behavior based on month,year, and subject id
+final_merge_list = ['month', 'year', 'subj']
+final_df = pd.merge(biomarker_df, pd_behav_dataset, how='left', on=final_merge_list)
+
+
+print(final_df.columns)
+
 
 
 
