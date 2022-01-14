@@ -30,17 +30,16 @@ final_df = pd.merge(biomarker_df, pd_behav_dataset, how='left', on=final_merge_l
 filter_list = ['subj', 'sample_number', 'month']
 final_df_checkker = final_df.filter(items=filter_list)
 final_df_checkker = final_df_checkker.sort_values(by=['month', 'subj'], ascending=True)
+
 #make a list of all different subj values
 unique_values = final_df_checkker.subj.unique()
 print(type(unique_values))
 #iterate over each unique values
 
-#creates empty dataframe with each month and subject type
-df = pd.DataFrame(columns=[unique_values], index=[1,2,3,4,5,6,7,8,9,10,11,12])
-#appends data
-df.loc['1','allo'] = [1]
-print(df)
 
+
+#creates empty dictionary
+monthly_dict = {}
 #change range to (1,13) for each month
 for month in range(1,13):
     for x in unique_values:
@@ -49,12 +48,33 @@ for month in range(1,13):
         #queries DF for specific subject and month
         #essentially final_df_checkker.query("subj == 'amos' and month ==1")
         z = final_df_checkker.query(query1)
+        #print(z)
 
 
-        print(z, end=' \n')
+        #print(z, end=' \n')
         #counts number of rows and therefore samples in each sub DF
+        # print(z.shape[0])
 
-        print(z.shape[0])
+        #adds to dictionary a count value
+        #pairs key to value
+        monthly_dict[''+x+" month "+ str(month) +"."] = z.shape[0]
+
+        #print(z.at[1,1])
+        #monthly_dict['']
+
+
+print(monthly_dict)
+
+#supposed to extract individual month
+for key in monthly_dict.keys():
+    #the value in find is the month (' 1.') is january
+   if key.find(' 2.')> -1:
+      print(key[0:4])
+      print(monthly_dict[key])
+
+
+print(final_df_checkker)
+
 
 
 
