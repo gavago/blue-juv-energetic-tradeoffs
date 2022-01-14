@@ -286,6 +286,15 @@ jet_data <- left_join(cp_raw, neo_data_full, by = intersect(names(neo_data_full)
   select(group, subj, date, age, year, month, time, sample_number, stdsg_CP, neo_sg, everything())
 names(jet_data)
 
+
+# avg monthly neo
+neo_month <- neo_data_full %>%
+  group_by(month, subj) %>%
+  summarise(avg_neo_mo = mean(neo_sg, na.rm = T)) %>%
+  ungroup()
+
+
+#simple mods
 library(lmerTest)
 lmer(neo_sg ~ time + (1|subj), data = jet_data) %>% summary()
 lmer(stdsg_CP ~ time + (1|subj), data = jet_data) %>% summary()
