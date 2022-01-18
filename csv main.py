@@ -25,62 +25,28 @@ biomarker_df = pd_cp_dataset.merge(pd_neo_dataset, on=cp_neo_merge_list)
 final_merge_list = ['month', 'year', 'subj']
 final_df = pd.merge(biomarker_df, pd_behav_dataset, how='left', on=final_merge_list)
 
+final_df.to_csv("merged dataset.csv")
+
 #filter the final DF to subject, sample number, and month
 #count how many samples per subject per month
 filter_list = ['subj', 'sample_number', 'month']
 final_df_checkker = final_df.filter(items=filter_list)
 final_df_checkker = final_df_checkker.sort_values(by=['month', 'subj'], ascending=True)
+#converts string to date
+final_df["date"] = pd.to_datetime(final_df['date'])
 
-#make a list of all different subj values
-unique_values = final_df_checkker.subj.unique()
-print(type(unique_values))
-#iterate over each unique values
+#groups the data by month and subj and then counts sample_number
+graph_df = final_df.groupby(['month','subj'],as_index = False)["sample_number"].count()
+graph_df = graph_df.rename(columns={"sample_number":"count"})
 
+#sets index to month
+graph_df.set_index('month', inplace= True)
+#reshapes df
+graph_df = graph_df.pivot(columns='subj', values='count')
+#converts NAN to 0
+graph_df = graph_df.fillna(0)
 
-
-#creates empty dictionary
-monthly_dict = {}
-#change range to (1,13) for each month
-for month in range(1,13):
-    for x in unique_values:
-        # creates custom query for specific value and month
-        query1 = "subj == '" + x + "' and month == " + str(month)
-        #queries DF for specific subject and month
-        #essentially final_df_checkker.query("subj == 'amos' and month ==1")
-        z = final_df_checkker.query(query1)
-        #print(z)
-
-
-        #print(z, end=' \n')
-        #counts number of rows and therefore samples in each sub DF
-        # print(z.shape[0])
-
-        #adds to dictionary a count value
-        #pairs key to value
-        monthly_dict[''+x+" month "+ str(month) +"."] = z.shape[0]
-
-        #print(z.at[1,1])
-        #monthly_dict['']
-
-
-print(monthly_dict)
-
-#supposed to extract individual month
-for key in monthly_dict.keys():
-    #the value in find is the month (' 1.') is january
-   if key.find(' 2.')> -1:
-      print(key[0:4])
-      print(monthly_dict[key])
-
-
-print(final_df_checkker)
-
-
-
-
-#print(final_df_checkker)
-
-
+print(graph_df)
 
 
 
