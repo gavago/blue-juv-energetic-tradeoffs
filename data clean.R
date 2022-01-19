@@ -294,9 +294,15 @@ neo_month <- neo_data_full %>%
   ungroup()
 
 
-#simple mods
+#time of day effects model ------
 library(lmerTest)
 lmer(neo_sg ~ time + (1|subj), data = jet_data) %>% summary()
 lmer(stdsg_CP ~ time + (1|subj), data = jet_data) %>% summary()
 plot(jet_data$time, jet_data$neo_sg) # no time of day effects...
 plot(jet_data$time, jet_data$stdsg_CP) 
+
+
+lmer(neo_sg ~ scale(stdsg_CP) + (1|subj), data = jet_data) %>% summary()
+
+
+
