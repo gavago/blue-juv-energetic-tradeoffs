@@ -26,13 +26,14 @@ final_merge_list = ['month', 'year', 'subj']
 final_df = pd.merge(biomarker_df, pd_behav_dataset, how='left', on=final_merge_list)
 
 final_df.to_csv("merged dataset.csv")
-
+"""
 #filter the final DF to subject, sample number, and month
 #count how many samples per subject per month
 filter_list = ['subj', 'sample_number', 'month']
 final_df_checkker = final_df.filter(items=filter_list)
 final_df_checkker = final_df_checkker.sort_values(by=['month', 'subj'], ascending=True)
 #converts string to date
+"""
 final_df["date"] = pd.to_datetime(final_df['date'])
 
 #groups the data by month and subj and then counts sample_number
@@ -42,11 +43,22 @@ graph_df = graph_df.rename(columns={"sample_number":"count"})
 #sets index to month
 graph_df.set_index('month', inplace= True)
 #reshapes df
-graph_df = graph_df.pivot(columns='subj', values='count')
+graph_df = graph_df.pivot(columns='subj', values=['count'])
 #converts NAN to 0
 graph_df = graph_df.fillna(0)
 
-print(graph_df)
+#grabs data from month 1 only
+#loc turns it into a series so you need to unstack it and then convert to DF
+#unstack makes it a single indexed series
+month_series = graph_df.loc[1, :]
+month_series = month_series.unstack(level=-1)
+month_df = pd.DataFrame(month_series)
+
+#month_df = month_df.pivot(columns='subj', values= 'count')
+
+
+print(month_df.describe())
+
 
 
 
