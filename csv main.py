@@ -22,45 +22,42 @@ cp_neo_merge_list = ['group', 'subj', 'date', 'month', 'year', 'time', "sample_n
 biomarker_df = pd_cp_dataset.merge(pd_neo_dataset, on=cp_neo_merge_list)
 
 #merge biomarker and behavior based on month,year, and subject id
-final_merge_list = ['month', 'year', 'subj']
-final_df = pd.merge(biomarker_df, pd_behav_dataset, how='left', on=final_merge_list)
+merge_list = ['month', 'year', 'subj']
+bio_behav_merge_df = pd.merge(biomarker_df, pd_behav_dataset, how='left', on=merge_list)
+bio_behav_merge_df["date"] = pd.to_datetime(bio_behav_merge_df['date'])
+bio_behav_merge_df.to_csv("merged dataset.csv")
 
-final_df.to_csv("merged dataset.csv")
+
+
+#create a behavior key dataframe
+key_df = pd_behav_dataset.filter(['subj', 'month', 'year'])
+
+
+#create a filtered DF from all the data
+#groups the data by month and subj and then counts sample_number
+subj_mo_yr_df = bio_behav_merge_df.groupby(['subj','month','year'], as_index = False)['sample_number'].count()
+subj_mo_yr_df = subj_mo_yr_df.rename(columns={"sample_number":"count"})
+
+freq_subj_mo_yr_df = pd.merge(key_df, subj_mo_yr_df, how = 'left')
+print('hello')
+#fill na's with zeros
+freq_subj_mo_yr_df =freq_subj_mo_yr_df.fillna(0)
+print(freq_subj_mo_yr_df)
+
+#average frequency per month
+avg_subj_mo = freq_subj_mo_yr_df.groupby([ 'month'])['count'].mean()
+print(avg_subj_mo)
+
+
+
 """
 #filter the final DF to subject, sample number, and month
 #count how many samples per subject per month
 filter_list = ['subj', 'sample_number', 'month']
-final_df_checkker = final_df.filter(items=filter_list)
-final_df_checkker = final_df_checkker.sort_values(by=['month', 'subj'], ascending=True)
+bio_behav_merge_df_checkker = bio_behav_merge_df.filter(items=filter_list)
+bio_behav_merge_df_checkker = bio_behav_merge_df_checkker.sort_values(by=['month', 'subj'], ascending=True)
 #converts string to date
 """
-final_df["date"] = pd.to_datetime(final_df['date'])
-
-#groups the data by month and subj and then counts sample_number
-graph_df = final_df.groupby(['month','subj'],as_index = False)["sample_number"].count()
-graph_df = graph_df.rename(columns={"sample_number":"count"})
-
-#sets index to month
-graph_df.set_index('month', inplace= True)
-#reshapes df
-graph_df = graph_df.pivot(columns='subj', values=['count'])
-#converts NAN to 0
-graph_df = graph_df.fillna(0)
-
-#grabs data from month 1 only
-#loc turns it into a series so you need to unstack it and then convert to DF
-#unstack makes it a single indexed series
-month_series = graph_df.loc[1, :]
-month_series = month_series.unstack(level=-1)
-month_df = pd.DataFrame(month_series)
-
-#month_df = month_df.pivot(columns='subj', values= 'count')
-
-
-print(month_df.describe())
-
-
-
 
 
 """
