@@ -97,7 +97,8 @@ lh.mo_merge <- lh.mo %>%
 apply(neo_data_no_info, 2, function(x) sum(is.na(x)))
 apply(lh.mo_merge, 2, function(x) sum(is.na(x)))
 
-sample_info <- read_xlsx("Neo shared w Josh C/Neo values complete to fill in.xlsx") %>%
+# only use sample info from template - not any miscellaneous values.
+sample_info <- read_xlsx("Neo sample info template.xlsx") %>%
   select(group, subj, date, time, sample_number, Cr, SG) %>%
   mutate(SG = as.numeric(SG), Cr = as.numeric(Cr), 
          date = date(date)) %>%
@@ -196,6 +197,12 @@ behav_data_month <- act_budget %>%
 
 
 # exploration ----
+# 
+# neo_data_no_info_unfiltered
+rbind(gnx, twn_twsx) %>%
+  count(sample_number) %>%
+  filter(n > 1)
+
 # --- examine twn tws 2x neo repeats ####
 twns_dups <- twn_twsx %>%
   count(sample_number) %>%
@@ -256,7 +263,7 @@ hi_cv_dups <- gnx %>%
   filter(n > 1) %>%
   pull(sample_number)
 
-# --- for methods - how many samples used assayed multiple times ----
+# --- for methods - how many samples used were assayed for neo multiple times ----
 twns_twice <- twn_tws %>%
   filter(sample_number %in% twns_dups) %>%
   nrow() 
