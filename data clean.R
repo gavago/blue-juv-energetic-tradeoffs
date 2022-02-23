@@ -29,6 +29,7 @@ twn_twsx <- read.csv("Neo shared w Josh C/updated draft assign neo value.csv") %
   ))
 nrow(twn_twsx) #498
 
+
 #values out of range are NA
 twn_twsx[!is.na(twn_twsx) & twn_twsx == "Range?"] <- NA
 
@@ -37,8 +38,8 @@ twn_twsx %<>%
          date_assayed = as.Date(date, format = "%m/%d/%y"),
          CV = as.numeric(CV)) %>%
   select(-date)
-nrow(twn_twsx)
-
+nrow(twn_twsx) #498
+ 
 # 1B. GN data ----
 gnx <- read.csv("Neo shared w Josh C/Updated GN results.csv") %>%
   filter(!is.na(sample_number)) %>%
@@ -80,25 +81,6 @@ nrow(gn) #185
 neo_data_no_info <- rbind(gn, twn_tws)
 nrow(neo_data_no_info) #561
 names(neo_data_no_info)
-
-# how many samples used assayed multiple times ----
-twns_twice <- twn_tws %>%
-  filter(sample_number %in% twns_dups) %>%
-  nrow() 
-twns_twice #57
-twns_thrice <- twn_tws %>%
-  filter(sample_number %in% twns_trips) %>%
-  nrow() 
-twns_thrice #13
-
-# how many samples assayed twice (no trips)
-gn_twice <- gn %>%
-  filter(sample_number %in% gn_dups) %>%
-  nrow() 
-gn_twice #25
-
-(gn_twice + twns_twice)/ nrow(neo_data_no_info) # 14.6% assayed twice
-twns_thrice/ nrow(neo_data_no_info) # 2.3% assayed thrice
 
 
 # --- save to data merge ----
@@ -187,6 +169,13 @@ nrow(neo_data_full)
 names(cp_raw)
 names(neo_data_full)
 
+# check that cp and neo data have same data for SG and Cr
+cp_sample_sgcr <- cp_raw %>% select(sample_number, SG, Cr)
+neo_sample_sgcr <- neo_data_full %>% select(sample_number, SG, Cr)
+left_join(cp_sample_sgcr, neo_sample_sgcr, by = "sample_number") %>%
+  filter(SG.x != SG.y | Cr.x != Cr.y)
+
+
 #save(cp_raw, file = "cp dataset full.Rdata")
 
 
@@ -205,7 +194,8 @@ behav_data_month <- act_budget %>%
 #save(behav_data_month, file = "behav dataset month.Rdata")
 
 
-# graveyard ----
+
+# exploration ----
 # --- examine twn tws 2x neo repeats ####
 twns_dups <- twn_twsx %>%
   count(sample_number) %>%
@@ -265,3 +255,22 @@ hi_cv_dups <- gnx %>%
   count(sample_number) %>%
   filter(n > 1) %>%
   pull(sample_number)
+
+# --- for methods - how many samples used assayed multiple times ----
+twns_twice <- twn_tws %>%
+  filter(sample_number %in% twns_dups) %>%
+  nrow() 
+twns_twice #57
+twns_thrice <- twn_tws %>%
+  filter(sample_number %in% twns_trips) %>%
+  nrow() 
+twns_thrice #13
+
+# how many samples assayed twice (no trips)
+gn_twice <- gn %>%
+  filter(sample_number %in% gn_dups) %>%
+  nrow() 
+gn_twice #25
+
+(gn_twice + twns_twice)/ nrow(neo_data_no_info) # 14.6% assayed twice
+twns_thrice/ nrow(neo_data_no_info) # 2.3% assayed thrice
