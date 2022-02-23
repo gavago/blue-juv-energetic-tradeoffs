@@ -27,9 +27,9 @@ twn_twsx <- read.csv("Neo shared w Josh C/updated draft assign neo value.csv") %
     sample_number %in% test_samp & plate_number == 11 ~ "Test to remove",
     TRUE ~ note
   ))
-nrow(twn_twsx)
+nrow(twn_twsx) #498
 
-str(twn_twsx)
+#values out of range are NA
 twn_twsx[!is.na(twn_twsx) & twn_twsx == "Range?"] <- NA
 
 twn_twsx %<>%
@@ -37,71 +37,14 @@ twn_twsx %<>%
          date_assayed = as.Date(date, format = "%m/%d/%y"),
          CV = as.numeric(CV)) %>%
   select(-date)
+nrow(twn_twsx)
 
-# --- examine 2x repeats ####
-twns_dups <- twn_twsx %>%
-  count(sample_number) %>%
-  filter(n == 2) %>%
-  pull(sample_number)
-
-# any dups where both CVs too high?
-high_twns_dups <- twn_twsx %>%
-  filter(sample_number %in% twns_dups) %>%
-  arrange(sample_number) %>%
-  filter(CV > 20) %>%
-  count(sample_number) %>%
-  filter(n > 1) %>%
-  pull(Sample_number)
-
-twn_twsx %>%
-  filter(sample_number %in% high_dups) %>%
-  arrange(sample_number)
-  
-# --- examine 3x repeats ----
- # remove all w filter CV
-                
-twns_trips <- twn_twsx %>%
-  count(sample_number) %>%
-  filter(n == 3) %>%
-  pull(sample_number)
-
-# any where all CVs > 20   
-high_twns_trips <- twn_twsx %>%
-  filter(sample_number %in% twns_trips) %>%
-  filter(CV > 20) %>%
-  arrange(sample_number) %>%
-  count(sample_number) %>%
-  filter(n > 2) %>%
-  pull(sample_number)
-
-twn_twsx %>%
-  filter(sample_number %in% high_twns_trips) %>%
-  arrange(sample_number)
-
-twn_twsx %>%
-  mutate(final_conc =  dilution * NEO_value) %>%
-  summarise(min = min(final_conc, na.rm = T) , max = max(final_conc, na.rm = T))
-
-range(twn_twsx$NEO_value, na.rm = T)
 # 1B. GN data ----
 gnx <- read.csv("Neo shared w Josh C/Updated GN results.csv") %>%
   filter(!is.na(sample_number)) %>%
   select(- Taken_From, - notes.for.josh, - SD) %>%
   rename(dilution = neo_dilution, plate_number = plate, note = notes) %>%
   mutate(date_assayed = mdy(date_assayed))
-
-# ---- examine 2x repeats -----
-gn_dups <- gnx %>%
-  count(sample_number) %>%
-  filter(n > 1) %>%
-  pull(sample_number)
-
-hi_cv_dups <- gnx %>%
-  filter(sample_number %in% gn_dups) %>%
-  filter(CV > 20) %>%
-  count(sample_number) %>%
-  filter(n > 1) %>%
-  pull(sample_number)
 
 # 1C. clean up n bind -----
 
@@ -166,6 +109,11 @@ twns_thrice/ nrow(neo_data_no_info) # 2.3% assayed thrice
 
 load("cleaned neo values to merge.Rdata", verbose = T)
 load("/Users/nicolethompsongonzalez/Dropbox/2. R projects/Juvenile blues (diss)/Juvenile data and field/Data/3. Behavior data by month/Rdata files month/Juv LH month.Rdata", verbose = T)
+lh.mo_merge <- lh.mo %>%
+  mutate(year = year(month), month = month(month)) 
+
+apply(neo_data_no_info, 2, function(x) sum(is.na(x)))
+apply(lh.mo_merge, 2, function(x) sum(is.na(x)))
 
 sample_info <- read_xlsx("Neo shared w Josh C/Neo values complete to fill in.xlsx") %>%
   select(group, subj, date, time, sample_number, Cr, SG) %>%
@@ -178,10 +126,6 @@ sample_info <- read_xlsx("Neo shared w Josh C/Neo values complete to fill in.xls
   mutate(time = strptime(time, format = "%H:%M")) %>%
   distinct() # removes one duplicate line, sample 18 burn 
 
-lh.mo_merge <- lh.mo %>%
-  mutate(year = year(month), month = month(month)) 
-head(lh.mo_merge)
-
 
 neo_data_full <- 
   left_join(sample_info, lh.mo_merge, by = c("group", "subj", "year", "month")) %>%
@@ -190,19 +134,12 @@ neo_data_full <-
   mutate(month = month(date), year = year(date), Cr = as.numeric(Cr)) %>%
   rename(neo_dilution = dilution, neo_date_assayed = date_assayed, neo_plate_number = plate_number, neo_note = note) %>%
     select(group, subj, sex, age, year, month, sample_number, date, time, everything())
+nrow(neo_data_full) #620
 
-View(neo_data_full)
-
-# how many subj represened w different numbers of samples per month, 
-# majority are at 2 samples
-neo_data_full %>%
-  filter(!is.na(neo_value)) %>% 
-  count(subj, month, year) %>% # nrow() #300 subj months
-  count(n) 
 
 #save(neo_data_full, file = "neo dataset full.Rdata")
 
-# see why 50 samples don't have neo value ----
+# -- see why 50 samples don't have neo value ----
 anti_join(sample_info %>% filter(group != "twn" & group != "tws"), gn, by = "sample_number") %>% View()
 
 anti_join(sample_info, neo_data_no_info, by = "sample_number") %>% 
@@ -212,9 +149,16 @@ anti_join(sample_info, neo_data_no_info, by = "sample_number") %>%
 
 
 
+# -- how many subj represented w different numbers of samples per month ----
+# majority are at 2 samples
+neo_data_full %>%
+  filter(!is.na(neo_value)) %>% 
+  count(subj, month, year) %>% # nrow() #300 subj months
+  count(n) 
 # 2A. Format CP data # ----
 
 cp_raw1 <- read.csv("/Users/nicolethompsongonzalez/Dropbox/2. R projects/Juvenile blues (diss)/Juv analysis/Lab work/UCPs/Std_UCP.csv", stringsAsFactors = F)
+
 cp_raw <- cp_raw1 %>%
   select(-X, -period) %>%
   mutate(date = mdy(date), Cr.date = mdy(Cr.date),
@@ -224,15 +168,11 @@ cp_raw <- cp_raw1 %>%
   rename(cp_assay_date = run.date, cp_run = run, cp_dilution = dilution,
          sample_number = NUMBER, cp_batch = batch, cp_note = notes)
 names(cp_raw)
-nrow(cp_raw)
+nrow(cp_raw) 
 
 str(cp_raw)
-# cp_raw1 %>%
-#   mutate(pg.ml_ucp_num = as.numeric(pg.ml_ucp)) %>%
-#   select(pg.ml_ucp, pg.ml_ucp_num) %>% 
-#   filter(pg.ml_ucp == "-")
 
-#going to check how stdsg CP  calculated, by comparing to newly calculated
+#checking how stdsg CP  calculated, by comparing to newly calculated
 # sg_std_check <- cp_raw %>%
 #   #value is already calculated with dilution, think that was the case of what needed to be entered in wizard/gamma counter.
 #   mutate(sg.corr.fac = mean(SG, na.rm = T)/SG) %>%
@@ -240,6 +180,7 @@ str(cp_raw)
 #   select(SG, cp_dilution, pg.ml_ucp, stdsg_CP, stdsg_CP1, sg.corr.fac) 
 # sg_std_check %>%
 #   filter(ceiling(stdsg_CP) != ceiling(stdsg_CP1)) # round bc diff in small binary computation
+# calculated correctly
 
 nrow(cp_raw)
 nrow(neo_data_full)
@@ -263,46 +204,64 @@ behav_data_month <- act_budget %>%
 
 #save(behav_data_month, file = "behav dataset month.Rdata")
 
-# all bind together well? -----
 
-load("neo dataset full.Rdata", verbose = T)
-load("cp dataset full.Rdata", verbose = T)
-load("behav dataset month.Rdata", verbose = T)
+# graveyard ----
+# --- examine twn tws 2x neo repeats ####
+twns_dups <- twn_twsx %>%
+  count(sample_number) %>%
+  filter(n == 2) %>%
+  pull(sample_number)
 
-#write.csv(neo_data_full, file = "neo dataset full.csv", row.names = F)
-#write.csv(cp_raw, file = "cp dataset full.csv", row.names = F)
-#write.csv(behav_data_month, file = "behav dataset month.csv", row.names = F)
+# any dups where both CVs too high?
+high_twns_dups <- twn_twsx %>%
+  filter(sample_number %in% twns_dups) %>%
+  arrange(sample_number) %>%
+  filter(CV > 20) %>%
+  count(sample_number) %>%
+  filter(n > 1) %>%
+  pull(sample_number)
 
-x <- left_join(cp_raw, neo_data_full, by = "sample_number")
-x %>%
- filter(time.x != time.y) %>%
-  select(starts_with("time"))
+twn_twsx %>%
+  filter(sample_number %in% high_twns_dups) %>%
+  arrange(sample_number)
 
-intersect(names(neo_data_full), names(cp_raw)) %>%
-  intersect(names(behav_data_month))
+# --- examine twn tws 3x neo repeats ----
+# remove all later w filter CV
 
-jet_data <- left_join(cp_raw, neo_data_full, by = intersect(names(neo_data_full), names(cp_raw))) %>%
-  left_join(., behav_data_month) %>%
-  select(group, subj, date, age, year, month, time, sample_number, stdsg_CP, neo_sg, everything())
-names(jet_data)
+twns_trips <- twn_twsx %>%
+  count(sample_number) %>%
+  filter(n == 3) %>%
+  pull(sample_number)
 
+# any where all CVs > 20   
+high_twns_trips <- twn_twsx %>%
+  filter(sample_number %in% twns_trips) %>%
+  filter(CV > 20) %>%
+  arrange(sample_number) %>%
+  count(sample_number) %>%
+  filter(n > 2) %>%
+  pull(sample_number)
 
-# avg monthly neo
-neo_month <- neo_data_full %>%
-  group_by(month, subj) %>%
-  summarise(avg_neo_mo = mean(neo_sg, na.rm = T)) %>%
-  ungroup()
+twn_twsx %>%
+  filter(sample_number %in% high_twns_trips) %>%
+  arrange(sample_number)
 
+names(twn_twsx)
+twn_twsx %>%
+  mutate(final_conc =  dilution * neo_value) %>%
+  summarise(min = min(final_conc, na.rm = T) , max = max(final_conc, na.rm = T))
 
-#time of day effects model ------
-library(lmerTest)
-lmer(neo_sg ~ time + (1|subj), data = jet_data) %>% summary()
-lmer(stdsg_CP ~ time + (1|subj), data = jet_data) %>% summary()
-plot(jet_data$time, jet_data$neo_sg) # no time of day effects...
-plot(jet_data$time, jet_data$stdsg_CP) 
+range(twn_twsx$NEO_value, na.rm = T)
 
+# --- examine gn 2x neo repeats -----
+gn_dups <- gnx %>%
+  count(sample_number) %>%
+  filter(n > 1) %>%
+  pull(sample_number)
 
-lmer(neo_sg ~ scale(stdsg_CP) + (1|subj), data = jet_data) %>% summary()
-
-
-
+hi_cv_dups <- gnx %>%
+  filter(sample_number %in% gn_dups) %>%
+  filter(CV > 20) %>%
+  count(sample_number) %>%
+  filter(n > 1) %>%
+  pull(sample_number)
