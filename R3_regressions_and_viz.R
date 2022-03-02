@@ -1,7 +1,10 @@
-full_data <- read.csv("full dataset juv immune energetics.csv", header = T)
+full_data <- read.csv("full_dataset_juv_immune_energetics.csv", header = T)
 
 full_data$time <- unclass(as.POSIXct(full_data$time))
 
+
+full_data %>%
+  filter()
 
 # Exploration H1 - neo~cp & H2 cr-sg~cp, cr-sg~neo -------
 
