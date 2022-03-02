@@ -35,10 +35,10 @@ nrow(full_data) # 620
 
 # check out how many values NA per variable, should def be zero for age and sex
 apply(merged_data, 2, function(x) sum(is.na(x)))
-#write.csv(merged_data,  file = "merged data no lean body mass.csv", row.names = F)
+#write.csv(merged_data,  file = "merged_data_no_lean_body_mass.csv", row.names = F)
 
 # Add lean body mass - calculating cr-sg resids ------
-merged_data <- read.csv("merged data no lean body mass.csv", header = T)
+merged_data <- read.csv("merged_data_no_lean_body_mass.csv", header = T)
 
 merged_data %>%
   filter(sex == "M") %>%
@@ -55,15 +55,31 @@ full_data <- merged_data %>%
   mutate(expected_cr = (SG/100) * slope_crsg, cr_resid = Cr - expected_cr) %>%
   select(-expected_cr)
 
-#write.csv(full_data, file = "full dataset juv immune energetics.csv", row.names = F)
+str(full_data)
+
+#write.csv(full_data, file = "full_dataset_juv_immune_energetics.csv", row.names = F)
 
 
 # Validation of cr-sg by relationship with age, sex, and c-peptide ------
-full_data %>%
-  #filter(sex == "M") %>%
-  ggplot(., aes(x = age, y = cr_resid, color = sex)) +
-  geom_point() +
-  geom_smooth(method = "lm")
+
+full_data %>% #sex == "M"
+  ggplot() +
+  geom_point(data = full_data %>% filter(subj == "amos"), 
+             aes(x = age, y = cr_resid, color = "red")) +
+  geom_smooth(data = full_data %>% filter(subj == "amos"), 
+              aes(x = age, y = cr_resid, color = "red"),
+              method = "lm") +
+  geom_point(data = full_data, 
+             aes(x = age, y = cr_resid), alpha = 0.1) +
+  geom_smooth(data = full_data, 
+              aes(x = age, y = cr_resid),
+              method = "lm")
+
+full_data %>% 
+  ggplot() +
+  geom_point(aes(x = age, y = cr_resid, color = sex), alpha = 0.3) +
+  geom_smooth(aes(x = age, y = cr_resid, color = sex), method = "lm") +
+  theme_minimal()
 
 df_cr_resid %>%
   ggplot(., aes(x = sex, y = cr_resid)) +
