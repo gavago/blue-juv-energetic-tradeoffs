@@ -25,6 +25,7 @@ biomarker_df = pd_cp_dataset.merge(pd_neo_dataset, on=cp_neo_merge_list)
 merge_list = ['month', 'year', 'subj']
 bio_behav_merge_df = pd.merge(biomarker_df, pd_behav_dataset, how='left', on=merge_list)
 bio_behav_merge_df["date"] = pd.to_datetime(bio_behav_merge_df['date'])
+print(bio_behav_merge_df)
 bio_behav_merge_df.to_csv("merged dataset.csv")
 
 
@@ -46,7 +47,7 @@ print(freq_subj_mo_yr_df)
 
 #average frequency per month
 avg_subj_mo = freq_subj_mo_yr_df.groupby([ 'month'])['count'].mean()
-print(avg_subj_mo)
+print(avg_subj_mo.describe())
 
 
 
