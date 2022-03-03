@@ -90,9 +90,9 @@ names(neo_data_no_info)
 # 1D. merge sample info with neo data ------
 
 load("cleaned neo values to merge.Rdata", verbose = T)
-load("/Users/nicolethompsongonzalez/Dropbox/2. R projects/Juvenile blues (diss)/Juvenile data and field/Data/3. Behavior data by month/Rdata files month/Juv LH month.Rdata", verbose = T)
+load("/Users/nicolethompsongonzalez/Dropbox/2_R projects/Juvenile blues diss/Juvenile data and field/Data/3. Behavior data by month/Rdata files month/Juv LH month.Rdata", verbose = T)
 lh.mo_merge <- lh.mo %>%
-  mutate(year = year(month), month = month(month)) 
+  mutate(year = lubridate::year(month), month = lubridate::month(month)) 
 
 apply(neo_data_no_info, 2, function(x) sum(is.na(x)))
 apply(lh.mo_merge, 2, function(x) sum(is.na(x)))
@@ -101,24 +101,25 @@ apply(lh.mo_merge, 2, function(x) sum(is.na(x)))
 sample_info <- read_xlsx("Neo sample info template.xlsx") %>%
   select(group, subj, date, time, sample_number, Cr, SG) %>%
   mutate(SG = as.numeric(SG), Cr = as.numeric(Cr), 
-         date = date(date)) %>%
-  mutate(year = year(date), month = month(date)) %>%
+         date = lubridate::date(date)) %>%
+  mutate(year = lubridate::year(date), month = lubridate::month(date)) %>%
   mutate(time_char = as.character(time)) %>%
   separate(time_char, into = c("xdate", "time"), sep = " ") %>%
   select(-xdate) %>%
   mutate(time = strptime(time, format = "%H:%M")) %>%
   distinct() # removes one duplicate line, sample 18 burn 
-
+#NAs introduced by coercion is ok
 
 neo_data_full <- 
   left_join(sample_info, lh.mo_merge, by = c("group", "subj", "year", "month")) %>%
   left_join(., neo_data_no_info) %>%
   mutate(SG_corr_fac = mean(SG, na.rm = T)/SG, neo_sg = neo_value*SG_corr_fac*dilution) %>%
-  mutate(month = month(date), year = year(date), Cr = as.numeric(Cr)) %>%
+  mutate(month = lubridate::month(date), year = lubridate::year(date), Cr = as.numeric(Cr)) %>%
   rename(neo_dilution = dilution, neo_date_assayed = date_assayed, neo_plate_number = plate_number, neo_note = note) %>%
-    select(group, subj, sex, age, year, month, sample_number, date, time, everything())
+    select(group, subj, sex, age, year, month, sample_number, date, time, everything()) %>%
+  rename(neo_CV = CV)
 nrow(neo_data_full) #620
-
+names(neo_data_full)
 
 #save(neo_data_full, file = "neo dataset full.Rdata")
 
@@ -140,7 +141,7 @@ neo_data_full %>%
   count(n) 
 # 2A. Format CP data # ----
 
-cp_raw1 <- read.csv("/Users/nicolethompsongonzalez/Dropbox/2. R projects/Juvenile blues (diss)/Juv analysis/Lab work/UCPs/Std_UCP.csv", stringsAsFactors = F)
+cp_raw1 <- read.csv("/Users/nicolethompsongonzalez/Dropbox/2_R projects/Juvenile blues diss/Juv analysis/Lab work/UCPs/Std_UCP.csv", stringsAsFactors = F)
 
 cp_raw <- cp_raw1 %>%
   select(-X, -period) %>%
