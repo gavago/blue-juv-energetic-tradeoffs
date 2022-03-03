@@ -1,3 +1,7 @@
+library(lmerTest)
+library(tidyverse)
+library(mgcv)
+
 full_data <- read.csv("full_dataset_juv_immune_energetics.csv", header = T)
 
 full_data$time <- unclass(as.POSIXct(full_data$time))
@@ -6,32 +10,51 @@ full_data$time <- unclass(as.POSIXct(full_data$time))
 full_data %>%
   filter()
 
-# Exploration H1 - neo~cp & H2 cr-sg~cp, cr-sg~neo -------
+# Descriptives -------
+# --- intra-assay CVs -----
+
+# --- neo, cp, cr_resid by age ----
+for_gam <- full_data %>% 
+  select(neo_sg, stdsg_CP, age, sex, subj) %>%
+  mutate(subj = as.factor(subj)) %>%
+  na.omit()
+
+neo_age_lm <- glmer(neo_sg ~ sex + scale(age) + sex*scale(age) + (1|subj), family = Gamma("log"), data = full_data)
+qqnorm(residuals(neo_age_lm))
+summary(neo_age_lm) # no relationship neo and age
+
+cp_age_lm <- glmer(stdsg_CP ~ sex + scale(age) + sex*scale(age) + (1|subj), family = Gamma("log"), data = full_data)
+qqnorm(residuals(cp_age_lm))
+summary(cp_age_lm) # cp higher males than females, and increase w age, same as previously reported Thompson HB
+
+lbm_age_lm <- lmer(cr_resid ~ sex + scale(age) + sex*scale(age) + (1|subj), data = full_data)
+qqnorm(residuals(lbm_age_lm))
+summary(lbm_age_lm) # strong increase lbm with age
+
+
 
 # H1 - neo cp - regression and viz ------
-#viz
+
+# neo by age
+full_data %>%
+  filter(neo_sg < 3000) %>%
+  ggplot(., aes(y = neo_sg, x = age, color = sex)) +
+  geom_point() +
+  geom_smooth(method = "loess")
+
+# neo by CP
 full_data %>%
   filter(neo_sg < 3000) %>%
   ggplot(., aes(y = neo_sg, x = stdsg_CP, color = sex)) +
   geom_point() +
   geom_smooth(method = "lm") #highest cp values are low neo
 
-# non linear relationship...
-for_gam <- fulld_data %>% 
-  select(neo_sg, stdsg_CP, age, sex, subj) %>%
-  mutate(subj = as.factor(subj)) %>%
-  na.omit()
-neo_cp_gam <- gam(neo_sg ~ sex + s(stdsg_CP, k = 5) + s(age, k = 5) + s(subj, bs = "re"), family = gaussian("log"), data = for_gam)
-gam.check(neo_cp_gam)
-plot.gam(neo_cp_gam, pages = 1)
-summary(neo_cp_gam)
-
 
 # expected linear relationship
-neo_cp_lm <- glmer(neo_sg ~ sex + scale(stdsg_CP) + scale(age) + (1|subj), family = Gamma("log"), data = fulld_data)
+neo_cp_lm <- glmer(neo_sg ~ sex + scale(stdsg_CP) + scale(age) + (1|subj), family = Gamma("log"), data = full_data)
 qqnorm(residuals(neo_cp_lm))
 summary(neo_cp_lm)
-
+hist(full_data$neo_sg)
 
 # H2 - cr_sg neo - regression and viz  ------
 
