@@ -39,7 +39,7 @@ twn_twsx %<>%
          CV = as.numeric(CV)) %>%
   select(-date)
 nrow(twn_twsx) #498
- 
+
 # 1B. GN data ----
 gnx <- read.csv("Neo shared w Josh C/Updated GN results.csv") %>%
   filter(!is.na(sample_number)) %>%
@@ -85,11 +85,11 @@ names(neo_data_no_info)
 
 # --- save to data merge ----
 
-#save(twn_tws, gn, neo_data_no_info, file = "cleaned neo values to merge.Rdata")
+#save(twn_tws, gn, neo_data_no_info, file = "data/cleaned neo values to merge.Rdata")
 
 # 1D. merge sample info with neo data ------
 
-load("cleaned neo values to merge.Rdata", verbose = T)
+load("data/cleaned neo values to merge.Rdata", verbose = T)
 load("/Users/nicolethompsongonzalez/Dropbox/2_R projects/Juvenile blues diss/Juvenile data and field/Data/3. Behavior data by month/Rdata files month/Juv LH month.Rdata", verbose = T)
 lh.mo_merge <- lh.mo %>%
   mutate(year = lubridate::year(month), month = lubridate::month(month)) 
@@ -98,7 +98,7 @@ apply(neo_data_no_info, 2, function(x) sum(is.na(x)))
 apply(lh.mo_merge, 2, function(x) sum(is.na(x)))
 
 # only use sample info from template - not any miscellaneous values.
-sample_info <- read_xlsx("Neo sample info template.xlsx") %>%
+sample_info <- read_xlsx("data/Neo sample info template.xlsx") %>%
   select(group, subj, date, time, sample_number, Cr, SG) %>%
   mutate(SG = as.numeric(SG), Cr = as.numeric(Cr), 
          date = lubridate::date(date)) %>%

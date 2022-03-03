@@ -2,7 +2,7 @@ library(lmerTest)
 library(tidyverse)
 library(mgcv)
 
-full_data <- read.csv("full_dataset_juv_immune_energetics.csv", header = T)
+full_data <- read.csv("data/full_dataset_juv_immune_energetics.csv", header = T)
 
 full_data$time <- unclass(as.POSIXct(full_data$time))
 
@@ -73,7 +73,10 @@ summary(crsg_neo_lm)
 
 
 # time of day effects ------
-str(full_data)
+str(full_datax)
+
+full_datax <- full_data %>%
+  mutate(time = strptime(time, format = "%H:%M"))
 
 lmer(neo_sg ~ time + (1|subj), data = full_data) %>% summary()
 lmer(stdsg_CP ~ time + (1|subj), data = full_data) %>% summary()
