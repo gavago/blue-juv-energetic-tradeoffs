@@ -7,11 +7,37 @@ full_data <- read.csv("data/full_dataset_juv_immune_energetics.csv", header = T)
 full_data$time <- unclass(as.POSIXct(full_data$time))
 
 
-full_data %>%
-  filter()
-
 # Descriptives -------
 # --- intra-assay CVs -----
+cp_cv <- read.csv("data/CP_IntraassayCV.csv", header = T)
+str(cp_cv)
+
+#average high and low control CVs
+cp_cv %>%
+  filter(grepl("Control", sample)) %>%
+  group_by(sample) %>%
+  summarise(inter_cv = mean(CV)) %>%
+  ungroup()
+
+# isolate samples CVs
+cv_num <- cp_cv %>%
+  filter(!grepl("Control", sample)) %>%
+  filter(!grepl("Standard", sample)) %>%
+  filter(!grepl("x", sample)) %>%
+  filter(!grepl("redo", notes)) %>%
+  mutate(sample_number = as.numeric(sample)) %>%
+  select(sample_number, CV, notes)
+
+# find intra-assay CV of samples in full dataset
+full_data %>%
+  select(sample_number, stdsg_CP) %>%
+  left_join(., cv_num) %>%
+  summarise(mean = mean(CV, na.rm = T))
+
+nrow(full_data)
+
+
+cv_num$sample
 
 # --- neo, cp, cr_resid by age ----
 for_gam <- full_data %>% 
