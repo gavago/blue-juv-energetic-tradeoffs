@@ -17,7 +17,7 @@ library(lubridate)
 # mark them as test for filtering
 test_samp <- c(7, 21, 35, 82, 87, 99, 140, 151, 165)
 
-twn_twsx <- read.csv("Neo shared w Josh C/updated draft assign neo value.csv") %>%
+twn_twsx <- read.csv("Neo_shared_w_Josh_C/updated draft assign neo value.csv") %>%
   filter(!is.na(Sample_number)) %>%
   mutate(OG_Data_Set = as.numeric(gsub("A", "", OG_Data_Set))) %>%
   mutate(plate_number = OG_Data_Set + 6) %>%
@@ -41,7 +41,7 @@ twn_twsx %<>%
 nrow(twn_twsx) #498
 
 # 1B. GN data ----
-gnx <- read.csv("Neo shared w Josh C/Updated GN results.csv") %>%
+gnx <- read.csv("Neo_shared_w_Josh_C/Updated GN results.csv") %>%
   filter(!is.na(sample_number)) %>%
   select(- Taken_From, - notes.for.josh, - SD) %>%
   rename(dilution = neo_dilution, plate_number = plate, note = notes) %>%
@@ -121,7 +121,7 @@ neo_data_full <-
 nrow(neo_data_full) #620
 names(neo_data_full)
 
-#save(neo_data_full, file = "neo dataset full.Rdata")
+#save(neo_data_full, file = "data/neo dataset full.Rdata")
 
 # -- see why 50 samples don't have neo value ----
 anti_join(sample_info %>% filter(group != "twn" & group != "tws"), gn, by = "sample_number") %>% View()
@@ -152,7 +152,7 @@ cp_raw <- cp_raw1 %>%
   rename(cp_assay_date = run.date, cp_run = run, cp_dilution = dilution,
          sample_number = NUMBER, cp_batch = batch, cp_note = notes)
 names(cp_raw)
-nrow(cp_raw) 
+nrow(cp_raw)#620
 
 str(cp_raw)
 
@@ -178,12 +178,12 @@ left_join(cp_sample_sgcr, neo_sample_sgcr, by = "sample_number") %>%
   filter(SG.x != SG.y | Cr.x != Cr.y)
 
 
-#save(cp_raw, file = "cp dataset full.Rdata")
+#save(cp_raw, file = "data/cp dataset full.Rdata")
 
 
 # 3a. Monthly rate of play -----
-load("/Users/nicolethompsongonzalez/Dropbox/2. R projects/Juvenile blues (diss)/Rewrite chapter 3 2021/scripts of Juv social preferences for rewrite/data/juv monthly activity budgets.Rdata", verbose = T)
-nrow(act_budget)
+load("/Users/nicolethompsongonzalez/Dropbox/2_R projects/Juvenile blues diss/Rewrite chapter 3 2021/scripts of Juv social preferences for rewrite/data/juv monthly activity budgets.Rdata", verbose = T)
+nrow(act_budget) #323
 head(act_budget)
 names(act_budget)
 str(act_budget)
@@ -193,7 +193,7 @@ behav_data_month <- act_budget %>%
   mutate(year = year(month), month = month(month)) %>%
   select(subj, month, year, month_name, pl, gmd, gm, r, n_agg_g, n_agg_r, n_obs)
 
-#save(behav_data_month, file = "behav dataset month.Rdata")
+#save(behav_data_month, file = "data/behav dataset month.Rdata")
 
 
 
