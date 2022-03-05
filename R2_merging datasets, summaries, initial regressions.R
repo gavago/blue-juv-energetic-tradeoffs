@@ -41,7 +41,8 @@ View(merged_data)
 
 # check out how many values NA per variable, should def be zero for age and sex
 apply(merged_data, 2, function(x) sum(is.na(x)))
-#write.csv(merged_data,  file = "merged_data_no_lean_body_mass.csv", row.names = F)
+
+#write.csv(merged_data,  file = "data/merged_data_no_lean_body_mass.csv", row.names = F)
 
 # Add lean body mass - calculating cr-sg resids ------
 merged_data <- read.csv("data/merged_data_no_lean_body_mass.csv", header = T)
