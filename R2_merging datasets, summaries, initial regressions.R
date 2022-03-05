@@ -5,9 +5,9 @@ library(lubridate)
 library(mgcv)
 library(lmerTest)
 
-load("neo dataset full.Rdata", verbose = T)
-load("cp dataset full.Rdata", verbose = T)
-load("behav dataset month.Rdata", verbose = T)
+load("data/neo dataset full.Rdata", verbose = T)
+load("data/cp dataset full.Rdata", verbose = T)
+load("data/behav dataset month.Rdata", verbose = T)
 
 # save each Rdata dataset to CV ----
 # write.csv(neo_data_full, file = "neo dataset full.csv", row.names = F)
@@ -27,18 +27,24 @@ load("behav dataset month.Rdata", verbose = T)
 # intersect(names(neo_data_full), names(cp_raw)) %>%
 #   intersect(names(behav_data_month))
 
-merged_data <- left_join(cp_raw, neo_data_full, by = intersect(names(neo_data_full), names(cp_raw))) %>%
+# x <- neo_data_full %>% arrange(sample_number)
+# y <- cp_raw %>% arrange(sample_number)
+# all(x$time == y$time) # amazing, if cp_raw and neo aren't saved on the same day then they're times aren't the same
+
+
+merged_data <- left_join( neo_data_full, cp_raw, by = intersect(names(neo_data_full), names(cp_raw))) %>%
   left_join(., behav_data_month) %>%
   select(group, subj, date, age, year, month, time, sample_number, stdsg_CP, neo_sg, everything())
-nrow(full_data) # 620
+nrow(merged_data) # 620
 
+View(merged_data)
 
 # check out how many values NA per variable, should def be zero for age and sex
 apply(merged_data, 2, function(x) sum(is.na(x)))
 #write.csv(merged_data,  file = "merged_data_no_lean_body_mass.csv", row.names = F)
 
 # Add lean body mass - calculating cr-sg resids ------
-merged_data <- read.csv("merged_data_no_lean_body_mass.csv", header = T)
+merged_data <- read.csv("data/merged_data_no_lean_body_mass.csv", header = T)
 
 merged_data %>%
   filter(sex == "M") %>%
@@ -57,17 +63,22 @@ full_data <- merged_data %>%
 
 str(full_data)
 
-#write.csv(full_data, file = "full_dataset_juv_immune_energetics.csv", row.names = F)
+#write.csv(full_data, file = "data/full_dataset_juv_immune_energetics.csv", row.names = F)
 
 
-# Validation of cr-sg by relationship with age, sex, and c-peptide ------
+# Validation of cr_resid by relationship with age, sex, and c-peptide ------
 
-full_data %>% #sex == "M"
+#sex == "M"
   ggplot() +
-  geom_point(data = full_data %>% filter(subj == "amos"), 
-             aes(x = age, y = cr_resid, color = "red")) +
-  geom_smooth(data = full_data %>% filter(subj == "amos"), 
-              aes(x = age, y = cr_resid, color = "red"),
+  geom_point(data = full_data %>% filter(subj == "allo"), 
+             aes(x = age, y = cr_resid), color = "red") +
+  geom_smooth(data = full_data %>% filter(subj == "allo"), 
+              aes(x = age, y = cr_resid), color = "red",
+              method = "lm") +
+  geom_point(data = full_data %>% filter(subj == "brog"), 
+             aes(x = age, y = cr_resid), color = "green") +
+  geom_smooth(data = full_data %>% filter(subj == "brog"), 
+              aes(x = age, y = cr_resid),color = "green",
               method = "lm") +
   geom_point(data = full_data, 
              aes(x = age, y = cr_resid), alpha = 0.1) +
@@ -95,6 +106,8 @@ crsg_cp_lm <- lmer(cr_resid ~ sex + scale(stdsg_CP) + scale(age) + (1|subj), dat
 qqnorm(residuals(crsg_cp_lm))
 summary(crsg_cp_lm)
 
+library(lme4)
+lmer(neo_sg ~ sex + scale(age) + scale(gm) + scale(stdsg_CP) + +  (1|subj), data = full_data)
 
 
 # graveyard ----
