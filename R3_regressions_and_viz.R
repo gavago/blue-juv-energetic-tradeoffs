@@ -8,7 +8,7 @@ full_data$time <- unclass(as.POSIXct(full_data$time))
 
 
 # Descriptives -------
-# --- intra-assay CVs -----
+# --- CP CVs -----
 cp_cv <- read.csv("data/CP_IntraassayCV.csv", header = T)
 str(cp_cv)
 
@@ -38,6 +38,10 @@ nrow(full_data)
 
 
 cv_num$sample
+
+# --- Neo CVs -----
+full_data %>% 
+  summarise(mean = mean(neo_CV, na.rm = T))
 
 # --- neo, cp, cr_resid by age ----
 for_gam <- full_data %>% 
