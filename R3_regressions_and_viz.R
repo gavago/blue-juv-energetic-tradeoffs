@@ -70,15 +70,20 @@ full_data %>%
   filter(neo_sg < 3000) %>%
   ggplot(., aes(y = neo_sg, x = age, color = sex)) +
   geom_point() +
-  geom_smooth(method = "loess")
+  geom_smooth(method = "lm")
+
+
 
 # neo by CP
-full_data %>%
+neo_cp <- full_data %>%
   filter(neo_sg < 3000) %>%
   ggplot(., aes(y = neo_sg, x = stdsg_CP, color = sex)) +
   geom_point() +
-  geom_smooth(method = "lm") #highest cp values are low neo
-
+  geom_smooth(method = "lm") + #highest cp values are low neo
+  theme_minimal() +
+  theme(legend.position = "none") 
+neo_cp  
+ggsave(file = "results/neo by cp viz.pdf", plot = neo_cp)
 
 # expected linear relationship
 neo_cp_lm <- glmer(neo_sg ~ sex + scale(stdsg_CP) + scale(age) + (1|subj), family = Gamma("log"), data = full_data)
@@ -90,15 +95,20 @@ hist(full_data$neo_sg)
 
 # now neo and cr_Sg
 #viz
-full_data %>%
+neo_crsg <- full_data %>%
   filter(neo_sg < 3000) %>%
-  ggplot(., aes(y = cr_resid, x = neo_sg, color = sex)) +
+  ggplot(., aes(x = cr_resid, y = neo_sg, color = sex)) +
   geom_point() +
-  geom_smooth(method = "lm")
+  geom_smooth(method = "lm") +
+  theme_minimal() +
+  theme(legend.position = "none") 
+neo_crsg
+ggsave(file = "results/neo by creatinine resid viz.pdf", plot = neo_crsg)
 
-crsg_neo_lm <- lmer(cr_resid ~ sex + scale(neo_sg) + scale(age) + (1|subj), data = full_data)
-qqnorm(residuals(crsg_neo_lm))
-summary(crsg_neo_lm)
+
+neo_crsg_lm <- lmer(neo_sg ~ sex + scale(cr_resid) + scale(age) + (1|subj), data = full_data)
+qqnorm(residuals(neo_crsg_lm))
+summary(neo_crsg_lm)
 
 
 
