@@ -83,7 +83,7 @@ neo_cp <- full_data %>%
   theme_minimal() +
   theme(legend.position = "none") 
 neo_cp  
-ggsave(file = "results/neo by cp viz.pdf", plot = neo_cp)
+ggsave(file = "results/neo by cp viz.jpg", plot = neo_cp, height = 4, width = 4)
 
 # expected linear relationship
 neo_cp_lm <- glmer(neo_sg ~ sex + scale(stdsg_CP) + scale(age) + (1|subj), family = Gamma("log"), data = full_data)
@@ -103,7 +103,7 @@ neo_crsg <- full_data %>%
   theme_minimal() +
   theme(legend.position = "none") 
 neo_crsg
-ggsave(file = "results/neo by creatinine resid viz.pdf", plot = neo_crsg)
+ggsave(file = "results/neo by creatinine resid viz.jpg", plot = neo_crsg, height = 4, width = 4)
 
 
 neo_crsg_lm <- lmer(neo_sg ~ sex + scale(cr_resid) + scale(age) + (1|subj), data = full_data)
