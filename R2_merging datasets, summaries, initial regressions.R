@@ -1,9 +1,9 @@
 library(tidyverse)
-library(readxl)
-library(magrittr)
-library(lubridate)
-library(mgcv)
-library(lmerTest)
+# library(readxl)
+# library(magrittr)
+# library(lubridate)
+# library(mgcv)
+ library(lmerTest)
 
 load("data/neo dataset full.Rdata", verbose = T)
 load("data/cp dataset full.Rdata", verbose = T)
@@ -48,19 +48,17 @@ apply(merged_data, 2, function(x) sum(is.na(x)))
 merged_data <- read.csv("data/merged_data_no_lean_body_mass.csv", header = T)
 
 merged_data %>%
-  filter(sex == "M") %>%
+  #filter(sex == "M") %>%
   #filter(subj == "dame") %>%
-  ggplot(., aes(y = Cr, x = SG/100, color = age)) +
+  ggplot(., aes(y = Cr, x = SG/100, color = sex)) +
   geom_point() +
   geom_smooth(method = "lm")
 
 m <- merged_data %>%
-  lm(Cr ~ I(SG/100) + I((SG/100)^2), data = .)
-slope_crsg <- coef(m)[[2]]
+  lm(Cr ~ I(SG/100) + I((SG/100)^2), data = ., na.action = na.exclude)
 
 full_data <- merged_data %>%
-  mutate(expected_cr = (SG/100) * slope_crsg, cr_resid = Cr - expected_cr) %>%
-  select(-expected_cr)
+  mutate(cr_resid = resid(m))
 
 str(full_data)
 
@@ -71,16 +69,16 @@ str(full_data)
 
 #sex == "M"
   ggplot() +
-  geom_point(data = full_data %>% filter(subj == "allo"), 
-             aes(x = age, y = cr_resid), color = "red") +
-  geom_smooth(data = full_data %>% filter(subj == "allo"), 
-              aes(x = age, y = cr_resid), color = "red",
-              method = "lm") +
-  geom_point(data = full_data %>% filter(subj == "brog"), 
-             aes(x = age, y = cr_resid), color = "green") +
-  geom_smooth(data = full_data %>% filter(subj == "brog"), 
-              aes(x = age, y = cr_resid),color = "green",
-              method = "lm") +
+  # geom_point(data = full_data %>% filter(subj == "allo"), 
+  #            aes(x = age, y = cr_resid), color = "red") +
+  # geom_smooth(data = full_data %>% filter(subj == "allo"), 
+  #             aes(x = age, y = cr_resid), color = "red",
+  #             method = "lm") +
+  # geom_point(data = full_data %>% filter(subj == "brog"), 
+  #            aes(x = age, y = cr_resid), color = "green") +
+  # geom_smooth(data = full_data %>% filter(subj == "brog"), 
+  #             aes(x = age, y = cr_resid),color = "green",
+  #             method = "lm") +
   geom_point(data = full_data, 
              aes(x = age, y = cr_resid), alpha = 0.1) +
   geom_smooth(data = full_data, 
