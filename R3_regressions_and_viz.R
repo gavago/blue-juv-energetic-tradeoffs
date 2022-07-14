@@ -72,8 +72,6 @@ full_data %>%
   geom_point() +
   geom_smooth(method = "lm")
 
-
-
 # neo by CP
 neo_cp <- full_data %>%
   filter(neo_sg < 3000) %>%
