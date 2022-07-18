@@ -54,11 +54,13 @@ merged_data %>%
   geom_point() +
   geom_smooth(method = "lm")
 
+
 m <- merged_data %>%
   lm(Cr ~ I(SG/100) + I((SG/100)^2), data = ., na.action = na.exclude)
+resids <- as.numeric(resid(m))
 
 full_data <- merged_data %>%
-  mutate(cr_resid = resid(m))
+  mutate(cr_resid = resids)
 
 str(full_data)
 
