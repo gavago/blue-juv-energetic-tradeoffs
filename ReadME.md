@@ -79,10 +79,26 @@ final value
 
 #### Behavioral dataset
 
-behav dataset, is a unique subject-month of behavioral observation, and
-variables. in here are proportion of observed time in a given behavioral
-activity (giving grooming, playing, etc.) or number of counts in a given
-month that a subject gave or received aggression.
+a row is a unique subject-month of behavioral observation. variables are proportion of observed time (point samples taken on the minute) in a given behavioral activity (giving grooming, playing, etc.) OR the number of times (all occurrence during focal follow) that a subject gave or received aggression.
+
+`pl`: proportion of observation time engaging in social play
+`gm`: proportion of observation time giving grooming to a partner
+`gmd`: "" receiving grooming from a partner
+`r`: "" sitting and resting (not feeding or socializing)
+`f`: "" feeding
+`m`: "" moving
+`sl`: "" sleeping
+`n_agg_g`: counts of aggression given
+`n_agg_r`: counts of aggression received
+`n_obs`: number of point samples taken, 1 record per minute
+Additional variables:
+`mrank`: maternal rank during study period (aug 2015-apr 2016) or mom's rank during last year of life if dead during study period
+`fai`: fruit availability based on the mid point estimate
+`fai_cat`: fai divided into high medium and low
+`avg_rain`: mean daily rainfall during the month
+
+### Added to merged dataset
+`cr_resid`:  residuals of a linear regression of sample creatinine over specific gravity, meant to approximate lean body mass
 
 ### Analysis
 
