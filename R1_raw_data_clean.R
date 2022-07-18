@@ -190,7 +190,7 @@ str(act_budget)
 
 behav_data_month <- act_budget %>%
   rename(subj = ID1, mrank = rank_ID1, fai = prod.ripe.mid) %>%
-  mutate(year = year(month), month = month(month)) %>%
+  mutate(year = lubridate::year(month), month = lubridate::month(month)) %>%
   select(subj, month, year, month_name, pl, gmd, gm, r, f, m, sl, n_agg_g, n_agg_r, n_obs, mrank, group, fai, fai_cat, avg_rain)
 
 #save(behav_data_month, file = "data/behav dataset month.Rdata")
