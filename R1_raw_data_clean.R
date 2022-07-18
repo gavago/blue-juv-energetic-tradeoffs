@@ -10,7 +10,7 @@ library(lubridate)
 # play immunity by cp
 
 
-# NEO
+# 1.NEO
 #### -----
 # 1A. TWN TWS ------
 #these samples tested a second time on plate 11, to see if dilution in freezer left an effect
@@ -139,7 +139,7 @@ neo_data_full %>%
   filter(!is.na(neo_value)) %>% 
   count(subj, month, year) %>% # nrow() #300 subj months
   count(n) 
-# 2A. Format CP data # ----
+# 2. CP ----
 
 cp_raw1 <- read.csv("/Users/nicolethompsongonzalez/Dropbox/2_R projects/Juvenile blues diss/Juv analysis/Lab work/UCPs/Std_UCP.csv", stringsAsFactors = F)
 
@@ -181,7 +181,7 @@ left_join(cp_sample_sgcr, neo_sample_sgcr, by = "sample_number") %>%
 #save(cp_raw, file = "data/cp dataset full.Rdata")
 
 
-# 3a. Monthly rate of play -----
+# 3. BEHAVIOR -----
 load("/Users/nicolethompsongonzalez/Dropbox/2_R projects/Juvenile blues diss/Rewrite chapter 3 2021/scripts of Juv social preferences for rewrite/data/juv monthly activity budgets.Rdata", verbose = T)
 nrow(act_budget) #323
 head(act_budget)
@@ -189,9 +189,9 @@ names(act_budget)
 str(act_budget)
 
 behav_data_month <- act_budget %>%
-  rename(subj = ID1) %>%
+  rename(subj = ID1, mrank = rank_ID1, fai = prod.ripe.mid) %>%
   mutate(year = year(month), month = month(month)) %>%
-  select(subj, month, year, month_name, pl, gmd, gm, r, n_agg_g, n_agg_r, n_obs)
+  select(subj, month, year, month_name, pl, gmd, gm, r, f, m, sl, n_agg_g, n_agg_r, n_obs, mrank, group, fai, fai_cat, avg_rain)
 
 #save(behav_data_month, file = "data/behav dataset month.Rdata")
 
