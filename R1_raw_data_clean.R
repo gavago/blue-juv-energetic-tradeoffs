@@ -197,6 +197,14 @@ behav_data_month <- act_budget %>%
 
 
 
+# 4. fGCs -------
+gc_raw <- read_csv("/Users/nicolethompsongonzalez/Dropbox/2_R projects/Juvenile blues diss/Juv analysis/Lab work/DPZ - fgcs/Final GC concentrations per sample.csv") %>%
+  select(-type) %>%
+  mutate(date = mdy(date),
+         month = month(date), year = year(date))
+
+#save(gc_raw, file = "data/fgc_data_by_sample.Rdata")
+
 # exploration ----
 # 
 # neo_data_no_info_unfiltered
