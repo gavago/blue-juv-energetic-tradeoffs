@@ -5,9 +5,10 @@ library(tidyverse)
 # library(mgcv)
  library(lmerTest)
 
-load("data/neo dataset full.Rdata", verbose = T)
-load("data/cp dataset full.Rdata", verbose = T)
-load("data/behav dataset month.Rdata", verbose = T)
+load("data/neo-dataset-full.Rdata", verbose = T)
+load("data/cp-dataset-full.Rdata", verbose = T)
+load("data/behav-dataset-month.Rdata", verbose = T)
+load("data/fgc_data_by_sample.Rdata", verbose = T)
 
 # save each Rdata dataset to CV ----
 # write.csv(neo_data_full, file = "neo dataset full.csv", row.names = F)

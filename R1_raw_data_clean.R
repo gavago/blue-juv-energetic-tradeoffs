@@ -85,11 +85,11 @@ names(neo_data_no_info)
 
 # --- save to data merge ----
 
-#save(twn_tws, gn, neo_data_no_info, file = "data/cleaned neo values to merge.Rdata")
+#save(twn_tws, gn, neo_data_no_info, file = "data/cleaned-neo-values-to-merge.Rdata")
 
 # 1D. merge sample info with neo data ------
 
-load("data/cleaned neo values to merge.Rdata", verbose = T)
+load("data/cleaned-neo-values-to-merge.Rdata", verbose = T)
 load("/Users/nicolethompsongonzalez/Dropbox/2_R projects/Juvenile blues diss/Juvenile data and field/Data/3. Behavior data by month/Rdata files month/Juv LH month.Rdata", verbose = T)
 lh.mo_merge <- lh.mo %>%
   mutate(year = lubridate::year(month), month = lubridate::month(month)) 
@@ -121,7 +121,7 @@ neo_data_full <-
 nrow(neo_data_full) #620
 names(neo_data_full)
 
-#save(neo_data_full, file = "data/neo dataset full.Rdata")
+#save(neo_data_full, file = "data/neo-dataset-full.Rdata")
 
 # -- see why 50 samples don't have neo value ----
 anti_join(sample_info %>% filter(group != "twn" & group != "tws"), gn, by = "sample_number") %>% View()
@@ -178,7 +178,7 @@ left_join(cp_sample_sgcr, neo_sample_sgcr, by = "sample_number") %>%
   filter(SG.x != SG.y | Cr.x != Cr.y)
 
 
-#save(cp_raw, file = "data/cp dataset full.Rdata")
+#save(cp_raw, file = "data/cp-dataset-full.Rdata")
 
 
 # 3. BEHAVIOR -----
@@ -193,7 +193,7 @@ behav_data_month <- act_budget %>%
   mutate(year = lubridate::year(month), month = lubridate::month(month)) %>%
   select(subj, month, year, month_name, pl, gmd, gm, r, f, m, sl, n_agg_g, n_agg_r, n_obs, mrank, group, fai, fai_cat, avg_rain)
 
-#save(behav_data_month, file = "data/behav dataset month.Rdata")
+#save(behav_data_month, file = "data/behav-dataset-month.Rdata")
 
 
 
