@@ -5,7 +5,7 @@ library(mgcv)
 
 full_data <- read.csv("data/full_dataset_juv_immune_energetics.csv", header = T)
 
-#neo and age
+# neo and age
 full_data %>% ggplot(aes(x = age, y = neo_sg, color = sex)) + geom_smooth(method = lm) + geom_point() + ylim(0,2000)
 
 neo_age_cor <- cor.test(formula = ~ neo_sg + age,
@@ -14,23 +14,22 @@ view(neo_age_cor)
 
 # positively correlated, makes sense given positive relationship btw cr and neo
 
-#age and cr
-full_data %>% ggplot(aes(x = age, y = Cr, color = sex)) + geom_smooth(method = lm) + geom_point()
-#not the relationship i would expect, if using cr and as proxy for weight/body size,
-#would anticipate faster growth rate for males 
+# age and cr_resid
+full_data %>% ggplot(aes(x = age, y = cr_resid, color = sex)) + geom_smooth(method = lm) + geom_point()
+# not the relationship i would expect, if using cr and as proxy for weight/body size,
+# would anticipate faster growth rate for males 
 
-#age and Cr
+# age and C peptide
 full_data %>% 
   ggplot(aes(x = age, y =  stdsg_CP, color = sex)) + geom_smooth(method = lm) + geom_point()
 
 
-#ignore
+# ignore
 full_data_no_hi_CP <- full_data %>% filter(stdsg_CP < 50000)
 
 full_data_no_hi_CP_reorder <- factor(full_data$fai_cat, levels=c("low", "med", "hi")) 
-view(full_data_no_hi_CP_reorder)
 
-#boxplots for food availability and biomarkers
+# boxplots for food availability and biomarkers
 boxplot(stdsg_CP~fai_cat,
         data = full_data_no_hi_CP, 
         main="Fruit availability and Energy Balance",
@@ -47,29 +46,27 @@ boxplot(neo_sg~fai_cat,
         col="light blue",
         border="dark blue")
 
-boxplot(Cr~fai_cat,
+boxplot(cr_resid~fai_cat,
         data = full_data,
         main="Fruit Availability and Lean Tissue",
         xlab="Fruit Availability",
         ylab="Creatinine",
         col="orange",
         border="black")
-
-full_data %>% group_by(age) %>% 
   
 full_data %>% ggplot(aes(x = fai_cat)) + geom_bar()
 
 full_data %>% filter(fai_cat == "low")  #346
 full_data %>% filter(fai_cat == "med") #117
 full_data %>% filter(fai_cat == "hi") #167
-#half are in low -- med and hi similar in size
+# half are in low -- med and hi similar in size
 
 neo_fai_cor <- cor.test(formula = ~ neo_sg + fai,
                        data = full_data)
 view(neo_fai_cor)
-#positive cor btw fruit availibity and neo
+# positive cor btw fruit availabity and neo
 
-#half are in low -- med and hi similar in size
+# half are in low -- med and hi similar in size
 
 # w higher neo values taken out, have low cp
 full_data %>%
@@ -78,7 +75,7 @@ full_data %>%
 # w linear regression model 
 full_data %>%
   ggplot(aes(x = neo_sg, y = stdsg_CP, color = sex)) + geom_smooth(method = lm) + geom_point() + xlim(0, 3000) + ylim(0, 50000) 
-#just to get better sense of general pattern w bulk of data
+# ust to get better sense of general pattern w bulk of data
 
 # all values included w linear regression 
 full_data %>% ggplot (aes(x = neo_sg, y = stdsg_CP, color = sex)) + geom_smooth(method = lm) + geom_point()
@@ -93,7 +90,7 @@ lm_cp_neo_no_hi_neo <- lm(stdsg_CP ~ neo_sg, data = full_data_no_high_neo)
 
 summary(lm_cp_neo_no_hi_neo)
 
-#significant positive correlation. higher energy balance, more energy able to allocate to immune function
+# significant positive correlation. higher energy balance, more energy able to allocate to immune function
 
 neo_CP_cor <- cor.test(formula = ~ neo_sg + stdsg_CP,
                        data = full_data)
@@ -103,21 +100,24 @@ view(neo_CP_cor)
 
 # Cr and CP
 full_data %>% 
-  ggplot(aes(x = Cr, y = stdsg_CP, color = sex)) + geom_smooth(method = lm) + xlim(0, 2) + ylim(0,40000)
-#higher energy balance positively correlated w amt of lean tissue
+  ggplot(aes(x = cr_resid, y = stdsg_CP, color = sex)) + geom_smooth(method = lm) + xlim(0, 2) + ylim(0,40000) + geom_point()
+# higher energy balance positively correlated w amt of lean tissue
 
-Cr_CP_cor <- cor.test(formula = ~ stdsg_CP + Cr,
+Cr_CP_cor <- cor.test(formula = ~ stdsg_CP + cr_resid,
                        data = full_data)
 view(Cr_CP_cor)
-#significant positive correlation
+# significant positive correlation
+
+full_data %>% ggplot(aes(x = neo_sg, y = cr_resid, color = sex)) + geom_smooth(method = lm) + geom_point() + xlim(0,3000)
+                  
+neo_cr_resid_cor <- cor.test(formula = ~ neo_sg + cr_resid,
+                       data = full_data)
+view(neo_cr_resid_cor)
+# significant positive correlation
 
 
 full_data %>% ggplot(aes(x = neo_sg, y = stdsg_CP, color = fai_cat)) + geom_smooth(method = lm) 
-
-neo_Cr_cor <- cor.test(formula = ~ neo_sg + Cr,
-                              data = full_data)
-view(neo_Cr_cor)
-
+# wee redundant
 boxplot(neo_sg~n_agg_r,
         data = full_data_no_hi_neo, 
         main="Neopterin and Aggression",
@@ -154,5 +154,11 @@ ggplot(full_data, aes(x = n_agg_r, y = neo_sg)) + geom_boxplot()
 
 full_data %>% 
   ggplot(aes(x = n_agg_r)) + geom_bar()
+
+full_data %>% ggplot(aes(x = pl, y = neo_sg, color = sex)) + geom_smooth(method = lm) + geom_point()
+# slight negative relationship? pretty wonky though
+
+full_data %>% ggplot(aes(x = age, y = pl, color = sex)) + geom_smooth(method = lm) + geom_point()
+# a mess
 
                      
