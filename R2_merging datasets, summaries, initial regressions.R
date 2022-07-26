@@ -45,19 +45,63 @@ str(full_udata)
 # Summarize udata and fgc data by month ------
 
 ### summarize & save udata -----
-full_udata <- read_csv("data/urine_sample_dataset_juv_immune_energetics.csv")
 
-str(full_udata)
-# group_by, summarize, 
+full_udata <- read_csv("data/urine_sample_dataset_juv_immune_energetics.csv")
+view(full_udata)
+
+udata_month_avg <- full_udata %>%
+  group_by(subj, month, year) %>% 
+  summarize(avg_neo_sg = mean(neo_sg), 
+            avg_cr_resid = mean(cr_resid), 
+            avg_stdsg_CP = mean(stdsg_CP),
+            weaning = weaning, sex = sex,
+            mum = mum,) %>% 
+  ungroup() %>% 
+  na.omit() %>% 
+  distinct() %>% 
+  as.data.frame()
+
+save(udata_month_avg, file = "data/udata_month_avg.Rdata", row.names = F)
 
 
 ### summarize & save fgcs ------
+
 load("data/fgc_data_by_sample.Rdata", verbose = T)
-str(gc_raw)
+view(gc_raw)
 
+fgc_month_avg <- gc_raw %>% 
+  group_by(subj, month, year) %>% 
+  summarize(avg_extraction_weight = mean(`extraction weight`), 
+            avg_5B.adiol.conc.50ml = mean(`5B.adiol.conc.50ml`),
+            avg_5B_dilution = mean(`5B dilution`),
+            avg_fgc.ng_g.feces = mean(fgc.ng_g.feces)) %>% 
+  ungroup() %>% 
+  na.omit() %>% 
+  distinct() %>% 
+  as.data.frame()
 
+save(fgc_month_avg, file = "data/fgc_month_avg.Rdata", row.names = F)
+
+view(fgc_month_avg)
 
 # Merge monthly data - urine, feces, behavior -----
+
+udata_fgc_month_avg <- left_join(udata_month_avg, fgc_month_avg, by = intersect(names(udata_month_avg), names(fgc_month_avg)))
+
+view(udata_gc_month_avg)
+
+full_data_month <- left_join(udata_fgc_month_avg, behav_data_month, by = intersect(names(udata_fgc_month_avg), names(behav_data_month)))
+
+view(full_data_month)
+
+# save r data
+save(full_data_month, file = "data/full_data_month_udata_fgc_behav.RData")
+
+load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
+
+# save csv
+write.csv(full_data_month,  file = "data/full_data_month_udata_fgc_behav.csv", row.names = F)
+
 # Validation of cr_resid by relationship with age, sex, and c-peptide ------
 
 #sex == "M"
