@@ -47,19 +47,20 @@ str(full_udata)
 ### summarize & save udata -----
 
 full_udata <- read_csv("data/urine_sample_dataset_juv_immune_energetics.csv")
-view(full_udata)
+View(full_udata)
 
 udata_month_avg <- full_udata %>%
   group_by(subj, month, year) %>% 
-  summarize(avg_neo_sg = mean(neo_sg), 
-            avg_cr_resid = mean(cr_resid), 
-            avg_stdsg_CP = mean(stdsg_CP),
+  summarize(avg_neo_sg = mean(neo_sg, na.rm = T), 
+            avg_cr_resid = mean(cr_resid, na.rm = T), 
+            avg_stdsg_CP = mean(stdsg_CP, na.rm = T),
+            med_neo_sg = median(neo_sg, na.rm = T), 
+            med_cr_resid = median(cr_resid, na.rm = T), 
+            med_stdsg_CP = median(stdsg_CP, na.rm = T),
             weaning = weaning, sex = sex,
-            mum = mum,) %>% 
+            mum = mum) %>% 
   ungroup() %>% 
-  na.omit() %>% 
-  distinct() %>% 
-  as.data.frame()
+  distinct()
 
 save(udata_month_avg, file = "data/udata_month_avg.Rdata", row.names = F)
 
