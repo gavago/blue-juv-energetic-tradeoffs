@@ -48,6 +48,7 @@ str(full_udata)
 
 full_udata <- read_csv("data/urine_sample_dataset_juv_immune_energetics.csv")
 View(full_udata)
+dim(full_udata)
 
 udata_month_avg <- full_udata %>%
   group_by(subj, month, year) %>% 
@@ -61,6 +62,7 @@ udata_month_avg <- full_udata %>%
             mum = mum) %>% 
   ungroup() %>% 
   distinct()
+dim(udata_month_avg)
 
 save(udata_month_avg, file = "data/udata_month_avg.Rdata", row.names = F)
 
@@ -69,23 +71,28 @@ save(udata_month_avg, file = "data/udata_month_avg.Rdata", row.names = F)
 
 load("data/fgc_data_by_sample.Rdata", verbose = T)
 view(gc_raw)
+dim(gc_raw)
 
 fgc_month_avg <- gc_raw %>% 
   group_by(subj, month, year) %>% 
   summarize(avg_fgc = mean(fgc.ng_g.feces, na.rm = T)) %>% 
   ungroup()
+dim(fgc_month_avg)
 
 save(fgc_month_avg, file = "data/fgc_month_avg.Rdata", row.names = F)
 
 view(fgc_month_avg)
 
 # Merge monthly data - urine, feces, behavior -----
+load("data/behav-dataset-month.Rdata", verbose = T)
 
-udata_fgc_month_avg <- left_join(udata_month_avg, fgc_month_avg, by = intersect(names(udata_month_avg), names(fgc_month_avg)))
+udata_fgc_month_avg <- full_join(udata_month_avg, fgc_month_avg, by = intersect(names(udata_month_avg), names(fgc_month_avg)))
+dim(udata_fgc_month_avg) # 317, 5 urine subj-months where no fgc data
 
 view(udata_gc_month_avg)
 
-full_data_month <- left_join(udata_fgc_month_avg, behav_data_month, by = intersect(names(udata_fgc_month_avg), names(behav_data_month)))
+full_data_month <- full_join(udata_fgc_month_avg, behav_data_month, by = intersect(names(udata_fgc_month_avg), names(behav_data_month)))
+dim(full_data_month) # 323
 
 view(full_data_month)
 
