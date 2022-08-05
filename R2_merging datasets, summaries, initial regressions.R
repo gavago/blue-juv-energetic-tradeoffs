@@ -72,14 +72,8 @@ view(gc_raw)
 
 fgc_month_avg <- gc_raw %>% 
   group_by(subj, month, year) %>% 
-  summarize(avg_extraction_weight = mean(`extraction weight`), 
-            avg_5B.adiol.conc.50ml = mean(`5B.adiol.conc.50ml`),
-            avg_5B_dilution = mean(`5B dilution`),
-            avg_fgc.ng_g.feces = mean(fgc.ng_g.feces)) %>% 
-  ungroup() %>% 
-  na.omit() %>% 
-  distinct() %>% 
-  as.data.frame()
+  summarize(avg_fgc = mean(fgc.ng_g.feces, na.rm = T)) %>% 
+  ungroup()
 
 save(fgc_month_avg, file = "data/fgc_month_avg.Rdata", row.names = F)
 
