@@ -59,7 +59,7 @@ udata_month_avg <- full_udata %>%
             med_cr_resid = median(cr_resid, na.rm = T), 
             med_stdsg_CP = median(stdsg_CP, na.rm = T),
             weaning = weaning, sex = sex,
-            mum = mum) %>% 
+            mum = mum, age = age) %>% 
   ungroup() %>% 
   distinct()
 dim(udata_month_avg)
