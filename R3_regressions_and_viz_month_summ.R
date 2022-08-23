@@ -2,6 +2,9 @@ library(tidyverse)
 library(lmerTest)
 library(dplyr)
 library(gtools)
+install.packages("AICcmodavg")
+library(AICcmodavg)
+
 
 # data includes fgcs and overall is summarized by subj year month
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
@@ -59,7 +62,7 @@ full_data_month %>% filter(med_stdsg_CP < 4000, med_neo_sg < 2000) %>%
   theme_minimal() +
   labs(y = "C-peptide",
        x = "Neopterin",
-       title = "Neopterin's Effect on Energy Balance")
+       title = "Neopterin and Energy Balance")
 
 # ---- if so (if neo coef < 0) is this because increase neo corresponds with lower feeding? 
 # neo coef > 0 
@@ -85,17 +88,21 @@ full_data_month %>% ggplot(aes(y = med_stdsg_CP, x = med_neo_sg, color = sex)) +
 neo_bin <- full_data_month %>% 
   select(med_neo_sg) %>% 
   pull() %>% 
-  quantcut(quant = 6)
+  quantcut(q = 6)
 
 full_data_month %>% 
   mutate(neo_bin = quantcut(med_neo_sg, q = 6)) %>% 
-  ggplot(aes(x = neo_bin, y = med_stdsg_CP))+
+  ggplot(aes(x = neo_bin, y = med_stdsg_CP)) +
   geom_boxplot() + 
   labs(x =  "Neopterin", 
        y = "C-Peptide",
        title = "Median C-Peptide and Neopterin by Month") 
 
+cp_neo_bin_anova <- aov(med_stdsg_CP ~ neo_bin*age*sex, data = full_data_month)
+
+view(cp_neo_bin_anova)
 # test with anova to see if cp differs by neo bin
+# need to find equivalent of (1 | subj)
 
 # H2ab - neo cr_resid - viz and regression ----
 # - H2a neo/immunity prioritized over growth --- cr_resid ~ neo + age + sex  ---
@@ -111,7 +118,7 @@ full_data_month %>%
   theme_minimal() + 
   labs(x = "Median Neopterin by Month",
        y =  "Median Creatinine Residuals by Month",
-       title = "Neopterin's Constraint on Growth")
+       title = "Neopterin Relationship with Lean Tissue")
 
 cr_neo_lm_month <- lmer(med_cr_resid ~ sex + 
                            scale(med_neo_sg) + 
@@ -150,7 +157,7 @@ full_data_month %>%
 
 # H3 investment in affiliative behavior vs immunity ----
 
-# all social behav viz
+# all affil behav viz
 
 full_data_month %>% 
   group_by(subj, month, year) %>% 
@@ -175,6 +182,7 @@ full_data_month %>% filter(med_neo_sg < 2000, pl < .1) %>%
                          y =  "Monthly Median Neopterin", 
                          title = "Immunity and Play")
 
+
 neo_pl_lm_month <- glmer(med_neo_sg ~ sex +
                            scale(pl) + 
                            scale(age) +
@@ -184,6 +192,17 @@ neo_pl_lm_month <- glmer(med_neo_sg ~ sex +
 qqnorm(residuals(neo_pl_lm_month))
 qqline(residuals(neo_pl_lm_month))
 summary(neo_pl_lm_month)
+
+#exploratory
+full_data_month %>%  filter(med_neo_sg < 2000) %>% 
+  mutate(pl_bin = quantcut(pl, q = 6)) %>%
+  ggplot(aes(x = pl_bin, y = med_neo_sg)) + geom_boxplot() 
+
+full_data_month %>%
+  ggplot(aes(x = neo_bin, y = pl)) + geom_boxplot()
+
+full_data_month %>%
+  ggplot(aes(x = neo_bin, y = pl, color = sex))  + geom_boxplot()
 
 # stronger relationship when controlling for fgc (estimate = -.09055 +- 1.96*.03773, p = .01639)
 
