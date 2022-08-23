@@ -100,7 +100,6 @@ full_data_month %>%
 
 cp_neo_bin_anova <- aov(med_stdsg_CP ~ neo_bin*age*sex, data = full_data_month)
 
-view(cp_neo_bin_anova)
 # test with anova to see if cp differs by neo bin
 # need to find equivalent of (1 | subj)
 
@@ -291,7 +290,6 @@ qqnorm(residuals(r_neo_lm_month))
 qqline(residuals(r_neo_lm_month))
 summary(r_neo_lm_month)
 
-full_data_month %>% count(sex == "M")
 # feeding
 # iffy q-q plot
 # results: no significant relationship w both med and avg
