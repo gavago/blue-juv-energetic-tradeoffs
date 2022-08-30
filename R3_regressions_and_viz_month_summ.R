@@ -1,6 +1,5 @@
 library(tidyverse)
 library(lmerTest)
-library(dplyr)
 library(gtools)
 install.packages("AICcmodavg")
 library(AICcmodavg)
