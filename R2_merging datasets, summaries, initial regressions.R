@@ -10,9 +10,13 @@ load("data/cp-dataset-full.Rdata", verbose = T)
 load("data/behav-dataset-month.Rdata", verbose = T)
 load("data/fgc_data_by_sample.Rdata", verbose = T)
 
+load("/Users/nicolethompsongonzalez/Dropbox/2_R-projects/Juv-blues-diss/Juvenile data and field/Data/3. Behavior data by month/Rdata files month/Juv LH month.Rdata", verbose = T)
+lh.mo_merge <- lh.mo %>%
+  mutate(year = lubridate::year(month), month = lubridate::month(month)) 
+
 
 # save each Rdata dataset to CV ----
-#write.csv(neo_data_full, file = "neo-dataset-full.csv", row.names = F)
+# write.csv(neo_data_full, file = "neo-dataset-full.csv", row.names = F)
 # write.csv(cp_raw, file = "cp-dataset-full.csv", row.names = F)
 # write.csv(behav_data_month, file = "behav-dataset-month.csv", row.names = F)
 
@@ -21,7 +25,7 @@ load("data/fgc_data_by_sample.Rdata", verbose = T)
 # Merging urine sample data (neo, cp, cr_resid)  -----
 merged_udata <- left_join( neo_data_full, cp_raw, by = intersect(names(neo_data_full), names(cp_raw))) %>%
   select(group, subj, date, age, year, month, time, sample_number, stdsg_CP, neo_sg, everything())
-
+dim(merged_udata) # 620 rows
 
 # Add lean body mass - calculating cr-sg resids ------
 
@@ -50,28 +54,26 @@ full_udata <- read_csv("data/urine_sample_dataset_juv_immune_energetics.csv")
 View(full_udata)
 dim(full_udata)
 
+
 udata_month_avg <- full_udata %>%
-  group_by(subj, month, year) %>% 
+  group_by(subj, month, year, weaning, sex, mum) %>% 
   summarize(avg_neo_sg = mean(neo_sg, na.rm = T), 
             avg_cr_resid = mean(cr_resid, na.rm = T), 
             avg_stdsg_CP = mean(stdsg_CP, na.rm = T),
             med_neo_sg = median(neo_sg, na.rm = T), 
             med_cr_resid = median(cr_resid, na.rm = T), 
-            med_stdsg_CP = median(stdsg_CP, na.rm = T),
-            weaning = weaning, sex = sex,
-            mum = mum, age = age) %>% 
-  ungroup() %>% 
-  distinct()
-dim(udata_month_avg)
+            med_stdsg_CP = median(stdsg_CP, na.rm = T)) %>% 
+  ungroup() 
+dim(udata_month_avg) # 299 rows
 
-save(udata_month_avg, file = "data/udata_month_avg.Rdata", row.names = F)
+#save(udata_month_avg, file = "data/udata_month_avg.Rdata", row.names = F)
 
 
 ### summarize & save fgcs ------
 
 load("data/fgc_data_by_sample.Rdata", verbose = T)
 view(gc_raw)
-dim(gc_raw)
+dim(gc_raw) # 627 rows
 
 fgc_month_avg <- gc_raw %>% 
   group_by(subj, month, year) %>% 
@@ -79,25 +81,28 @@ fgc_month_avg <- gc_raw %>%
   ungroup()
 dim(fgc_month_avg)
 
-save(fgc_month_avg, file = "data/fgc_month_avg.Rdata", row.names = F)
+#save(fgc_month_avg, file = "data/fgc_month_avg.Rdata", row.names = F)
 
 view(fgc_month_avg)
 
-# Merge monthly data - urine, feces, behavior -----
+# Merge monthly data - urine, feces, behavior, lh bday -----
 load("data/behav-dataset-month.Rdata", verbose = T)
+names(behav_data_month)
 
 udata_fgc_month_avg <- full_join(udata_month_avg, fgc_month_avg, by = intersect(names(udata_month_avg), names(fgc_month_avg)))
 dim(udata_fgc_month_avg) # 317, 5 urine subj-months where no fgc data
 
 view(udata_gc_month_avg)
 
-full_data_month <- full_join(udata_fgc_month_avg, behav_data_month, by = intersect(names(udata_fgc_month_avg), names(behav_data_month)))
+full_data_month <- full_join(udata_fgc_month_avg, behav_data_month, by = intersect(names(udata_fgc_month_avg), names(behav_data_month))) %>%
+  left_join(., lh.mo_merge) %>%
+  mutate(age = as.numeric(mid - bday)/365.25)
 dim(full_data_month) # 323
 
 view(full_data_month)
 
 # save r data
-save(full_data_month, file = "data/full_data_month_udata_fgc_behav.RData")
+#save(full_data_month, file = "data/full_data_month_udata_fgc_behav.RData")
 
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
