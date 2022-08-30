@@ -14,8 +14,8 @@ view(full_data_month)
 # - H1a is neo energetically constrained? --- neo ~ cp + age + sex ------
 
 neo_cp_lm_month <- glmer(med_neo_sg ~ sex +
-                           scale(med_stdsg_CP) +
                            scale(age) +
+                           scale(med_stdsg_CP) +
                            (1|subj), 
                          family = Gamma("log"),
                          data = full_data_month)
