@@ -1,6 +1,5 @@
 library(tidyverse)
 library(lmerTest)
-library(dplyr)
 library(gtools)
 install.packages("AICcmodavg")
 library(AICcmodavg)
@@ -19,9 +18,10 @@ apply(full_data_month, 2, function(x) sum(is.na(x)))
 
 # - H1a is neo energetically constrained? --- neo ~ cp + age + sex ------
 # results - pos corr: estimate = .17546 +- 1.96 * .03850
-neo_cp_glm_month <- glmer(med_neo_sg ~ sex +
-                           scale(med_stdsg_CP) +
+
+neo_cp_lm_month <- glmer(med_neo_sg ~ sex +
                            scale(age) +
+                           scale(med_stdsg_CP) +
                            (1|subj), 
                          family = Gamma("log"),
                          data = full_data_month)
