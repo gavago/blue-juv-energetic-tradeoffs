@@ -10,23 +10,40 @@ library(AICcmodavg)
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 view(full_data_month)
 
+apply(full_data_month, 2, function(x) sum(is.na(x)))
+
+
 # regressions to be run here will test relationships in the concept map
 
 # H1a & b - cp neo - viz and regression -----
 
 # - H1a is neo energetically constrained? --- neo ~ cp + age + sex ------
 # results - pos corr: estimate = .17546 +- 1.96 * .03850
-neo_cp_lm_month <- glmer(med_neo_sg ~ sex +
+neo_cp_glm_month <- glmer(med_neo_sg ~ sex +
                            scale(med_stdsg_CP) +
                            scale(age) +
                            (1|subj), 
                          family = Gamma("log"),
                          data = full_data_month)
-qqnorm(residuals(neo_cp_lm_month))
-qqline(residuals(neo_cp_lm_month))
-summary(neo_cp_lm_month)
+qqnorm(residuals(neo_cp_glm_month))
+qqline(residuals(neo_cp_glm_month))
+summary(neo_cp_glm_month)
 
-hist(residuals(neo_cp_lm_month))
+#neo ~ cp controlling for fgc
+neo_cp_fgc_glm_month <- glmer(med_neo_sg ~ sex +
+                            scale(med_stdsg_CP) +
+                            scale(avg_fgc) +
+                            scale(age) +
+                            (1|subj), 
+                          family = Gamma("log"),
+                          data = full_data_month)
+qqnorm(residuals(neo_cp_fgc_glm_month))
+qqline(residuals(neo_cp_fgc_glm_month))
+summary(neo_cp_fgc_glm_month)
+
+hist(residuals(neo_cp_glm_month))
+
+hist(residuals(neo_cp_glm_month))
 
 # visualization (mean and median look very similar in viz)
 
@@ -45,15 +62,15 @@ full_data_month %>% filter(med_stdsg_CP < 4000, med_neo_sg < 2000) %>%
 # result: pos corr btw med cp and med neo, coefficient = .16085 +- 1.96 * .05783 -- 
 # does not eat into available energy -- as more energy becomes available, more used for immunity
 
-cp_neo_lm_month <- glmer(med_stdsg_CP ~ sex +
+cp_neo_glm_month <- glmer(med_stdsg_CP ~ sex +
                            scale(med_neo_sg) +
                            scale(age) +
                            (1|subj), 
                          family = Gamma("log"), 
                          data = full_data_month)
-qqnorm(residuals(cp_neo_lm_month))
-qqline(residuals(cp_neo_lm_month))
-summary(cp_neo_lm_month)
+qqnorm(residuals(cp_neo_glm_month))
+qqline(residuals(cp_neo_glm_month))
+summary(cp_neo_glm_month)
 
 full_data_month %>% filter(med_stdsg_CP < 4000, med_neo_sg < 2000) %>%
   ggplot(aes(y = med_stdsg_CP, x = med_neo_sg, color = sex)) +
@@ -69,10 +86,9 @@ full_data_month %>% filter(med_stdsg_CP < 4000, med_neo_sg < 2000) %>%
 # ---- f ~ neo + age + sex 
 # results: no significant relationship. large P value, std error crosses 0
 # but iffy q-q plot
-f_neo_lm_month <- glmer(f ~ sex + 
+f_neo_lm_month <- lmer(f ~ sex + 
                           scale(med_neo_sg) + 
                           scale(age) + (1|subj), 
-                        family = Gamma("log"), 
                         data = full_data_month)
 qqnorm(residuals(f_neo_lm_month))
 qqline(residuals(f_neo_lm_month))
@@ -133,16 +149,15 @@ summary(cr_neo_lm_month)
 # iffy q-q plot
 # results - pos corr btw neo and cr: estimate = .273630 +- 1.96*0 .032827, p score = <2e-16
 
-cr_neo_lm_month <- glmer(med_neo_sg ~ sex +
+neo_cr_glm_month <- glmer(med_neo_sg ~ sex +
                            scale(med_cr_resid) + 
                            scale(age) +
                            (1|subj), 
                          family = Gamma("log"), 
                          data = full_data_month)
-qqnorm(residuals(cr_neo_lm_month))
-qqline(residuals(cr_neo_lm_month))
-summary(cr_neo_lm_month)
-
+qqnorm(residuals(neo_cr_glm_month))
+qqline(residuals(neo_cr_glm_month))
+summary(neo_cr_glm_month)
 
 full_data_month %>% 
   filter(med_neo_sg < 2000, med_cr_resid < .75) %>% 
@@ -151,12 +166,12 @@ full_data_month %>%
   geom_point() +
   theme_minimal() + 
   labs(y = "Median Neopterin by Month",
-       x =  "Creatinine Residuals by Month",
+       x =  "Median Lean Body Mass by Month",
        title = "Body Condition Constraint on Neopterin")
 
 # H3 investment in affiliative behavior vs immunity ----
 
-# all affil behav viz
+# all affil behav viz (boring)
 
 full_data_month %>% 
   group_by(subj, month, year) %>% 
@@ -182,15 +197,45 @@ full_data_month %>% filter(med_neo_sg < 2000, pl < .1) %>%
                          title = "Immunity and Play")
 
 
-neo_pl_lm_month <- glmer(med_neo_sg ~ sex +
+neo_pl_glm_month <- glmer(med_neo_sg ~ sex +
                            scale(pl) + 
                            scale(age) +
                            (1|subj), 
                          family = Gamma("log"),
                          data = full_data_month)
-qqnorm(residuals(neo_pl_lm_month))
-qqline(residuals(neo_pl_lm_month))
-summary(neo_pl_lm_month)
+qqnorm(residuals(neo_pl_glm_month))
+qqline(residuals(neo_pl_glm_month))
+summary(neo_pl_glm_month)
+
+# neo ~ pl with low cp
+
+full_data_month %>%  filter(med_neo_sg < 2000) %>% 
+  mutate(pl_bin = quantcut(pl, q = 6)) %>%
+  ggplot(aes(x = pl_bin, y = med_neo_sg)) + geom_boxplot() 
+
+full_data_month_cp_bin <- full_data_month %>% 
+  mutate(cp_bin = quantcut(med_stdsg_CP, q = 6))
+
+lo_cp <- full_data_month_cp_bin %>%
+  filter(med_stdsg_CP < 6190) %>% 
+  as.data.frame()
+
+two.way <- aov(med_neo_sg ~ scale(med_stdsg_CP) + scale(pl), data = full_data_month)
+summary(two.way)
+
+neo_pl_glm_month_lo_cp <- glmer(med_neo_sg ~ sex +
+                            scale(pl) + 
+                            scale(age) +
+                            (1|subj), 
+                          family = Gamma("log"),
+                          data = lo_cp)
+summary(neo_pl_glm_month_lo_cp)
+
+hist(neo_pl_glm_month_lo_cp)
+plot(residuals(neo_pl_glm_month_lo_cp))
+qqplot(residuals(neo_pl_glm_month_lo_cp))
+
+sum(full_data_month$pl == 0, na.rm = TRUE)
 
 #exploratory
 full_data_month %>%  filter(med_neo_sg < 2000) %>% 
@@ -203,18 +248,22 @@ full_data_month %>%
 full_data_month %>%
   ggplot(aes(x = neo_bin, y = pl, color = sex))  + geom_boxplot()
 
+full_data_month %>% filter(med_stdsg_CP < 20000) %>% 
+  ggplot(aes(x = med_stdsg_CP, y = pl, color = sex)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
 # stronger relationship when controlling for fgc (estimate = -.09055 +- 1.96*.03773, p = .01639)
 
-neo_pl_fgc_lm_month <- glmer(med_neo_sg ~ sex +
+neo_pl_fgc_glm_month <- glmer(med_neo_sg ~ sex +
                            scale(pl) + 
                            scale(age) + 
                            scale(avg_fgc) +
                            (1|subj), 
                          family = Gamma("log"),
                          data = full_data_month)
-qqnorm(residuals(neo_pl_fgc_lm_month))
-qqline(residuals(neo_pl_fgc_lm_month))
-summary(neo_pl_fgc_lm_month)
+qqnorm(residuals(neo_pl_fgc_glm_month))
+qqline(residuals(neo_pl_fgc_glm_month))
+summary(neo_pl_fgc_glm_month)
 
 # grooming given and neo
 # bad q-q plot
@@ -230,15 +279,15 @@ full_data_month %>% filter(gm < .10) %>%
                            y =  "Monthly Median Neopterin", 
                            title = "Immunity and Grooming")
 
-neo_gm_lm_month <- glmer(med_neo_sg ~ sex +
+neo_gm_glm_month <- glmer(med_neo_sg ~ sex +
                            scale(gm) + 
                            scale(age) +
                            (1|subj), 
                          family = Gamma("log"), 
                          data = full_data_month)
-qqnorm(residuals(neo_gm_lm_month))
-qqline(residuals(neo_gm_lm_month))
-summary(neo_gm_lm_month)
+qqnorm(residuals(neo_gm_glm_month))
+qqline(residuals(neo_gm_glm_month))
+summary(neo_gm_glm_month)
 
 # grooming recieved and neo 
 
@@ -254,15 +303,15 @@ full_data_month %>% filter(gmd < .08) %>%
        y =  "Monthly Median Neopterin", 
        title = "Immunity and Grooming Recieved")
 
-neo_gmd_lm_month <- glmer(med_neo_sg ~ sex +
+neo_gmd_glm_month <- glmer(med_neo_sg ~ sex +
                            scale(gmd) + 
                            scale(age) +
                            (1|subj), 
                          family = Gamma("log"),
                          data = full_data_month)
-qqnorm(residuals(neo_gmd_lm_month))
-qqline(residuals(neo_gmd_lm_month))
-summary(neo_gm_lm_month)
+qqnorm(residuals(neo_gmd_glm_month))
+qqline(residuals(neo_gmd_glm_month))
+summary(neo_gm_glm_month)
 
 # Resting and feeding compensating for neo ----
 
@@ -271,24 +320,25 @@ summary(neo_gm_lm_month)
 # results: pos corr (estimate = 0.02366 +- 1.96*.01011, p = .01926)
 # suggests animals rest to compensate for energy expend. from immunity
 
-full_data_month %>% filter(med_neo_sg < 2000) %>% 
-  ggplot(aes(x = med_neo_sg, y = r, color = sex)) + 
+full_data_month %>% 
+  #filter(med_neo_sg < 2000) %>% 
+  ggplot(aes(x = log(med_neo_sg), y = r, color = sex)) + 
   geom_point() + 
   geom_smooth(method = lm) + 
   theme_minimal() + 
-  labs(x = "Monthly Median Neopterin",
+  labs(x = "Monthly Log Median Neopterin",
        y =  "Proportion of Time Resting", 
        title = "Immunity and Rest")
 
-r_neo_lm_month <- glmer(r ~ sex +
+r_neo_glm_month <- glmer(r ~ sex +
                            scale(med_neo_sg) + 
                            scale(age) +
                            (1|subj), 
                          family = Gamma("log"),
                          data = full_data_month)
-qqnorm(residuals(r_neo_lm_month))
-qqline(residuals(r_neo_lm_month))
-summary(r_neo_lm_month)
+qqnorm(residuals(r_neo_glm_month))
+qqline(residuals(r_neo_glm_month))
+summary(r_neo_glm_month)
 
 # feeding
 # iffy q-q plot
@@ -304,25 +354,26 @@ full_data_month %>% filter(med_neo_sg < 2000) %>%
        x =  "Proportion of Time Feeding", 
        title = "Immunity and Feeding")
 
-f_neo_lm_month <- glmer(f ~ sex +
+f_neo_lm_month_lmer <- lmer(f ~ sex +
                           scale(avg_neo_sg) + 
                           scale(age) +
                           (1|subj), 
-                        family = Gamma("log"),
                         data = full_data_month)
-qqnorm(residuals(f_neo_lm_month))
-qqline(residuals(f_neo_lm_month))
-summary(f_neo_lm_month)
+qqnorm(residuals(f_neo_lm_month_lmer))
+qqline(residuals(f_neo_lm_month_lmer))
+summary(f_neo_lm_month_lmer)
 
-neo_f_lm_month <- glmer(med_neo_sg ~ sex +
+hist(residuals(f_neo_lm_month_lmer))
+
+neo_f_glm_month <- glmer(med_neo_sg ~ sex +
                           scale(f) + 
                           scale(age) +
                           (1|subj), 
                         family = Gamma("log"),
                         data = full_data_month)
-qqnorm(residuals(neo_f_lm_month))
-qqline(residuals(neo_f_lm_month))
-summary(neo_f_lm_month)
+qqnorm(residuals(neo_f_glm_month))
+qqline(residuals(neo_f_glm_month))
+summary(neo_f_glm_month)
 
 # significant relationship BUT 
 # failed to converge with max|grad| = 0.0348692 (tol = 0.002, component 1)
@@ -339,73 +390,78 @@ full_data_month %>% filter(med_neo_sg < 1000) %>%
   geom_point() + 
   geom_smooth(method = "lm")
 
-neo_fgc_lm_month <- glmer(med_neo_sg ~ sex +
+neo_fgc_glm_month <- glmer(med_neo_sg ~ sex +
                           scale(avg_fgc) + 
                           scale(age) +
                           (1|subj), 
                         family = Gamma("log"),
                         data = full_data_month)
-qqnorm(residuals(neo_fgc_lm_month))
-qqline(residuals(neo_fgc_lm_month))
-summary(neo_fgc_lm_month)
-
-#fgc and pl, no significant relationship
-fgc_pl_lm_month <- glmer(avg_fgc ~ sex +
-                            scale(pl) + 
-                            scale(age) +
-                            (1|subj), 
-                          family = Gamma("log"),
-                          data = full_data_month)
-qqnorm(residuals(fgc_pl_lm_month))
-qqline(residuals(fgc_pl_lm_month))
-summary(fgc_pl_lm_month)
-
-# grooming given and fgc
-# results: pos corr (estimate = .07164 +- 1.96*.032108, p = .0257)
-fgc_gm_lm_month <- glmer(avg_fgc ~ sex +
-                           scale(gm) + 
-                           scale(age) +
-                           (1|subj), 
-                         family = Gamma("log"),
-                         data = full_data_month)
-qqnorm(residuals(fgc_gm_lm_month))
-qqline(residuals(fgc_gm_lm_month))
-
-hist(residuals(fgc_gm_lm_month))
-plot(fgc_gm_lm_month)
-
-summary(fgc_gm_lm_month)
-
-# grooming recieved and fgc
-# no significant correlation
-
-fgc_gmd_lm_month <- glmer(avg_fgc ~ sex +
-                           scale(gmd) + 
-                           scale(age) +
-                           (1|subj), 
-                         family = Gamma("log"),
-                         data = full_data_month)
-qqnorm(residuals(fgc_gmd_lm_month))
-qqline(residuals(fgc_gmd_lm_month))
-
-hist(residuals(fgc_gmd_lm_month))
-plot(fgc_gmd_lm_month)
-
-summary(fgc_gmd_lm_month)
+qqnorm(residuals(neo_fgc_glm_month))
+qqline(residuals(neo_fgc_glm_month))
+summary(neo_fgc_glm_month)
 
 # cp and fgc
 # neg corr (estimate = -.11694 +- 1.96* .0457, p = .0150)
-cp_fgc_lm_month <- glmer(med_stdsg_CP ~ sex +
+cp_fgc_glm_month <- glmer(med_stdsg_CP ~ sex +
                             scale(avg_fgc) + 
                             scale(age) +
                             (1|subj), 
                           family = Gamma("log"),
                           data = full_data_month)
 
-qqnorm(residuals(cp_fgc_lm_month))
-qqline(residuals(cp_fgc_lm_month))
+qqnorm(residuals(cp_fgc_glm_month))
+qqline(residuals(cp_fgc_glm_month))
 
-hist(residuals(cp_fgc_lm_month))
-plot(cp_fgc_lm_month)
+hist(residuals(cp_fgc_glm_month))
+plot(cp_fgc_glm_month)
 
-summary(cp_fgc_lm_month)
+summary(cp_fgc_glm_month)
+
+# need to fix model, right skewed
+
+#fgc and pl, no significant relationship
+fgc_pl_glm_month <- glmer(avg_fgc ~ sex +
+                            scale(pl) + 
+                            scale(age) +
+                            (1|subj), 
+                          family = Gamma("log"),
+                          data = full_data_month)
+qqnorm(residuals(fgc_pl_glm_month))
+qqline(residuals(fgc_pl_glm_month))
+summary(fgc_pl_glm_month)
+
+
+# grooming given and fgc
+# results: pos corr (estimate = .07164 +- 1.96*.032108, p = .0257)
+fgc_gm_glm_month <- glmer(avg_fgc ~ sex +
+                           scale(gm) + 
+                           scale(age) +
+                           (1|subj), 
+                         family = Gamma("log"),
+                         data = full_data_month)
+qqnorm(residuals(fgc_gm_glm_month))
+qqline(residuals(fgc_gm_glm_month))
+
+hist(residuals(fgc_gm_glm_month))
+plot(fgc_gm_glm_month)
+
+summary(fgc_gm_glm_month)
+
+# grooming recieved and fgc
+# no significant correlation
+
+fgc_gmd_glm_month <- glmer(avg_fgc ~ sex +
+                           scale(gmd) + 
+                           scale(age) +
+                           (1|subj), 
+                         family = Gamma("log"),
+                         data = full_data_month)
+qqnorm(residuals(fgc_gmd_glm_month))
+qqline(residuals(fgc_gmd_glm_month))
+
+hist(residuals(fgc_gmd_glm_month))
+plot(fgc_gmd_glm_month)
+
+summary(fgc_gmd_glm_month)
+
+
