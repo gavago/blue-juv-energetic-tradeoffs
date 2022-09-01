@@ -188,7 +188,9 @@ full_data_month %>%
 # play and neo
 # results: neg corr w large std error (estimate = -.07584 +- 1.96* .03781, p-score = .0448)
 
-full_data_month %>% filter(med_neo_sg < 2000, pl < .1) %>% 
+full_data_month %>% 
+  #filter(med_neo_sg < 2000, pl < .1) %>% 
+  filter(sex == "M") %>%
   ggplot(aes(x = pl, y = med_neo_sg, color = sex)) +
   geom_point() + 
   geom_smooth(method = "lm") +
@@ -196,27 +198,29 @@ full_data_month %>% filter(med_neo_sg < 2000, pl < .1) %>%
                          y =  "Monthly Median Neopterin", 
                          title = "Immunity and Play")
 
-neo_pl_glm_month <- glmer(med_neo_sg ~ sex +
-                           scale(pl) + 
-                           scale(age) +
-                           (1|subj), 
-                         family = Gamma("log"),
-                         data = full_data_month)
-qqnorm(residuals(neo_pl_glm_month))
-qqline(residuals(neo_pl_glm_month))
-summary(neo_pl_glm_month)
-
 neo_pl_glm_month_male <- full_data_month %>%
   filter(sex == "M") %>%
-  glmer(med_neo_sg ~ scale(pl) + scale(age) + (1|subj), 
+  glmer(med_neo_sg ~ scale(pl) + scale(age) + scale(med_stdsg_CP) + (1|subj), 
         family = Gamma("log"), data = .)
+
+neo_pl_glm_month_male_int <- full_data_month %>%
+  filter(sex == "M") %>%
+  glmer(med_neo_sg ~ scale(pl) + scale(age) + scale(med_stdsg_CP) + 
+          scale(med_stdsg_CP)*scale(pl) + (1|subj), 
+        family = Gamma("log"), data = .)
+
 qqnorm(residuals(neo_pl_glm_month_male))
 qqline(residuals(neo_pl_glm_month_male))
-summary(neo_pl_glm_month_male)
+summary(neo_pl_glm_month_male_int)
 
 # neo ~ pl with low cp
+full_data_month %>% 
+  filter(med_neo_sg < 2000, sex == "M") %>% 
+  mutate(cp_bin = quantcut(med_stdsg_CP, q = 3)) %>%
+  ggplot(aes(x = pl, y = med_neo_sg, color = cp_bin)) +
+  geom_smooth(method = "lm")
 
-full_data_month %>%  filter(med_neo_sg < 2000) %>% 
+full_data_month %>%  filter(med_neo_sg < 2000, sex == "M") %>% 
   mutate(pl_bin = quantcut(pl, q = 6)) %>%
   ggplot(aes(x = pl_bin, y = med_neo_sg)) + geom_boxplot() 
 
