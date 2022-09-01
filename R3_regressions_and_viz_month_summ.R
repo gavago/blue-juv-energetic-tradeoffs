@@ -175,18 +175,16 @@ full_data_month %>%
 full_data_month %>% filter(med_neo_sg < 2000, pl < .1) %>% 
   ggplot(aes(x = pl, y = med_neo_sg, color = sex)) +
   geom_point() + 
-  geom_smooth(method = lm) +
+  geom_smooth(method = "lm") +
   theme_minimal() + labs(x = "Proportion of Time Playing",
                          y =  "Monthly Median Neopterin", 
                          title = "Immunity and Play")
 
 
-neo_pl_lm_month <- glmer(med_neo_sg ~ sex +
-                           scale(pl) + 
-                           scale(age) +
-                           (1|subj), 
-                         family = Gamma("log"),
-                         data = full_data_month)
+neo_pl_lm_month <- full_data_month %>%
+  filter(sex == "M") %>%
+                    glmer(med_neo_sg ~ scale(pl) + scale(age) + (1|subj), 
+                          family = Gamma("log"), data = .)
 qqnorm(residuals(neo_pl_lm_month))
 qqline(residuals(neo_pl_lm_month))
 summary(neo_pl_lm_month)
