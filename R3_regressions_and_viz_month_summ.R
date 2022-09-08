@@ -3,7 +3,8 @@ library(lmerTest)
 library(gtools)
 install.packages("AICcmodavg")
 library(AICcmodavg)
-
+install.packages("mediation")
+library(mediation)
 
 # data includes fgcs and overall is summarized by subj year month
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
@@ -14,7 +15,7 @@ apply(full_data_month, 2, function(x) sum(is.na(x)))
 
 # regressions to be run here will test relationships in the concept map
 
-# H1a & b - cp neo - viz and regression -----
+# H1a & b (Aim 1)- cp neo - viz and regression -----
 
 # - H1a is neo energetically constrained? --- neo ~ cp + age + sex ------
 # results - pos corr: estimate = .17546 +- 1.96 * .03850
@@ -120,7 +121,7 @@ cp_neo_bin_anova <- aov(med_stdsg_CP ~ neo_bin*age*sex, data = full_data_month)
 # need to find equivalent of (1 | subj)
 
 # H2ab - neo cr_resid - viz and regression ----
-# - H2a neo/immunity prioritized over growth --- cr_resid ~ neo + age + sex  ---
+# - H2a neo/immunity prioritized over growth --- cr_resid ~ neo + age + sex  ----
 # iffy q-q plot
 # non-positive values can't be used with gamma and cant use log
 # pos corr btw med cr and med neo sg
@@ -145,7 +146,7 @@ qqline(residuals(cr_neo_lm_month))
 summary(cr_neo_lm_month)
 
 
-# - H2b neo/immunity constrained by body condition --- neo ~ cr_resid + age + sex ---
+# - H2b neo/immunity constrained by body condition --- neo ~ cr_resid + age + sex ----
 # iffy q-q plot
 # results - pos corr btw neo and cr: estimate = .273630 +- 1.96*0 .032827, p score = <2e-16
 
@@ -185,7 +186,7 @@ full_data_month %>%
        y = "Median Neopterin by Month",
        title = "Neopterin and Affiliative Behavior") 
   
-# play and neo
+# Male only play model ----
 # results: neg corr w large std error (estimate = -.07584 +- 1.96* .03781, p-score = .0448)
 
 full_data_month %>% 
@@ -212,6 +213,67 @@ neo_pl_glm_month_male_int <- full_data_month %>%
 qqnorm(residuals(neo_pl_glm_month_male))
 qqline(residuals(neo_pl_glm_month_male))
 summary(neo_pl_glm_month_male_int)
+
+# Female only grooming model ----
+# grooming given
+full_data_month %>% filter(sex == "F") %>%
+  ggplot(aes(x = gm, y = med_neo_sg, color = sex)) +
+  geom_point() + 
+  geom_smooth(method = "lm") +
+  theme_minimal() + labs(x = "Proportion of Time Grooming",
+                         y =  "Monthly Median Neopterin", 
+                         title = "Immunity and Play")
+
+neo_gm_glm_month_female <- full_data_month %>%
+  filter(sex == "F") %>%
+  glmer(med_neo_sg ~ scale(gm) + scale(age) + scale(med_stdsg_CP) + (1|subj), 
+        family = Gamma("log"), data = .)
+
+qqnorm(residuals(neo_gm_glm_month_female))
+qqline(residuals(neo_gm_glm_month_female))
+summary(neo_gm_glm_month_female)
+# negative estimate but high P value, no significant relationship
+
+neo_gm_glm_month_female_int <- full_data_month %>%
+  filter(sex == "M") %>%
+  glmer(med_neo_sg ~ scale(gm) + scale(age) + scale(med_stdsg_CP) + 
+          scale(med_stdsg_CP)*scale(gm) + (1|subj), 
+        family = Gamma("log"), data = .)
+
+qqnorm(residuals(neo_gm_glm_month_female_int))
+qqline(residuals(neo_gm_glm_month_female_int))
+summary(neo_gm_glm_month_female_int)
+# negative relationship btw gm  given and neo
+
+# grooming received 
+full_data_month %>% filter(sex == "F") %>%
+  ggplot(aes(x = gm, y = med_neo_sg, color = sex)) +
+  geom_point() + 
+  geom_smooth(method = "lm") +
+  theme_minimal() + labs(x = "Proportion of Time Grooming",
+                         y =  "Monthly Median Neopterin", 
+                         title = "Immunity and Play")
+
+neo_gmd_glm_month_female <- full_data_month %>%
+  filter(sex == "F") %>%
+  glmer(med_neo_sg ~ scale(gmd) + scale(age) + scale(med_stdsg_CP) + (1|subj), 
+        family = Gamma("log"), data = .)
+
+qqnorm(residuals(neo_gmd_glm_month_female))
+qqline(residuals(neo_gmd_glm_month_female))
+summary(neo_gmd_glm_month_female)
+# negative estimate but high P value, no significant relationship
+
+neo_gmd_glm_month_female_int <- full_data_month %>%
+  filter(sex == "M") %>%
+  glmer(med_neo_sg ~ scale(gmd) + scale(age) + scale(med_stdsg_CP) + 
+          scale(med_stdsg_CP)*scale(gmd) + (1|subj), 
+        family = Gamma("log"), data = .)
+
+qqnorm(residuals(neo_gmd_glm_month_female_int))
+qqline(residuals(neo_gmd_glm_month_female_int))
+summary(neo_gmd_glm_month_female_int)
+# same as grooming received -- low p value with interaction
 
 # neo ~ pl with low cp
 full_data_month %>% 
@@ -324,7 +386,7 @@ qqnorm(residuals(neo_gmd_glm_month))
 qqline(residuals(neo_gmd_glm_month))
 summary(neo_gm_glm_month)
 
-# Resting and feeding compensating for neo ----
+# R and f compensating for cost of neo ----
 
 # resting
 # good q-q plot
@@ -391,7 +453,7 @@ summary(neo_f_glm_month)
 
 # how to address non normality in linear mixed models
 
-# fgc ----
+# Fgc ----
 
 # neo and fgc
 # results: negative corr (estimate = -0.11286 +- 1.96* .03389, p = .000868)
@@ -475,4 +537,16 @@ plot(fgc_gmd_glm_month)
 
 summary(fgc_gmd_glm_month)
 
+# mediation analysis ----
+
+df = full_data_month
+set.seed(12334)
+
+fit.mediator=lm(mediator~Sepal.Length,df)
+
+fit.dv=lm(med_neo_sg~med_stdsg_CP avg_fgc,data = full_data_month)
+
+results = mediate(fit.mediator, fit.dv, treat='avg_fgc', mediator='mediator', boot=T)
+
+# df$random1=runif(nrow(df),min=min(df$avg_fgc),max=max(df$avg_fgc))
 
