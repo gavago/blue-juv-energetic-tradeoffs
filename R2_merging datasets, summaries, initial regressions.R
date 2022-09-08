@@ -75,7 +75,7 @@ fgc_month_avg <- gc_raw %>%
   group_by(subj, month, year) %>% 
   summarize(avg_fgc = mean(fgc.ng_g.feces, na.rm = T)) %>% 
   ungroup()
-dim(fgc_month_avg)
+dim(fgc_month_avg) 
 
 #save(fgc_month_avg, file = "data/fgc_month_avg.Rdata")
 

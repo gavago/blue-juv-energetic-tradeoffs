@@ -221,7 +221,7 @@ full_data_month %>% filter(sex == "F") %>%
   ggplot(aes(x = gm, y = med_neo_sg, color = sex)) +
   geom_point() + 
   geom_smooth(method = "lm") +
-  theme_minimal() + labs(x = "Proportion of Time Receiving Grooming",
+  theme_minimal() + labs(x = "Proportion of Time Grooming",
                          y =  "Monthly Median Neopterin", 
                          title = "Immunity and Grooming")
 
@@ -236,7 +236,7 @@ summary(neo_gm_glm_month_female)
 # negative estimate but high P value, no significant relationship
 
 neo_gm_glm_month_female_int <- full_data_month %>%
-  filter(sex == "M") %>%
+  filter(sex == "F") %>%
   glmer(med_neo_sg ~ scale(gm) + scale(age) + scale(med_stdsg_CP) + 
           scale(med_stdsg_CP)*scale(gm) + (1|subj), 
         family = Gamma("log"), data = .)
@@ -244,7 +244,6 @@ neo_gm_glm_month_female_int <- full_data_month %>%
 qqnorm(residuals(neo_gm_glm_month_female_int))
 qqline(residuals(neo_gm_glm_month_female_int))
 summary(neo_gm_glm_month_female_int)
-# negative relationship btw gm  given and neo
 
 # grooming recieved 
 full_data_month %>% filter(sex == "F") %>%
@@ -267,7 +266,7 @@ summary(neo_gmd_glm_month_female)
 # negative estimate but high P value, no significant relationship
 
 neo_gmd_glm_month_female_int <- full_data_month %>%
-  filter(sex == "M") %>%
+  filter(sex == "F") %>%
   glmer(med_neo_sg ~ scale(gmd) + scale(age) + scale(med_stdsg_CP) + 
           scale(med_stdsg_CP)*scale(gmd) + (1|subj), 
         family = Gamma("log"), data = .)
@@ -275,9 +274,63 @@ neo_gmd_glm_month_female_int <- full_data_month %>%
 qqnorm(residuals(neo_gmd_glm_month_female_int))
 qqline(residuals(neo_gmd_glm_month_female_int))
 summary(neo_gmd_glm_month_female_int)
-# same as grooming received -- low p value with interaction
 
-# neo ~ pl with low cp
+# Male only grooming model ----
+full_data_month %>% filter(sex == "M") %>%
+  ggplot(aes(x = gm, y = med_neo_sg, color = sex)) +
+  geom_point() + 
+  geom_smooth(method = "lm") +
+  theme_minimal() + labs(x = "Proportion of Time Grooming",
+                         y =  "Monthly Median Neopterin", 
+                         title = "Immunity and Grooming")
+
+neo_gm_glm_month_male <- full_data_month %>%
+  filter(sex == "M") %>%
+  glmer(med_neo_sg ~ scale(gm) + scale(age) + scale(med_stdsg_CP) + (1|subj), 
+        family = Gamma("log"), data = .)
+
+summary(neo_gm_glm_month_male)
+
+neo_gm_glm_month_male_int <- full_data_month %>%
+  filter(sex == "M") %>%
+  glmer(med_neo_sg ~ scale(gm) + scale(age) + scale(med_stdsg_CP) + 
+          scale(med_stdsg_CP)*scale(gm) + (1|subj), 
+        family = Gamma("log"), data = .)
+
+summary(neo_gm_glm_month_male_int)
+# negative relationship btw gm given and neo
+
+# grooming received 
+
+full_data_month %>% filter(sex == "M") %>%
+  ggplot(aes(x = gmd, y = med_neo_sg, color = sex)) +
+  geom_point() + 
+  geom_smooth(method = "lm") +
+  theme_minimal() + labs(x = "Proportion of Time Receiving Grooming",
+                         y =  "Monthly Median Neopterin", 
+                         title = "Immunity and Recieving Grooming")
+
+neo_gmd_glm_month_male <- full_data_month %>%
+  filter(sex == "M") %>%
+  glmer(med_neo_sg ~ scale(gmd) + scale(age) + scale(med_stdsg_CP) + (1|subj), 
+        family = Gamma("log"), data = .)
+
+summary(neo_gmd_glm_month_male)
+
+neo_gmd_glm_month_male_int <- full_data_month %>%
+  filter(sex == "M") %>%
+  glmer(med_neo_sg ~ scale(gmd) + scale(age) + scale(med_stdsg_CP) + 
+          scale(med_stdsg_CP)*scale(gmd) + (1|subj), 
+        family = Gamma("log"), data = .)
+
+summary(neo_gmd_glm_month_male_int)
+
+full_data_month_1_subj <- full_data_month %>% 
+  group_by(subj) %>% summarise(sex = sex, subj = subj) %>% distinct()
+full_data_month_1_subj %>% filter(sex == "F") %>% nrow()
+# same amt of male and female subjects
+
+# neo ~ pl with low cp ----
 full_data_month %>% 
   filter(med_neo_sg < 2000, sex == "M") %>% 
   mutate(cp_bin = quantcut(med_stdsg_CP, q = 3)) %>%
@@ -546,6 +599,8 @@ set.seed(288)
 full_data_month_mediate <- full_data_month %>% 
   drop_na(avg_fgc, med_stdsg_CP, med_neo_sg)
 
+colSums(!is.na(full_data_month_mediate))
+
 # total effect iv has on dv plus covariates
 fit.totaleffect <- lmer(med_neo_sg ~ scale(med_stdsg_CP) + 
                            scale(age) + 
@@ -583,7 +638,8 @@ fit.dv <- lmer(med_neo_sg ~ scale(avg_fgc) +
 
 summary(fit.dv)
 
-results = mediate(fit.mediator, fit.dv, treat='med_stdsgz_CP', mediator='avg_fgc', boot =T)
+results = mediate(fit.mediator, fit.dv, treat='med_stdsg_CP', mediator='avg_fgc', boot =T)
+
 
 # cannot use glmer and number of observations dont match btw mediator 
 # and outcome models
