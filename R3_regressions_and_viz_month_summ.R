@@ -5,6 +5,7 @@ install.packages("AICcmodavg")
 library(AICcmodavg)
 install.packages("mediation")
 library(mediation)
+library(tidyr)
 
 # data includes fgcs and overall is summarized by subj year month
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
@@ -220,9 +221,9 @@ full_data_month %>% filter(sex == "F") %>%
   ggplot(aes(x = gm, y = med_neo_sg, color = sex)) +
   geom_point() + 
   geom_smooth(method = "lm") +
-  theme_minimal() + labs(x = "Proportion of Time Grooming",
+  theme_minimal() + labs(x = "Proportion of Time Receiving Grooming",
                          y =  "Monthly Median Neopterin", 
-                         title = "Immunity and Play")
+                         title = "Immunity and Grooming")
 
 neo_gm_glm_month_female <- full_data_month %>%
   filter(sex == "F") %>%
@@ -245,14 +246,14 @@ qqline(residuals(neo_gm_glm_month_female_int))
 summary(neo_gm_glm_month_female_int)
 # negative relationship btw gm  given and neo
 
-# grooming received 
+# grooming recieved 
 full_data_month %>% filter(sex == "F") %>%
-  ggplot(aes(x = gm, y = med_neo_sg, color = sex)) +
+  ggplot(aes(x = gmd, y = med_neo_sg, color = sex)) +
   geom_point() + 
   geom_smooth(method = "lm") +
-  theme_minimal() + labs(x = "Proportion of Time Grooming",
+  theme_minimal() + labs(x = "Proportion of Time Receiving Grooming",
                          y =  "Monthly Median Neopterin", 
-                         title = "Immunity and Play")
+                         title = "Immunity and Grooming Received")
 
 neo_gmd_glm_month_female <- full_data_month %>%
   filter(sex == "F") %>%
@@ -262,6 +263,7 @@ neo_gmd_glm_month_female <- full_data_month %>%
 qqnorm(residuals(neo_gmd_glm_month_female))
 qqline(residuals(neo_gmd_glm_month_female))
 summary(neo_gmd_glm_month_female)
+
 # negative estimate but high P value, no significant relationship
 
 neo_gmd_glm_month_female_int <- full_data_month %>%
@@ -538,15 +540,50 @@ plot(fgc_gmd_glm_month)
 summary(fgc_gmd_glm_month)
 
 # mediation analysis ----
+# in progress
+set.seed(288)
 
-df = full_data_month
-set.seed(12334)
+full_data_month_mediate <- full_data_month %>% 
+  drop_na(avg_fgc, med_stdsg_CP, med_neo_sg)
 
-fit.mediator=lm(mediator~Sepal.Length,df)
+# total effect iv has on dv plus covariates
+fit.totaleffect <- lmer(med_neo_sg ~ scale(med_stdsg_CP) + 
+                           scale(age) + 
+                           sex + 
+                           (1|subj), 
+                         #family = Gamma("log")
+                        full_data_month_mediate)
 
-fit.dv=lm(med_neo_sg~med_stdsg_CP avg_fgc,data = full_data_month)
+summary(fit.totaleffect)
 
-results = mediate(fit.mediator, fit.dv, treat='avg_fgc', mediator='mediator', boot=T)
+# effect of iv on mediator
 
-# df$random1=runif(nrow(df),min=min(df$avg_fgc),max=max(df$avg_fgc))
+fit.mediator <- lmer(avg_fgc ~ scale(med_stdsg_CP) + 
+                        scale(age) +
+                        sex +
+                        (1|subj),
+                      #family = Gamma("log"),
+                      data = full_data_month_mediate)
+qqnorm(residuals(fit.mediator))
+qqline(residuals(fit.mediator))
+hist(residuals(fit.mediator))
+summary(fit.mediator)
 
+# no significant relationship, strange given negative relationship when cp is dependent
+
+# effect of mediator on dv controlling for iv
+
+fit.dv <- lmer(med_neo_sg ~ scale(avg_fgc) + 
+               scale(med_stdsg_CP) +
+               scale(age) +
+               sex +
+               (1|subj),
+             #family = Gamma("log"),
+             data = full_data_month_mediate)
+
+summary(fit.dv)
+
+results = mediate(fit.mediator, fit.dv, treat='med_stdsgz_CP', mediator='avg_fgc', boot =T)
+
+# cannot use glmer and number of observations dont match btw mediator 
+# and outcome models
