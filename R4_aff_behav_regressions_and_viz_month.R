@@ -276,3 +276,49 @@ neo_gmd_glm_month <- glmer(med_neo_sg ~ sex +
 qqnorm(residuals(neo_gmd_glm_month))
 qqline(residuals(neo_gmd_glm_month))
 summary(neo_gm_glm_month)
+
+# pl gm and fgcs ----
+#fgc and pl, no significant relationship
+fgc_pl_glm_month <- glmer(avg_fgc ~ sex +
+                            scale(pl) + 
+                            scale(age) +
+                            (1|subj), 
+                          family = Gamma("log"),
+                          data = full_data_month)
+qqnorm(residuals(fgc_pl_glm_month))
+qqline(residuals(fgc_pl_glm_month))
+summary(fgc_pl_glm_month)
+
+
+# grooming given and fgc
+# results: pos corr (estimate = .07164 +- 1.96*.032108, p = .0257)
+fgc_gm_glm_month <- glmer(avg_fgc ~ sex +
+                            scale(gm) + 
+                            scale(age) +
+                            (1|subj), 
+                          family = Gamma("log"),
+                          data = full_data_month)
+qqnorm(residuals(fgc_gm_glm_month))
+qqline(residuals(fgc_gm_glm_month))
+
+hist(residuals(fgc_gm_glm_month))
+plot(fgc_gm_glm_month)
+
+summary(fgc_gm_glm_month)
+
+# grooming recieved and fgc
+# no significant correlation
+
+fgc_gmd_glm_month <- glmer(avg_fgc ~ sex +
+                             scale(gmd) + 
+                             scale(age) +
+                             (1|subj), 
+                           family = Gamma("log"),
+                           data = full_data_month)
+qqnorm(residuals(fgc_gmd_glm_month))
+qqline(residuals(fgc_gmd_glm_month))
+
+hist(residuals(fgc_gmd_glm_month))
+plot(fgc_gmd_glm_month)
+
+summary(fgc_gmd_glm_month)

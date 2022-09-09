@@ -16,7 +16,7 @@ apply(full_data_month, 2, function(x) sum(is.na(x)))
 
 # regressions to be run here will test relationships in the concept map
 
-# H1a & b (Aim 1)- cp neo - viz and regression -----
+# H1 (Aim 1)- cp neo - viz and regression -----
 
 # - H1a is neo energetically constrained? --- neo ~ cp + age + sex ------
 # results - pos corr: estimate = .17546 +- 1.96 * .03850
@@ -60,7 +60,7 @@ full_data_month %>% filter(med_stdsg_CP < 4000, med_neo_sg < 2000) %>%
 
 
 
-# - H1c does neo eat into available energy? --- cp ~ neo + age + sex ----
+# - H1b does neo eat into available energy? --- cp ~ neo + age + sex ----
 # result: pos corr btw med cp and med neo, coefficient = .16085 +- 1.96 * .05783 -- 
 # does not eat into available energy -- as more energy becomes available, more used for immunity
 
@@ -97,6 +97,7 @@ qqline(residuals(f_neo_lm_month))
 summary(f_neo_lm_month)
 
 
+# - 
 # - additional exploration cp neo -----
 # LF says high neo outliers have lower cp, worth checking somehow
 # NATG suggestion: bin neopterin using quantcut into 6 even bins,
@@ -121,7 +122,7 @@ cp_neo_bin_anova <- aov(med_stdsg_CP ~ neo_bin*age*sex, data = full_data_month)
 # test with anova to see if cp differs by neo bin
 # need to find equivalent of (1 | subj)
 
-# H2ab - neo cr_resid - viz and regression ----
+# H2- neo cr_resid - viz and regression ----
 # - H2a neo/immunity prioritized over growth --- cr_resid ~ neo + age + sex  ----
 # iffy q-q plot
 # non-positive values can't be used with gamma and cant use log
@@ -240,7 +241,7 @@ summary(neo_f_glm_month)
 
 # Fgc ----
 
-# neo and fgc
+# fgc ~ neo
 # results: negative corr (estimate = -0.11286 +- 1.96* .03389, p = .000868)
 
 full_data_month %>% filter(med_neo_sg < 1000) %>% 
@@ -258,7 +259,7 @@ qqnorm(residuals(neo_fgc_glm_month))
 qqline(residuals(neo_fgc_glm_month))
 summary(neo_fgc_glm_month)
 
-# cp and fgc
+# fgc ~ CP
 # neg corr (estimate = -.11694 +- 1.96* .0457, p = .0150)
 cp_fgc_glm_month <- glmer(med_stdsg_CP ~ sex +
                             scale(avg_fgc) + 
@@ -277,50 +278,7 @@ summary(cp_fgc_glm_month)
 
 # need to fix model, right skewed
 
-#fgc and pl, no significant relationship
-fgc_pl_glm_month <- glmer(avg_fgc ~ sex +
-                            scale(pl) + 
-                            scale(age) +
-                            (1|subj), 
-                          family = Gamma("log"),
-                          data = full_data_month)
-qqnorm(residuals(fgc_pl_glm_month))
-qqline(residuals(fgc_pl_glm_month))
-summary(fgc_pl_glm_month)
-
-
-# grooming given and fgc
-# results: pos corr (estimate = .07164 +- 1.96*.032108, p = .0257)
-fgc_gm_glm_month <- glmer(avg_fgc ~ sex +
-                           scale(gm) + 
-                           scale(age) +
-                           (1|subj), 
-                         family = Gamma("log"),
-                         data = full_data_month)
-qqnorm(residuals(fgc_gm_glm_month))
-qqline(residuals(fgc_gm_glm_month))
-
-hist(residuals(fgc_gm_glm_month))
-plot(fgc_gm_glm_month)
-
-summary(fgc_gm_glm_month)
-
-# grooming recieved and fgc
-# no significant correlation
-
-fgc_gmd_glm_month <- glmer(avg_fgc ~ sex +
-                           scale(gmd) + 
-                           scale(age) +
-                           (1|subj), 
-                         family = Gamma("log"),
-                         data = full_data_month)
-qqnorm(residuals(fgc_gmd_glm_month))
-qqline(residuals(fgc_gmd_glm_month))
-
-hist(residuals(fgc_gmd_glm_month))
-plot(fgc_gmd_glm_month)
-
-summary(fgc_gmd_glm_month)
+#
 
 # mediation analysis ----
 # in progress
