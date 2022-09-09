@@ -73,7 +73,7 @@ dim(gc_raw) # 627 rows
 
 fgc_month_avg <- gc_raw %>% 
   group_by(subj, month, year) %>% 
-  summarize(avg_fgc = mean(fgc.ng_g.feces, na.rm = T)) %>% 
+  summarize(avg_fgc = mean(fgc.ng_g.feces, na.rm = T), med_fgc = median(fgc.ng_g.feces, na.rm = T)) %>% 
   ungroup()
 dim(fgc_month_avg) 
 
@@ -114,12 +114,12 @@ view(full_data_month)
 #load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
 # save csv
-write.csv(full_data_month,  file = "data/full_data_month_udata_fgc_behav.csv", row.names = F)
+# write.csv(full_data_month,  file = "data/full_data_month_udata_fgc_behav.csv", row.names = F)
 
 # Validation of cr_resid by relationship with age, sex, and c-peptide ------
 
 #sex == "M"
-  ggplot() +
+  # ggplot() +
   # geom_point(data = full_data %>% filter(subj == "allo"), 
   #            aes(x = age, y = cr_resid), color = "red") +
   # geom_smooth(data = full_data %>% filter(subj == "allo"), 
@@ -130,11 +130,11 @@ write.csv(full_data_month,  file = "data/full_data_month_udata_fgc_behav.csv", r
   # geom_smooth(data = full_data %>% filter(subj == "brog"), 
   #             aes(x = age, y = cr_resid),color = "green",
   #             method = "lm") +
-  geom_point(data = full_data, 
-             aes(x = age, y = cr_resid), alpha = 0.1) +
-  geom_smooth(data = full_data, 
-              aes(x = age, y = cr_resid),
-              method = "lm")
+  # geom_point(data = full_data, 
+  #            aes(x = age, y = cr_resid), alpha = 0.1) +
+  # geom_smooth(data = full_data, 
+  #             aes(x = age, y = cr_resid),
+  #             method = "lm")
 
 full_data %>% 
   ggplot() +
