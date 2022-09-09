@@ -16,7 +16,7 @@ apply(full_data_month, 2, function(x) sum(is.na(x)))
 
 # regressions to be run here will test relationships in the concept map
 
-# H1 (Aim 1)- cp neo - viz and regression -----
+# H1 - cp neo - viz and regression -----
 
 # - H1a is neo energetically constrained? --- neo ~ cp + age + sex ------
 # results - pos corr: estimate = .17546 +- 1.96 * .03850
@@ -97,7 +97,98 @@ qqline(residuals(f_neo_lm_month))
 summary(f_neo_lm_month)
 
 
-# - 
+# - H1c - cp effect on neo mediated by GCs - Steps 2 & 3 ----
+
+# fgc ~ neo
+# results: negative corr (estimate = -0.11286 +- 1.96* .03389, p = .000868)
+
+full_data_month %>% filter(med_neo_sg < 1000) %>% 
+  ggplot(aes(x = med_neo_sg, y = avg_fgc, color = sex)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
+
+neo_fgc_glm_month <- glmer(med_neo_sg ~ sex +
+                             scale(avg_fgc) + 
+                             scale(age) +
+                             (1|subj), 
+                           family = Gamma("log"),
+                           data = full_data_month)
+qqnorm(residuals(neo_fgc_glm_month))
+qqline(residuals(neo_fgc_glm_month))
+summary(neo_fgc_glm_month)
+
+# fgc ~ CP
+# neg corr (estimate = -.11694 +- 1.96* .0457, p = .0150)
+cp_fgc_glm_month <- glmer(med_stdsg_CP ~ sex +
+                            scale(avg_fgc) + 
+                            scale(age) +
+                            (1|subj), 
+                          family = Gamma("log"),
+                          data = full_data_month)
+
+qqnorm(residuals(cp_fgc_glm_month))
+qqline(residuals(cp_fgc_glm_month))
+
+hist(residuals(cp_fgc_glm_month))
+plot(cp_fgc_glm_month)
+
+summary(cp_fgc_glm_month)
+
+# need to fix model, right skewed
+
+
+# -- step 4 causal mediation analysis ----
+# in progress
+set.seed(288)
+
+full_data_month_mediate <- full_data_month %>% 
+  drop_na(avg_fgc, med_stdsg_CP, med_neo_sg)
+
+colSums(!is.na(full_data_month_mediate))
+
+# total effect iv has on dv plus covariates
+fit.totaleffect <- lmer(med_neo_sg ~ scale(med_stdsg_CP) + 
+                          scale(age) + 
+                          sex + 
+                          (1|subj), 
+                        #family = Gamma("log")
+                        full_data_month_mediate)
+
+summary(fit.totaleffect)
+
+# effect of iv on mediator
+
+fit.mediator <- lmer(avg_fgc ~ scale(med_stdsg_CP) + 
+                       scale(age) +
+                       sex +
+                       (1|subj),
+                     #family = Gamma("log"),
+                     data = full_data_month_mediate)
+qqnorm(residuals(fit.mediator))
+qqline(residuals(fit.mediator))
+hist(residuals(fit.mediator))
+summary(fit.mediator)
+
+# no significant relationship, strange given negative relationship when cp is dependent
+
+# effect of mediator on dv controlling for iv
+
+fit.dv <- lmer(med_neo_sg ~ scale(avg_fgc) + 
+                 scale(med_stdsg_CP) +
+                 scale(age) +
+                 sex +
+                 (1|subj),
+               #family = Gamma("log"),
+               data = full_data_month_mediate)
+
+summary(fit.dv)
+
+results = mediate(fit.mediator, fit.dv, treat='med_stdsg_CP', mediator='avg_fgc', boot =T)
+
+
+# cannot use glmer and number of observations dont match btw mediator 
+# and outcome models
+
 # - additional exploration cp neo -----
 # LF says high neo outliers have lower cp, worth checking somehow
 # NATG suggestion: bin neopterin using quantcut into 6 even bins,
@@ -239,95 +330,5 @@ summary(neo_f_glm_month)
 
 # how to address non normality in linear mixed models
 
-# Fgc ----
-
-# fgc ~ neo
-# results: negative corr (estimate = -0.11286 +- 1.96* .03389, p = .000868)
-
-full_data_month %>% filter(med_neo_sg < 1000) %>% 
-  ggplot(aes(x = med_neo_sg, y = avg_fgc, color = sex)) + 
-  geom_point() + 
-  geom_smooth(method = "lm")
-
-neo_fgc_glm_month <- glmer(med_neo_sg ~ sex +
-                          scale(avg_fgc) + 
-                          scale(age) +
-                          (1|subj), 
-                        family = Gamma("log"),
-                        data = full_data_month)
-qqnorm(residuals(neo_fgc_glm_month))
-qqline(residuals(neo_fgc_glm_month))
-summary(neo_fgc_glm_month)
-
-# fgc ~ CP
-# neg corr (estimate = -.11694 +- 1.96* .0457, p = .0150)
-cp_fgc_glm_month <- glmer(med_stdsg_CP ~ sex +
-                            scale(avg_fgc) + 
-                            scale(age) +
-                            (1|subj), 
-                          family = Gamma("log"),
-                          data = full_data_month)
-
-qqnorm(residuals(cp_fgc_glm_month))
-qqline(residuals(cp_fgc_glm_month))
-
-hist(residuals(cp_fgc_glm_month))
-plot(cp_fgc_glm_month)
-
-summary(cp_fgc_glm_month)
-
-# need to fix model, right skewed
-
-#
-
-# mediation analysis ----
-# in progress
-set.seed(288)
-
-full_data_month_mediate <- full_data_month %>% 
-  drop_na(avg_fgc, med_stdsg_CP, med_neo_sg)
-
-colSums(!is.na(full_data_month_mediate))
-
-# total effect iv has on dv plus covariates
-fit.totaleffect <- lmer(med_neo_sg ~ scale(med_stdsg_CP) + 
-                           scale(age) + 
-                           sex + 
-                           (1|subj), 
-                         #family = Gamma("log")
-                        full_data_month_mediate)
-
-summary(fit.totaleffect)
-
-# effect of iv on mediator
-
-fit.mediator <- lmer(avg_fgc ~ scale(med_stdsg_CP) + 
-                        scale(age) +
-                        sex +
-                        (1|subj),
-                      #family = Gamma("log"),
-                      data = full_data_month_mediate)
-qqnorm(residuals(fit.mediator))
-qqline(residuals(fit.mediator))
-hist(residuals(fit.mediator))
-summary(fit.mediator)
-
-# no significant relationship, strange given negative relationship when cp is dependent
-
-# effect of mediator on dv controlling for iv
-
-fit.dv <- lmer(med_neo_sg ~ scale(avg_fgc) + 
-               scale(med_stdsg_CP) +
-               scale(age) +
-               sex +
-               (1|subj),
-             #family = Gamma("log"),
-             data = full_data_month_mediate)
-
-summary(fit.dv)
-
-results = mediate(fit.mediator, fit.dv, treat='med_stdsg_CP', mediator='avg_fgc', boot =T)
 
 
-# cannot use glmer and number of observations dont match btw mediator 
-# and outcome models
