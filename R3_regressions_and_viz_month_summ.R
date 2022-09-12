@@ -25,29 +25,36 @@ hist(full_data_month$med_stdsg_CP)
 hist(scale(full_data_month$avg_stdsg_CP))
 hist(log2(full_data_month$avg_stdsg_CP))
 
+hist(full_data_month$avg_fgc)
+hist(full_data_month$med_fgc)
+hist(scale(full_data_month$avg_fgc))
+hist(log2(full_data_month$avg_fgc))
+
 # H1 - energetics of cellular immunity - cp neo - viz and regression -----
 
 # - H1a is neo energetically constrained? --- neo ~ cp + age + sex ------
 # results - pos corr: estimate = .17546 +- 1.96 * .03850
 
 neo_cp_glm_month <- glmer(avg_neo_sg ~ sex +
-                           log2(age) +
+                           age +
                            log2(avg_stdsg_CP) +
                            (1|subj), 
                          family = Gamma("log"),
-                         data = full_data_month)
+                         data = full_data_month,
+                         control = glmerControl(optimizer ="Nelder_Mead"))
 qqnorm(residuals(neo_cp_glm_month))
 qqline(residuals(neo_cp_glm_month))
 summary(neo_cp_glm_month)
 
 #neo ~ cp controlling for fgc
 neo_cp_fgc_glm_month <- glmer(avg_neo_sg ~ sex +
-                            log2(age) +
+                            age +
                             log2(avg_stdsg_CP) +
                             log2(avg_fgc) +
                             (1|subj), 
                           family = Gamma("log"),
-                          data = full_data_month)
+                          data = full_data_month,
+                          control = glmerControl(optimizer ="Nelder_Mead"))
 qqnorm(residuals(neo_cp_fgc_glm_month))
 qqline(residuals(neo_cp_fgc_glm_month))
 summary(neo_cp_fgc_glm_month)
@@ -75,7 +82,7 @@ full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
 # does not eat into available energy -- as more energy becomes available, more used for immunity
 # mod
 cp_neo_glm_month <- glmer(avg_stdsg_CP ~ sex +
-                            log2(age) +
+                            age +
                             log2(avg_neo_sg) +
                            (1|subj), 
                          family = Gamma("log"), 
@@ -107,9 +114,10 @@ full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
 
 # feeding ~ neo 
 f_neo_lm_month <- lmer(f ~ sex + 
+                          age +
                           log2(avg_neo_sg) + 
                           log2(avg_stdsg_CP) +
-                          log2(age) + (1|subj), 
+                           (1|subj), 
                         data = full_data_month)
 qqnorm(residuals(f_neo_lm_month))
 qqline(residuals(f_neo_lm_month))
@@ -117,9 +125,10 @@ summary(f_neo_lm_month)
 
 # resting ~ neo - see increased resting when neo is higher
 r_neo_lm_month <- lmer(r ~ sex + 
+                         age +
                          log2(avg_neo_sg) + 
                          log2(avg_stdsg_CP) +
-                         log2(age) + (1|subj), 
+                         (1|subj), 
                        data = full_data_month)
 qqnorm(residuals(r_neo_lm_month))
 qqline(residuals(r_neo_lm_month))
@@ -127,9 +136,10 @@ summary(r_neo_lm_month)
 
 # moving ~ neo 
 m_neo_lm_month <- lmer(m ~ sex + 
+                         age +
                          log2(avg_neo_sg) + 
                          log2(avg_stdsg_CP) +
-                         log2(age) + (1|subj), 
+                         (1|subj), 
                        data = full_data_month)
 qqnorm(residuals(m_neo_lm_month))
 qqline(residuals(m_neo_lm_month))
@@ -146,34 +156,24 @@ full_data_month %>% filter(avg_neo_sg < 1000) %>%
   geom_smooth(method = "lm")
 
 
-fgc_cp_glm_month <- glmer(avg_fgc ~ sex +
-                            log(age) +
-                            log(avg_stdsg_CP) +
-                            (1|subj), 
-                          family = Gamma("log"),
+fgc_cp_lm_month <- lmer(avg_fgc ~ sex +
+                            age +
+                            log2(avg_stdsg_CP) +
+                            (1|subj),
                           data = full_data_month)
-qqnorm(residuals(fgc_cp_glm_month))
-qqline(residuals(fgc_cp_glm_month))
-summary(fgc_cp_glm_month)
+qqnorm(residuals(fgc_cp_lm_month))
+qqline(residuals(fgc_cp_lm_month))
+summary(fgc_cp_lm_month)
 
 neo_fgc_glm_month <- glmer(avg_neo_sg ~ sex +
+                             age +
                              log2(avg_fgc) + 
-                             log2(age) +
                              (1|subj), 
                            family = Gamma("log"),
                            data = full_data_month)
 qqnorm(residuals(neo_fgc_glm_month))
 qqline(residuals(neo_fgc_glm_month))
 summary(neo_fgc_glm_month)
-
-
-
-hist(residuals(cp_fgc_glm_month))
-plot(cp_fgc_glm_month)
-
-
-# need to fix model, right skewed
-
 
 # -- step 4 causal mediation analysis ----
 # in progress
@@ -186,7 +186,7 @@ colSums(!is.na(full_data_month_mediate))
 
 # total effect iv has on dv plus covariates
 fit.totaleffect <- lmer(avg_neo_sg ~ log2(avg_stdsg_CP) + 
-                          log2(age) + 
+                          age + 
                           sex + 
                           (1|subj), 
                         #family = Gamma("log")
@@ -197,7 +197,7 @@ summary(fit.totaleffect)
 # effect of iv on mediator
 
 fit.mediator <- lmer(avg_fgc ~ log2(avg_stdsg_CP) + 
-                       log2(age) +
+                       age +
                        sex +
                        (1|subj),
                      #family = Gamma("log"),
@@ -213,7 +213,7 @@ summary(fit.mediator)
 
 fit.dv <- lmer(avg_neo_sg ~ log2(avg_fgc) + 
                  log2(avg_stdsg_CP) +
-                 log2(age) +
+                 age +
                  sex +
                  (1|subj),
                #family = Gamma("log"),
@@ -269,7 +269,7 @@ full_data_month %>%
 
 cr_neo_lm_month <- lmer(avg_cr_resid ~ sex + 
                            log2(avg_neo_sg) + 
-                           log2(age) +
+                           age +
                            (1|subj),
                          data = full_data_month)
 qqnorm(residuals(cr_neo_lm_month))
@@ -283,7 +283,7 @@ summary(cr_neo_lm_month)
 
 neo_cr_glm_month <- glmer(avg_neo_sg ~ sex +
                            log2(avg_cr_resid) + 
-                           log2(age) +
+                           age +
                            (1|subj), 
                          family = Gamma("log"), 
                          data = full_data_month)
@@ -315,7 +315,7 @@ full_data_month %>%
 
 r_neo_glm_month <- glmer(r ~ sex +
                            log2(avg_neo_sg) + 
-                           log2(age) +
+                           age +
                            (1|subj), 
                          family = Gamma("log"),
                          data = full_data_month)
@@ -335,7 +335,7 @@ full_data_month %>% filter(avg_neo_sg < 2000) %>%
 
 f_neo_lm_month_lmer <- lmer(f ~ sex +
                           log2(avg_neo_sg) + 
-                          log2(age) +
+                          age +
                           (1|subj), 
                         data = full_data_month)
 qqnorm(residuals(f_neo_lm_month_lmer))
@@ -346,7 +346,7 @@ hist(residuals(f_neo_lm_month_lmer))
 
 neo_f_glm_month <- glmer(avg_neo_sg ~ sex +
                           log2(f) + 
-                          log2(age) +
+                          age +
                           (1|subj), 
                         family = Gamma("log"),
                         data = full_data_month)
@@ -365,7 +365,7 @@ summary(neo_f_glm_month)
 # neg corr (estimate = -.11694 +- 1.96* .0457, p = .0150)
 cp_fgc_glm_month <- glmer(avg_stdsg_CP ~ sex +
                             log2(avg_fgc) + 
-                            log2(age) +
+                            age +
                             (1|subj), 
                           family = Gamma("log"),
                           data = full_data_month)
