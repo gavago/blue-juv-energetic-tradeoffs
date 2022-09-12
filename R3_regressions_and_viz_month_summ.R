@@ -1,7 +1,7 @@
 library(tidyverse)
 library(lmerTest)
 library(gtools)
-library(AICcmodavg) #NTG to LF - what are are you using this for?
+library(AICcmodavg) #NTG to LF - what are are you using this package for?
 library(mediation)
 
 # data includes fgcs and overall is summarized by subj year month
@@ -25,10 +25,7 @@ hist(full_data_month$med_stdsg_CP)
 hist(scale(full_data_month$avg_stdsg_CP))
 hist(log2(full_data_month$avg_stdsg_CP))
 
-
-# regressions to be run here will test relationships in the concept map
-
-# H1 - cp neo - viz and regression -----
+# H1 - energetics of cellular immunity - cp neo - viz and regression -----
 
 # - H1a is neo energetically constrained? --- neo ~ cp + age + sex ------
 # results - pos corr: estimate = .17546 +- 1.96 * .03850
@@ -73,9 +70,10 @@ full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
 
 
 # - H1b does neo eat into available energy? --- cp ~ neo + age + sex ----
+
 # result: pos corr btw med cp and med neo, coefficient = .16085 +- 1.96 * .05783 -- 
 # does not eat into available energy -- as more energy becomes available, more used for immunity
-
+# mod
 cp_neo_glm_month <- glmer(avg_stdsg_CP ~ sex +
                             log2(age) +
                             log2(avg_neo_sg) +
@@ -87,6 +85,7 @@ qqnorm(residuals(cp_neo_glm_month))
 qqline(residuals(cp_neo_glm_month))
 summary(cp_neo_glm_month)
 
+# viz
 full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
   ggplot(aes(y = avg_stdsg_CP, x = avg_neo_sg, color = sex)) +
   geom_point() +
@@ -96,11 +95,15 @@ full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
        x = "Neopterin",
        title = "Neopterin and Energy Balance")
 
-# ---- if so (if neo coef < 0) is this because increase neo corresponds with lower feeding? 
-# neo coef > 0 
-# ---- f ~ neo + age + sex 
-# results: no significant relationship. large P value, std error crosses 0
-# but iffy q-q plot
+# - Does feeding, moving, or resting compensate for the cost of neo? ----
+# resting:
+# good q-q plot
+# results: pos corr (estimate = 0.02366 +- 1.96*.01011, p = .01926)
+# suggests animals rest to compensate for energy expend. from immunity
+# feeding
+# iffy q-q plot
+# results: no significant relationship w both med and avg
+# (estimate crosses 0, hi p score)
 
 # feeding ~ neo 
 f_neo_lm_month <- lmer(f ~ sex + 
@@ -112,16 +115,6 @@ qqnorm(residuals(f_neo_lm_month))
 qqline(residuals(f_neo_lm_month))
 summary(f_neo_lm_month)
 
-# moving ~ neo 
-m_neo_lm_month <- lmer(m ~ sex + 
-                         log2(avg_neo_sg) + 
-                         log2(avg_stdsg_CP) +
-                         log2(age) + (1|subj), 
-                       data = full_data_month)
-qqnorm(residuals(m_neo_lm_month))
-qqline(residuals(m_neo_lm_month))
-summary(m_neo_lm_month)
-
 # resting ~ neo - see increased resting when neo is higher
 r_neo_lm_month <- lmer(r ~ sex + 
                          log2(avg_neo_sg) + 
@@ -132,6 +125,15 @@ qqnorm(residuals(r_neo_lm_month))
 qqline(residuals(r_neo_lm_month))
 summary(r_neo_lm_month)
 
+# moving ~ neo 
+m_neo_lm_month <- lmer(m ~ sex + 
+                         log2(avg_neo_sg) + 
+                         log2(avg_stdsg_CP) +
+                         log2(age) + (1|subj), 
+                       data = full_data_month)
+qqnorm(residuals(m_neo_lm_month))
+qqline(residuals(m_neo_lm_month))
+summary(m_neo_lm_month)
 
 # - H1c - cp effect on neo mediated by GCs - Steps 2 & 3 ----
 
@@ -249,7 +251,7 @@ cp_neo_bin_anova <- aov(avg_stdsg_CP ~ neo_bin*age*sex, data = full_data_month)
 # test with anova to see if cp differs by neo bin
 # need to find equivalent of (1 | subj)
 
-# H2- neo cr_resid - viz and regression ----
+# H2- body condition and cellular immunity - neo cr_resid - viz and regression ----
 # - H2a neo/immunity prioritized over growth --- cr_resid ~ neo + age + sex  ----
 # iffy q-q plot
 # non-positive values can't be used with gamma and cant use log
@@ -299,12 +301,7 @@ full_data_month %>%
        x =  "Median Lean Body Mass by Month",
        title = "Body Condition Constraint on Neopterin")
 
-# R and f compensating for cost of neo ----
 
-# resting
-# good q-q plot
-# results: pos corr (estimate = 0.02366 +- 1.96*.01011, p = .01926)
-# suggests animals rest to compensate for energy expend. from immunity
 
 full_data_month %>% 
   #filter(avg_neo_sg < 2000) %>% 
@@ -326,11 +323,7 @@ qqnorm(residuals(r_neo_glm_month))
 qqline(residuals(r_neo_glm_month))
 summary(r_neo_glm_month)
 
-# feeding
-# iffy q-q plot
-# results: no significant relationship w both med and avg
-# (estimate crosses 0, hi p score)
-
+# viz
 full_data_month %>% filter(avg_neo_sg < 2000) %>% 
   ggplot(aes(x = avg_neo_sg, y = f, color = sex)) + 
   geom_point() + 
