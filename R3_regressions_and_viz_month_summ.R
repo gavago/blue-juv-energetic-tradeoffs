@@ -15,13 +15,13 @@ hist(full_data_month$age)
 hist(scale(full_data_month$age))
 hist(log2(full_data_month$age))
 
-hist(full_data_month$med_neo_sg)
 hist(full_data_month$avg_neo_sg)
+hist(full_data_month$med_neo_sg)
 hist(scale(full_data_month$avg_neo_sg))
 hist(log2(full_data_month$avg_neo_sg))
 
-hist(full_data_month$med_stdsg_CP)
 hist(full_data_month$avg_stdsg_CP)
+hist(full_data_month$med_stdsg_CP)
 hist(scale(full_data_month$avg_stdsg_CP))
 hist(log2(full_data_month$avg_stdsg_CP))
 
@@ -33,9 +33,9 @@ hist(log2(full_data_month$avg_stdsg_CP))
 # - H1a is neo energetically constrained? --- neo ~ cp + age + sex ------
 # results - pos corr: estimate = .17546 +- 1.96 * .03850
 
-neo_cp_glm_month <- glmer(med_neo_sg ~ sex +
+neo_cp_glm_month <- glmer(avg_neo_sg ~ sex +
                            log2(age) +
-                           log2(med_stdsg_CP) +
+                           log2(avg_stdsg_CP) +
                            (1|subj), 
                          family = Gamma("log"),
                          data = full_data_month)
@@ -44,9 +44,9 @@ qqline(residuals(neo_cp_glm_month))
 summary(neo_cp_glm_month)
 
 #neo ~ cp controlling for fgc
-neo_cp_fgc_glm_month <- glmer(med_neo_sg ~ sex +
+neo_cp_fgc_glm_month <- glmer(avg_neo_sg ~ sex +
                             log2(age) +
-                            log2(med_stdsg_CP) +
+                            log2(avg_stdsg_CP) +
                             log2(avg_fgc) +
                             (1|subj), 
                           family = Gamma("log"),
@@ -61,8 +61,8 @@ hist(residuals(neo_cp_glm_month))
 
 # visualization (mean and median look very similar in viz)
 
-full_data_month %>% filter(med_stdsg_CP < 4000, med_neo_sg < 2000) %>%
-  ggplot(aes(x = med_stdsg_CP, y = med_neo_sg, color = sex)) +
+full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
+  ggplot(aes(x = avg_stdsg_CP, y = avg_neo_sg, color = sex)) +
   geom_point() +
   geom_smooth(method = "lm") +
   theme_minimal() +
@@ -76,18 +76,19 @@ full_data_month %>% filter(med_stdsg_CP < 4000, med_neo_sg < 2000) %>%
 # result: pos corr btw med cp and med neo, coefficient = .16085 +- 1.96 * .05783 -- 
 # does not eat into available energy -- as more energy becomes available, more used for immunity
 
-cp_neo_glm_month <- glmer(med_stdsg_CP ~ sex +
+cp_neo_glm_month <- glmer(avg_stdsg_CP ~ sex +
                             log2(age) +
-                            log2(med_neo_sg) +
+                            log2(avg_neo_sg) +
                            (1|subj), 
                          family = Gamma("log"), 
-                         data = full_data_month)
+                         data = full_data_month,
+                         control = glmerControl(optimizer ="Nelder_Mead"))
 qqnorm(residuals(cp_neo_glm_month))
 qqline(residuals(cp_neo_glm_month))
 summary(cp_neo_glm_month)
 
-full_data_month %>% filter(med_stdsg_CP < 4000, med_neo_sg < 2000) %>%
-  ggplot(aes(y = med_stdsg_CP, x = med_neo_sg, color = sex)) +
+full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
+  ggplot(aes(y = avg_stdsg_CP, x = avg_neo_sg, color = sex)) +
   geom_point() +
   geom_smooth(method = "lm") +
   theme_minimal() +
@@ -100,13 +101,36 @@ full_data_month %>% filter(med_stdsg_CP < 4000, med_neo_sg < 2000) %>%
 # ---- f ~ neo + age + sex 
 # results: no significant relationship. large P value, std error crosses 0
 # but iffy q-q plot
+
+# feeding ~ neo 
 f_neo_lm_month <- lmer(f ~ sex + 
-                          log2(med_neo_sg) + 
+                          log2(avg_neo_sg) + 
+                          log2(avg_stdsg_CP) +
                           log2(age) + (1|subj), 
                         data = full_data_month)
 qqnorm(residuals(f_neo_lm_month))
 qqline(residuals(f_neo_lm_month))
 summary(f_neo_lm_month)
+
+# moving ~ neo 
+m_neo_lm_month <- lmer(m ~ sex + 
+                         log2(avg_neo_sg) + 
+                         log2(avg_stdsg_CP) +
+                         log2(age) + (1|subj), 
+                       data = full_data_month)
+qqnorm(residuals(m_neo_lm_month))
+qqline(residuals(m_neo_lm_month))
+summary(m_neo_lm_month)
+
+# resting ~ neo - see increased resting when neo is higher
+r_neo_lm_month <- lmer(r ~ sex + 
+                         log2(avg_neo_sg) + 
+                         log2(avg_stdsg_CP) +
+                         log2(age) + (1|subj), 
+                       data = full_data_month)
+qqnorm(residuals(r_neo_lm_month))
+qqline(residuals(r_neo_lm_month))
+summary(r_neo_lm_month)
 
 
 # - H1c - cp effect on neo mediated by GCs - Steps 2 & 3 ----
@@ -114,15 +138,15 @@ summary(f_neo_lm_month)
 # fgc ~ neo
 # results: negative corr (estimate = -0.11286 +- 1.96* .03389, p = .000868)
 
-full_data_month %>% filter(med_neo_sg < 1000) %>% 
-  ggplot(aes(x = med_neo_sg, y = avg_fgc, color = sex)) + 
+full_data_month %>% filter(avg_neo_sg < 1000) %>% 
+  ggplot(aes(x = avg_neo_sg, y = avg_fgc, color = sex)) + 
   geom_point() + 
   geom_smooth(method = "lm")
 
 
 fgc_cp_glm_month <- glmer(avg_fgc ~ sex +
                             log(age) +
-                            log(med_stdsg_CP) +
+                            log(avg_stdsg_CP) +
                             (1|subj), 
                           family = Gamma("log"),
                           data = full_data_month)
@@ -130,7 +154,7 @@ qqnorm(residuals(fgc_cp_glm_month))
 qqline(residuals(fgc_cp_glm_month))
 summary(fgc_cp_glm_month)
 
-neo_fgc_glm_month <- glmer(med_neo_sg ~ sex +
+neo_fgc_glm_month <- glmer(avg_neo_sg ~ sex +
                              log2(avg_fgc) + 
                              log2(age) +
                              (1|subj), 
@@ -154,12 +178,12 @@ plot(cp_fgc_glm_month)
 set.seed(288)
 
 full_data_month_mediate <- full_data_month %>% 
-  drop_na(avg_fgc, med_stdsg_CP, med_neo_sg)
+  drop_na(avg_fgc, avg_stdsg_CP, avg_neo_sg)
 
 colSums(!is.na(full_data_month_mediate))
 
 # total effect iv has on dv plus covariates
-fit.totaleffect <- lmer(med_neo_sg ~ log2(med_stdsg_CP) + 
+fit.totaleffect <- lmer(avg_neo_sg ~ log2(avg_stdsg_CP) + 
                           log2(age) + 
                           sex + 
                           (1|subj), 
@@ -170,7 +194,7 @@ summary(fit.totaleffect)
 
 # effect of iv on mediator
 
-fit.mediator <- lmer(avg_fgc ~ log2(med_stdsg_CP) + 
+fit.mediator <- lmer(avg_fgc ~ log2(avg_stdsg_CP) + 
                        log2(age) +
                        sex +
                        (1|subj),
@@ -185,8 +209,8 @@ summary(fit.mediator)
 
 # effect of mediator on dv controlling for iv
 
-fit.dv <- lmer(med_neo_sg ~ log2(avg_fgc) + 
-                 log2(med_stdsg_CP) +
+fit.dv <- lmer(avg_neo_sg ~ log2(avg_fgc) + 
+                 log2(avg_stdsg_CP) +
                  log2(age) +
                  sex +
                  (1|subj),
@@ -195,7 +219,7 @@ fit.dv <- lmer(med_neo_sg ~ log2(avg_fgc) +
 
 summary(fit.dv)
 
-results = mediate(fit.mediator, fit.dv, treat='med_stdsg_CP', mediator='avg_fgc', boot =T)
+results = mediate(fit.mediator, fit.dv, treat='avg_stdsg_CP', mediator='avg_fgc', boot =T)
 
 
 # cannot use glmer and number of observations dont match btw mediator 
@@ -205,22 +229,22 @@ results = mediate(fit.mediator, fit.dv, treat='med_stdsg_CP', mediator='avg_fgc'
 # LF says high neo outliers have lower cp, worth checking somehow
 # NATG suggestion: bin neopterin using quantcut into 6 even bins,
 # visualize with boxplot with y = cp and x = neo_bin
-full_data_month %>% ggplot(aes(y = med_stdsg_CP, x = med_neo_sg, color = sex)) + geom_point()
+full_data_month %>% ggplot(aes(y = avg_stdsg_CP, x = avg_neo_sg, color = sex)) + geom_point()
 
 neo_bin <- full_data_month %>% 
-  select(med_neo_sg) %>% 
+  select(avg_neo_sg) %>% 
   pull() %>% 
   quantcut(q = 6)
 
 full_data_month %>% 
-  mutate(neo_bin = quantcut(med_neo_sg, q = 6)) %>% 
-  ggplot(aes(x = neo_bin, y = med_stdsg_CP)) +
+  mutate(neo_bin = quantcut(avg_neo_sg, q = 6)) %>% 
+  ggplot(aes(x = neo_bin, y = avg_stdsg_CP)) +
   geom_boxplot() + 
   labs(x =  "Neopterin", 
        y = "C-Peptide",
        title = "Median C-Peptide and Neopterin by Month") 
 
-cp_neo_bin_anova <- aov(med_stdsg_CP ~ neo_bin*age*sex, data = full_data_month)
+cp_neo_bin_anova <- aov(avg_stdsg_CP ~ neo_bin*age*sex, data = full_data_month)
 
 # test with anova to see if cp differs by neo bin
 # need to find equivalent of (1 | subj)
@@ -232,8 +256,8 @@ cp_neo_bin_anova <- aov(med_stdsg_CP ~ neo_bin*age*sex, data = full_data_month)
 # pos corr btw med cr and med neo sg
 
 full_data_month %>% 
-  filter(med_neo_sg < 2000) %>% 
-  ggplot(aes(x = med_neo_sg, y = med_cr_resid, color = sex)) +
+  filter(avg_neo_sg < 2000) %>% 
+  ggplot(aes(x = avg_neo_sg, y = avg_cr_resid, color = sex)) +
   geom_smooth(method = "lm") + 
   geom_point() +
   theme_minimal() + 
@@ -241,8 +265,8 @@ full_data_month %>%
        y =  "Median Creatinine Residuals by Month",
        title = "Neopterin Relationship with Lean Tissue")
 
-cr_neo_lm_month <- lmer(med_cr_resid ~ sex + 
-                           log2(med_neo_sg) + 
+cr_neo_lm_month <- lmer(avg_cr_resid ~ sex + 
+                           log2(avg_neo_sg) + 
                            log2(age) +
                            (1|subj),
                          data = full_data_month)
@@ -255,8 +279,8 @@ summary(cr_neo_lm_month)
 # iffy q-q plot
 # results - pos corr btw neo and cr: estimate = .273630 +- 1.96*0 .032827, p score = <2e-16
 
-neo_cr_glm_month <- glmer(med_neo_sg ~ sex +
-                           log2(med_cr_resid) + 
+neo_cr_glm_month <- glmer(avg_neo_sg ~ sex +
+                           log2(avg_cr_resid) + 
                            log2(age) +
                            (1|subj), 
                          family = Gamma("log"), 
@@ -266,8 +290,8 @@ qqline(residuals(neo_cr_glm_month))
 summary(neo_cr_glm_month)
 
 full_data_month %>% 
-  filter(med_neo_sg < 2000, med_cr_resid < .75) %>% 
-  ggplot(aes(y = med_neo_sg, x = med_cr_resid, color = sex)) +
+  filter(avg_neo_sg < 2000, avg_cr_resid < .75) %>% 
+  ggplot(aes(y = avg_neo_sg, x = avg_cr_resid, color = sex)) +
   geom_smooth(method = "lm") + 
   geom_point() +
   theme_minimal() + 
@@ -283,8 +307,8 @@ full_data_month %>%
 # suggests animals rest to compensate for energy expend. from immunity
 
 full_data_month %>% 
-  #filter(med_neo_sg < 2000) %>% 
-  ggplot(aes(x = log(med_neo_sg), y = r, color = sex)) + 
+  #filter(avg_neo_sg < 2000) %>% 
+  ggplot(aes(x = log(avg_neo_sg), y = r, color = sex)) + 
   geom_point() + 
   geom_smooth(method = lm) + 
   theme_minimal() + 
@@ -293,7 +317,7 @@ full_data_month %>%
        title = "Immunity and Rest")
 
 r_neo_glm_month <- glmer(r ~ sex +
-                           log2(med_neo_sg) + 
+                           log2(avg_neo_sg) + 
                            log2(age) +
                            (1|subj), 
                          family = Gamma("log"),
@@ -307,8 +331,8 @@ summary(r_neo_glm_month)
 # results: no significant relationship w both med and avg
 # (estimate crosses 0, hi p score)
 
-full_data_month %>% filter(med_neo_sg < 2000) %>% 
-  ggplot(aes(x = med_neo_sg, y = f, color = sex)) + 
+full_data_month %>% filter(avg_neo_sg < 2000) %>% 
+  ggplot(aes(x = avg_neo_sg, y = f, color = sex)) + 
   geom_point() + 
   geom_smooth(method = lm) + 
   theme_minimal() + 
@@ -327,7 +351,7 @@ summary(f_neo_lm_month_lmer)
 
 hist(residuals(f_neo_lm_month_lmer))
 
-neo_f_glm_month <- glmer(med_neo_sg ~ sex +
+neo_f_glm_month <- glmer(avg_neo_sg ~ sex +
                           log2(f) + 
                           log2(age) +
                           (1|subj), 
@@ -346,7 +370,7 @@ summary(neo_f_glm_month)
 # graveyard ----
 # fgc ~ CP
 # neg corr (estimate = -.11694 +- 1.96* .0457, p = .0150)
-cp_fgc_glm_month <- glmer(med_stdsg_CP ~ sex +
+cp_fgc_glm_month <- glmer(avg_stdsg_CP ~ sex +
                             log2(avg_fgc) + 
                             log2(age) +
                             (1|subj), 
