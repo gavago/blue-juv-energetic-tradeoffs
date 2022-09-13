@@ -149,13 +149,12 @@ summary(m_neo_lm_month)
 
 # fgc ~ neo
 # results: negative corr (estimate = -0.11286 +- 1.96* .03389, p = .000868)
-
 full_data_month %>% filter(avg_neo_sg < 1000) %>% 
   ggplot(aes(x = avg_neo_sg, y = avg_fgc, color = sex)) + 
   geom_point() + 
   geom_smooth(method = "lm")
 
-
+# fgc ~ cp
 fgc_cp_lm_month <- lmer(avg_fgc ~ sex +
                             age +
                             log2(avg_stdsg_CP) +
@@ -165,6 +164,7 @@ qqnorm(residuals(fgc_cp_lm_month))
 qqline(residuals(fgc_cp_lm_month))
 summary(fgc_cp_lm_month)
 
+# neo ~ fgc
 neo_fgc_glm_month <- glmer(avg_neo_sg ~ sex +
                              age +
                              log2(avg_fgc) + 
@@ -174,6 +174,22 @@ neo_fgc_glm_month <- glmer(avg_neo_sg ~ sex +
 qqnorm(residuals(neo_fgc_glm_month))
 qqline(residuals(neo_fgc_glm_month))
 summary(neo_fgc_glm_month)
+
+# neo ~ fgc + cp
+neo_fgc_cp_glm_month <- glmer(avg_neo_sg ~ sex +
+                             age +
+                             log2(avg_fgc) + 
+                            log2(avg_stdsg_CP) +
+                             (1|subj), 
+                           family = Gamma("log"),
+                           data = full_data_month,
+                           control = glmerControl(optimizer ="Nelder_Mead"))
+qqnorm(residuals(neo_fgc_cp_glm_month))
+qqline(residuals(neo_fgc_cp_glm_month))
+# neo ~ fgc + cp vs. neo ~ cp,
+# compare cp coefficient when fgc present vs absent, no big change.
+summary(neo_fgc_cp_glm_month)
+summary(neo_cp_glm_month) 
 
 # -- step 4 causal mediation analysis ----
 # in progress
@@ -220,6 +236,7 @@ fit.dv <- lmer(avg_neo_sg ~ log2(avg_fgc) +
                data = full_data_month_mediate)
 
 summary(fit.dv)
+summary(fit.totaleffect)
 
 results = mediate(fit.mediator, fit.dv, treat='avg_stdsg_CP', mediator='avg_fgc', boot =T)
 
