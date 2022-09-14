@@ -1,11 +1,14 @@
 library(tidyverse)
 detach("package:lmerTest", unload = T)
 library(lme4)
+library(mediation)
 
-set.seed(288)
+
+load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 full_data_month_mediate <- full_data_month %>% 
   drop_na(avg_fgc, avg_stdsg_CP, avg_neo_sg)
 colSums(!is.na(full_data_month_mediate))
+dim(full_data_month)
 
 # total effect iv has on dv plus covariates
 fit.totaleffect <- lmer(avg_neo_sg ~ 
@@ -40,6 +43,7 @@ fit.dv <- lmer(avg_neo_sg ~
 summary(fit.dv)
 summary(fit.totaleffect)
 
+set.seed(288)
 results = mediate(fit.mediator, fit.dv, treat='log2(avg_stdsg_CP)', mediator='log2(avg_fgc)')
 
 summary(results)
@@ -51,9 +55,3 @@ plot(results)
 summary(results, output = "b")
 
 
-qqnorm(residuals(fit.mediator))
-qqline(residuals(fit.mediator))
-hist(residuals(fit.mediator))
-qqnorm(residuals(fit.mediator))
-qqline(residuals(fit.mediator))
-hist(residuals(fit.mediator))
