@@ -15,8 +15,7 @@ fit.totaleffect <- lmer(avg_neo_sg ~
                           log2(avg_stdsg_CP) + 
                           age + 
                           sex + 
-                          (1|subj), 
-                        #family = Gamma("log")
+                          (1|subj),
                         full_data_month_mediate)
 
 
@@ -26,7 +25,6 @@ fit.mediator <- lmer(avg_fgc ~
                        age +
                        sex +
                        (1|subj),
-                     #family = Gamma("log"),
                      data = full_data_month_mediate)
 
 # effect of mediator on dv controlling for iv
@@ -37,7 +35,6 @@ fit.dv <- lmer(avg_neo_sg ~
                  age +
                  sex +
                  (1|subj),
-               #family = Gamma("log"),
                data = full_data_month_mediate)
 
 summary(fit.dv)
