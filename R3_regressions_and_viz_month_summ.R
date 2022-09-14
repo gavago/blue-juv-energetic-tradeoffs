@@ -11,25 +11,6 @@ view(full_data_month)
 apply(full_data_month, 2, function(x) sum(is.na(x)))
 
 
-hist(full_data_month$age)
-hist(scale(full_data_month$age))
-hist(log2(full_data_month$age))
-
-hist(full_data_month$avg_neo_sg)
-hist(full_data_month$med_neo_sg)
-hist(scale(full_data_month$avg_neo_sg))
-hist(log2(full_data_month$avg_neo_sg))
-
-hist(full_data_month$avg_stdsg_CP)
-hist(full_data_month$med_stdsg_CP)
-hist(scale(full_data_month$avg_stdsg_CP))
-hist(log2(full_data_month$avg_stdsg_CP))
-
-hist(full_data_month$avg_fgc)
-hist(full_data_month$med_fgc)
-hist(scale(full_data_month$avg_fgc))
-hist(log2(full_data_month$avg_fgc))
-
 # H1 - energetics of cellular immunity - cp neo - viz and regression -----
 
 # - H1a is neo energetically constrained? --- neo ~ cp + age + sex ------
@@ -390,3 +371,21 @@ results = mediate(fit.mediator, fit.dv, treat='avg_stdsg_CP', mediator='avg_fgc'
 # cannot use glmer and number of observations dont match btw mediator 
 # and outcome models
 
+hist(full_data_month$age)
+hist(scale(full_data_month$age))
+hist(log2(full_data_month$age))
+
+hist(full_data_month$avg_neo_sg)
+hist(full_data_month$med_neo_sg)
+hist(scale(full_data_month$avg_neo_sg))
+hist(log2(full_data_month$avg_neo_sg))
+
+hist(full_data_month$avg_stdsg_CP)
+hist(full_data_month$med_stdsg_CP)
+hist(scale(full_data_month$avg_stdsg_CP))
+hist(log2(full_data_month$avg_stdsg_CP))
+
+hist(full_data_month$avg_fgc)
+hist(full_data_month$med_fgc)
+hist(scale(full_data_month$avg_fgc))
+hist(log2(full_data_month$avg_fgc))
