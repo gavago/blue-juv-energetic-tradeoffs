@@ -58,33 +58,35 @@ summary(fit.dv)
 summary(fit.dv_full) # no diff, bc all NAs dropped here too.
 
 
-# glmer vs lmer ---------
-
+# glmer vs lmer, using mediation dataset ---------
 fit.totaleffect_glmer <- glmer(avg_neo_sg ~
                             log2(avg_stdsg_CP) +
                               age + sex +
                             (1|subj), 
                           family = Gamma("log"),
-                          data = full_data_month,
+                          data = full_data_month_mediate,
                           control = glmerControl(optimizer ="Nelder_Mead"))
-# no fit.mediator_glmer - use lmer
-
+# no fit.mediator_glmer - uses lmer
 fit.dv_glmer <- glmer(avg_neo_sg ~ 
                                 log2(avg_fgc) + 
                                 log2(avg_stdsg_CP) +
                                 age + sex +
                                 (1|subj), 
                               family = Gamma("log"),
-                              data = full_data_month,
+                              data = full_data_month_mediate,
                               control = glmerControl(optimizer ="Nelder_Mead"))
 
 summary(fit.totaleffect_full)
 summary(fit.totaleffect_glmer)
-summary(fit.mediator_full) 
 summary(fit.dv_full)
 summary(fit.dv_glmer) 
-# big difference between direct effect of CP on NEO 
+# much stronger direct effect of CP on NEO (i.e. direct = controlling for FGCs)
 # when using gamma error distribution vs gaussian
+# gah. can't use mediate package.
+# suppose must do deep dive/consultation about how to conduct appropriate 
+# mediation analysis
+# mediation package results are perhaps ok for tentative reporting in AABA abstract
+
 
 
 # inspect model fits ---------
