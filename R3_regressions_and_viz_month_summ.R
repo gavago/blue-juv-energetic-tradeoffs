@@ -336,6 +336,7 @@ r_neo_glm_month <- glmer(r ~ sex +
                            (1|subj), 
                          family = Gamma("log"),
                          data = full_data_month)
+
 qqnorm(residuals(r_neo_glm_month))
 qqline(residuals(r_neo_glm_month))
 summary(r_neo_glm_month)
@@ -350,6 +351,7 @@ full_data_month %>% filter(avg_neo_sg < 2000) %>%
        x =  "Proportion of Time Feeding", 
        title = "Immunity and Feeding")
 
+#regression
 f_neo_lm_month_lmer <- lmer(f ~ sex +
                           log2(avg_neo_sg) + 
                           age +
@@ -371,12 +373,6 @@ qqnorm(residuals(neo_f_glm_month))
 qqline(residuals(neo_f_glm_month))
 summary(neo_f_glm_month)
 
-# significant relationship BUT 
-# failed to converge with max|grad| = 0.0348692 (tol = 0.002, component 1)
-
-# how to address non normality in linear mixed models
-
-
 # graveyard ----
 # fgc ~ CP
 # neg corr (estimate = -.11694 +- 1.96* .0457, p = .0150)
@@ -385,7 +381,7 @@ cp_fgc_glm_month <- glmer(avg_stdsg_CP ~ sex +
                             age +
                             (1|subj), 
                           family = Gamma("log"),
-                          data = full_data_month)
+                          data = full_data_month) 
 
 qqnorm(residuals(cp_fgc_glm_month))
 qqline(residuals(cp_fgc_glm_month))
