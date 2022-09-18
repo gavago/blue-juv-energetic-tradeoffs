@@ -73,6 +73,29 @@ qqnorm(residuals(cp_neo_glm_month))
 qqline(residuals(cp_neo_glm_month))
 summary(cp_neo_glm_month)
 
+# - H1c is food availability responsible for relationship bw cp and neo
+cp_fai_glm_month <- glmer(avg_stdsg_CP ~ sex +
+                            age + log2(fai) +
+                            (1|subj), 
+                          family = Gamma("log"), 
+                          data = full_data_month,
+                          control = glmerControl(optimizer ="Nelder_Mead"))
+qqnorm(residuals(cp_fai_glm_month))
+qqline(residuals(cp_fai_glm_month))
+summary(cp_fai_glm_month)
+# pos corr btw fai and cp as expected
+
+neo_fai_glm_month <- glmer(avg_neo_sg ~ sex +
+                            scale(age) + scale(log2(fai)) +
+                             scale(log2(avg_stdsg_CP)) +
+                            (1|subj), 
+                          family = Gamma("log"), 
+                          data = full_data_month,
+                          control = glmerControl(optimizer ="Nelder_Mead"))
+qqnorm(residuals(neo_fai_glm_month))
+qqline(residuals(neo_fai_glm_month))
+summary(neo_fai_glm_month)
+
 # viz
 full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
   ggplot(aes(y = avg_stdsg_CP, x = avg_neo_sg, color = sex)) +
