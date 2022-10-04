@@ -182,7 +182,7 @@ left_join(cp_sample_sgcr, neo_sample_sgcr, by = "sample_number") %>%
 
 
 # 3. BEHAVIOR -----
-load("/Users/nicolethompsongonzalez/Dropbox/2_R projects/Juvenile blues diss/Rewrite chapter 3 2021/scripts of Juv social preferences for rewrite/data/juv monthly activity budgets.Rdata", verbose = T)
+load("/Users/nicolethompsongonzalez/Dropbox/2_R-projects/Juv-blues-diss/Rewrite chapter 3 2021/scripts of Juv social preferences for rewrite/data/juv monthly activity budgets.Rdata", verbose = T)
 nrow(act_budget) #323
 head(act_budget)
 names(act_budget)
