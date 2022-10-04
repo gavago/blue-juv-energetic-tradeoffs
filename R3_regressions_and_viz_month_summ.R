@@ -6,6 +6,7 @@ library(mediation)
 
 # data includes fgcs and overall is summarized by subj year month
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
+names(full_data_month)
 view(full_data_month)
 
 apply(full_data_month, 2, function(x) sum(is.na(x)))

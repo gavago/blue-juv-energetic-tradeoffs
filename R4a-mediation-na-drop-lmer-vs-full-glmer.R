@@ -1,4 +1,3 @@
-# Examine if large difference in relationships because of NA rows dropped 
 library(tidyverse)
 library(lmerTest)
 
@@ -76,9 +75,9 @@ fit.dv_glmer <- glmer(avg_neo_sg ~
                               data = full_data_month_mediate,
                               control = glmerControl(optimizer ="Nelder_Mead"))
 
-summary(fit.totaleffect_full)
+summary(fit.totaleffect)
 summary(fit.totaleffect_glmer)
-summary(fit.dv_full)
+summary(fit.dv)
 summary(fit.dv_glmer) 
 # much stronger direct effect of CP on NEO (i.e. direct = controlling for FGCs)
 # when using gamma error distribution vs gaussian
