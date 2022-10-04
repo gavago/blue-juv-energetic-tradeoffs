@@ -74,6 +74,29 @@ qqnorm(residuals(cp_neo_glm_month))
 qqline(residuals(cp_neo_glm_month))
 summary(cp_neo_glm_month)
 
+# - H1c is food availability responsible for relationship bw cp and neo
+cp_fai_glm_month <- glmer(avg_stdsg_CP ~ sex +
+                            age + log2(fai) +
+                            (1|subj), 
+                          family = Gamma("log"), 
+                          data = full_data_month,
+                          control = glmerControl(optimizer ="Nelder_Mead"))
+qqnorm(residuals(cp_fai_glm_month))
+qqline(residuals(cp_fai_glm_month))
+summary(cp_fai_glm_month)
+# pos corr btw fai and cp as expected
+
+neo_fai_glm_month <- glmer(avg_neo_sg ~ sex +
+                            scale(age) + scale(log2(fai)) +
+                             scale(log2(avg_stdsg_CP)) +
+                            (1|subj), 
+                          family = Gamma("log"), 
+                          data = full_data_month,
+                          control = glmerControl(optimizer ="Nelder_Mead"))
+qqnorm(residuals(neo_fai_glm_month))
+qqline(residuals(neo_fai_glm_month))
+summary(neo_fai_glm_month)
+
 # viz
 full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
   ggplot(aes(y = avg_stdsg_CP, x = avg_neo_sg, color = sex)) +
@@ -266,6 +289,7 @@ r_neo_glm_month <- glmer(r ~ sex +
                            (1|subj), 
                          family = Gamma("log"),
                          data = full_data_month)
+
 qqnorm(residuals(r_neo_glm_month))
 qqline(residuals(r_neo_glm_month))
 summary(r_neo_glm_month)
@@ -280,6 +304,7 @@ full_data_month %>% filter(avg_neo_sg < 2000) %>%
        x =  "Proportion of Time Feeding", 
        title = "Immunity and Feeding")
 
+#regression
 f_neo_lm_month_lmer <- lmer(f ~ sex +
                           log2(avg_neo_sg) + 
                           age +
@@ -301,12 +326,6 @@ qqnorm(residuals(neo_f_glm_month))
 qqline(residuals(neo_f_glm_month))
 summary(neo_f_glm_month)
 
-# significant relationship BUT 
-# failed to converge with max|grad| = 0.0348692 (tol = 0.002, component 1)
-
-# how to address non normality in linear mixed models
-
-
 # graveyard ----
 # fgc ~ CP
 # neg corr (estimate = -.11694 +- 1.96* .0457, p = .0150)
@@ -315,7 +334,7 @@ cp_fgc_glm_month <- glmer(avg_stdsg_CP ~ sex +
                             log2(avg_fgc) + 
                             (1|subj), 
                           family = Gamma("log"),
-                          data = full_data_month)
+                          data = full_data_month) 
 
 qqnorm(residuals(cp_fgc_glm_month))
 qqline(residuals(cp_fgc_glm_month))
