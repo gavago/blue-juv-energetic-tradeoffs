@@ -27,6 +27,20 @@ qqnorm(residuals(neo_cp_glm_month))
 qqline(residuals(neo_cp_glm_month))
 summary(neo_cp_glm_month)
 
+# neo ~ cp controlling for mrank
+
+neo_cp_mrank_glm_month <- glmer(avg_neo_sg ~ sex +
+                            age + mrank +
+                            log2(avg_stdsg_CP) +
+                            (1|subj), 
+                          family = Gamma("log"),
+                          data = full_data_month)
+                          #control = glmerControl(optimizer ="Nelder_Mead"))
+qqnorm(residuals(neo_cp_mrank_glm_month))
+qqline(residuals(neo_cp_mrank_glm_month))
+summary(neo_cp_mrank_glm_month)
+
+
 #neo ~ cp controlling for fgc
 neo_cp_fgc_glm_month <- glmer(avg_neo_sg ~ sex +
                             age +
@@ -67,11 +81,34 @@ cp_neo_glm_month <- glmer(avg_stdsg_CP ~ sex +
                             log2(avg_neo_sg) +
                            (1|subj), 
                          family = Gamma("log"), 
-                         data = full_data_month,
+                         data = full_data_month)
                          control = glmerControl(optimizer ="Nelder_Mead"))
 qqnorm(residuals(cp_neo_glm_month))
 qqline(residuals(cp_neo_glm_month))
 summary(cp_neo_glm_month)
+
+# does mrank correlate with energy balance?
+cp_neo_mrank_glm_month <- glmer(avg_stdsg_CP ~ sex +
+                            age +
+                            log2(avg_neo_sg) + 
+                            mrank +
+                            (1|subj), 
+                          family = Gamma("log"), 
+                          data = full_data_month)
+                        # control = glmerControl(optimizer ="Nelder_Mead"))
+qqnorm(residuals(cp_neo_mrank_glm_month))
+qqline(residuals(cp_neo_mrank_glm_month))
+summary(cp_neo_mrank_glm_month)
+
+# viz
+full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
+  ggplot(aes(y = avg_stdsg_CP, x = avg_neo_sg, color = sex)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_minimal() +
+  labs(y = "C-peptide",
+       x = "Neopterin",
+       title = "Neopterin and Energy Balance")
 
 # - H1c is food availability responsible for relationship bw cp and neo
 cp_fai_glm_month <- glmer(avg_stdsg_CP ~ sex +
@@ -86,25 +123,41 @@ summary(cp_fai_glm_month)
 # pos corr btw fai and cp as expected
 
 neo_fai_glm_month <- glmer(avg_neo_sg ~ sex +
+                                scale(age) + scale(log2(fai)) +
+                                (1|subj), 
+                              family = Gamma("log"), 
+                              data = full_data_month,
+                              control = glmerControl(optimizer ="Nelder_Mead"))
+summary(neo_fai_glm_month)
+
+neo_fai_cp_glm_month <- glmer(avg_neo_sg ~ sex +
                             scale(age) + scale(log2(fai)) +
                              scale(log2(avg_stdsg_CP)) +
                             (1|subj), 
                           family = Gamma("log"), 
                           data = full_data_month,
                           control = glmerControl(optimizer ="Nelder_Mead"))
-qqnorm(residuals(neo_fai_glm_month))
-qqline(residuals(neo_fai_glm_month))
-summary(neo_fai_glm_month)
+qqnorm(residuals(neo_fai_cp_glm_month))
+qqline(residuals(neo_fai_cp_glm_month))
+summary(neo_fai_cp_glm_month)
 
-# viz
-full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
-  ggplot(aes(y = avg_stdsg_CP, x = avg_neo_sg, color = sex)) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  theme_minimal() +
-  labs(y = "C-peptide",
-       x = "Neopterin",
-       title = "Neopterin and Energy Balance")
+neo_fai_cp_glm_month_nolog <- glmer(avg_neo_sg ~ sex +
+                                scale(age) + scale(fai) +
+                                scale(avg_stdsg_CP) +
+                                (1|subj), 
+                              family = Gamma("log"), 
+                              data = full_data_month,
+control = glmerControl(optimizer ="Nelder_Mead"))
+
+qqnorm(residuals(neo_fai_cp_glm_month_nolog))
+qqline(residuals(neo_fai_cp_glm_month_nolog))
+summary(neo_fai_cp_glm_month_nolog)
+
+
+# stronger relationship btw fai and neo than cp and neo (ind of each other)
+# suggests fruit availability has stronger influence on neo than energy
+# stores released/other food in environment
+
 
 # - Does feeding, moving, or resting compensate for the cost of neo? ----
 # resting:
@@ -183,7 +236,7 @@ summary(neo_fgc_glm_month)
 neo_fgc_cp_glm_month <- glmer(avg_neo_sg ~ sex +
                                 age +
                                 log2(avg_fgc) + 
-                                log2(avg_stdsg_CP) +
+                                log2(avg_stdsg_CP)
                                 (1|subj), 
                               family = Gamma("log"),
                               data = full_data_month,
