@@ -45,7 +45,7 @@ full_data_month_rownum %>% filter(rowid > 200, rowid < 300) %>%
 
 # viz: fluctuations in neo
 
-full_data_rownum %>% filter(rowid > 200, rowid < 300) %>% 
+full_data_month_rownum %>% filter(rowid > 200, rowid < 300) %>% 
   ggplot() + 
   geom_line(aes(x = rowid, y = avg_neo_sg, color = subj))
 
@@ -72,12 +72,14 @@ full_data_avg_neo <- full_data %>%
   ungroup()
 
 full_data_growth_neo <- full_join(full_data_avg_neo, full_data_chng_lbm,  
-                                  by = intersect(names(full_data_avg_neo), names(full_data_chng_lbm)))
-
+                                  by = "subj")
+nrow(full_data_avg_neo)
+nrow(full_data_chng_lbm)
+nrow(full_data_growth_neo)
 # regression ----
 # had to use glm bc there is no change over time
 
-change_lbm_avg_neo_glm <- glm(change_lbm ~ log2(avg_neo_all_months) + 
+change_lbm_avg_neo_glm <- lm(change_lbm ~ log2(avg_neo_all_months) + 
         age + 
         sex,
         data = full_data_growth_neo)
@@ -116,4 +118,6 @@ cor.test(full_data_growth_neo$change_lbm,
         method = c("pearson"),
         conf.level = 0.95,
         continuity = FALSE)
-  
+full_data_growth_neo %>% ggplot(aes(x = avg_neo_all_months, y = change_lbm, 
+                                    color = sex, size = age)) + 
+  geom_jitter() 
