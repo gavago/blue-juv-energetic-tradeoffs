@@ -19,6 +19,7 @@ apply(full_data_month, 2, function(x) sum(is.na(x)))
 
 neo_cp_glm_month <- glmer(avg_neo_sg ~ sex +
                            age +
+                            mrank +
                            log2(avg_stdsg_CP) +
                            (1|subj), 
                          family = Gamma("log"),
@@ -65,6 +66,7 @@ full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
 # mod
 cp_neo_glm_month <- glmer(avg_stdsg_CP ~ sex +
                             age +
+                            mrank +
                             log2(avg_neo_sg) +
                            (1|subj), 
                          family = Gamma("log"), 
