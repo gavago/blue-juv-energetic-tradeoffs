@@ -72,8 +72,9 @@ full_data_short_term_lbm_change %>%
              y = sample_lbm_change, 
              color = sex)) +
   geom_jitter() +
-  geom_smooth(method = "lm") 
-#geom_point()
+  geom_smooth(method = "lm")
+
+# viz - change in relationship neo & change elbm according to change interval
 interplot(m = sample_lbm_change_neo_sg_lmer, var1 = "log2_neo", var2 = "sample_interval")
 
 
