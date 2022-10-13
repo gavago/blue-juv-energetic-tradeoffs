@@ -18,16 +18,17 @@ full_data_short_term_lbm_change <- full_data %>%
   #   TRUE ~ sample_interval)) %>% 
   ungroup()
 
-full_data_short_term_lbm_change %>%
-    select(subj, date, sample_interval, sample_lbm_change, cr_resid, neo_sg) %>% 
-    arrange(subj, date) %>%
-    view()
+#check alignment of data within rows
+# full_data_short_term_lbm_change %>%
+#     select(subj, date, sample_interval, sample_lbm_change, cr_resid, neo_sg) %>%
+#     arrange(subj, date) %>%
+#     view()
   
 view(full_data_short_term_lbm_change)
 hist(full_data_short_term_lbm_change$sample_lbm_change)
 # looks like normal dist
 
-# relationship lbm change and sample interval
+# relationship lbm change and sample interval - no bias, similar changes at all intervals
 full_data_short_term_lbm_change %>%
   ggplot(aes(sample_interval, sample_lbm_change)) +
   geom_point() +
@@ -44,8 +45,6 @@ full_data_short_term_lbm_change %>%
              color = sex)) +
   geom_smooth(method = "lm") + 
   geom_point()
-
-z.<- function(x) log2(x)
 
 # regression
 sample_lbm_change_neo_sg_lmer <-  full_data_short_term_lbm_change %>%
