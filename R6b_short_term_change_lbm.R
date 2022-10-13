@@ -1,7 +1,5 @@
 library(lmerTest)
-library(mgcv)
 library(tidyverse)
-library(dplyr)
 
 #load datasets
 full_data <- read.csv("data/full_dataset_juv_immune_energetics.csv", header = T)
