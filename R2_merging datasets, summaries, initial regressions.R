@@ -161,6 +161,18 @@ lmer(neo_sg ~ sex + scale(age) + scale(gm) + scale(stdsg_CP) + +  (1|subj), data
 
 
 
+# Sample counts for methods ------
+full_udata <- read_csv("data/urine_sample_dataset_juv_immune_energetics.csv")
+load("data/fgc_data_by_sample.Rdata", verbose = T)
+
+nrow(full_udata) #620
+nrow(gc_raw) #627
+
+full_udata %>%
+  distinct(subj, .keep_all = T) %>%
+  count(sex)
+
+
 # graveyard -----
 merged_data <- read.csv("data/merged_data_no_lean_body_mass.csv", header = T)
 
