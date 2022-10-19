@@ -81,10 +81,10 @@ cp_neo_glm_month <- glmer(avg_stdsg_CP ~ sex +
                             age +
                             mrank +
                             log2(avg_neo_sg) +
-                           (1|group/subj), 
+                           (1|subj), 
                          family = Gamma("log"), 
                          data = full_data_month)
-                         control = glmerControl(optimizer ="Nelder_Mead"))
+                         control = glmerControl(optimizer ="Nelder_Mead")
 qqnorm(residuals(cp_neo_glm_month))
 qqline(residuals(cp_neo_glm_month))
 summary(cp_neo_glm_month)
@@ -291,10 +291,10 @@ full_data_month %>%
        y =  "Median Creatinine Residuals by Month",
        title = "Neopterin Relationship with Lean Tissue")
 
-cr_neo_lm_month <- lmer(avg_cr_resid ~ sex + 
+cr_neo_lm_month <- lmer(avg_cr_resid ~ sex + mrank +
                            log2(avg_neo_sg) + 
                            age +
-                           (1|group/subj),
+                           (1|subj),
                          data = full_data_month)
 qqnorm(residuals(cr_neo_lm_month))
 qqline(residuals(cr_neo_lm_month))
