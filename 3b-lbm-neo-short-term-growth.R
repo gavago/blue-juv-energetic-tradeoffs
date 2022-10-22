@@ -1,10 +1,13 @@
+library(tidyverse)
 library(lmerTest)
 library(interplot)
-library(tidyverse)
 
-select <- dplyr::select
+select <- dplyr::select # interplot also has select
 
-#load datasets
+source("functions/vif.mer function.R") # function is "vif.mer"
+
+
+# create dataset ------
 full_data <- read.csv("data/full_dataset_juv_immune_energetics.csv", header = T)
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
@@ -23,7 +26,14 @@ full_data_short_term_lbm_change <- full_data %>%
 #     select(subj, date, sample_interval, sample_lbm_change, cr_resid, neo_sg) %>%
 #     arrange(subj, date) %>%
 #     view()
-  
+
+#save(full_data_short_term_lbm_change, file="data/full_data_short_term_lbm_change.Rdata")
+ 
+# load datasets ---
+load("data/full_data_short_term_lbm_change.Rdata", verbose = T)
+ 
+
+# explore dataset ------
 view(full_data_short_term_lbm_change)
 hist(full_data_short_term_lbm_change$sample_lbm_change)
 # looks like normal dist
@@ -46,7 +56,7 @@ full_data_short_term_lbm_change %>%
   geom_smooth(method = "lm") + 
   geom_point()
 
-# regression
+# change lbm t2-t1 ~ neo t1, regression ------
 sample_lbm_change_neo_sg_lmer <-  full_data_short_term_lbm_change %>%
   mutate(log2_neo = log2(neo_sg)) %>%
   lmer(sample_lbm_change ~
@@ -64,7 +74,7 @@ plot(residuals(sample_lbm_change_neo_sg_lmer))
 
 summary(sample_lbm_change_neo_sg_lmer)
 
-# viz - relationship neo and subsequent change in elbm
+# viz - relationship neo and subsequent change in elbm -----
 full_data_short_term_lbm_change %>% 
   filter(neo_sg < 2000) %>% 
   ggplot(aes(x = log2(neo_sg), 
@@ -73,7 +83,8 @@ full_data_short_term_lbm_change %>%
   geom_jitter() +
   geom_smooth(method = "lm")
 
-# viz - change in relationship neo & change elbm according to change interval
+# viz interaction - neo by interval ----
+# change in relationship neo & change elbm according to change interval
 interplot(m = sample_lbm_change_neo_sg_lmer, var1 = "log2_neo", var2 = "sample_interval")
 
 
