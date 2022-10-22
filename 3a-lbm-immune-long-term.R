@@ -2,21 +2,15 @@ library(tidyverse)
 library(lmerTest)
 library(gtools)
 
-source("functions/vif.mer function.R") # vif.mer
+source("functions/vif.mer function.R") # function is "vif.mer"
 
-
-
-# data includes fgcs and overall is summarized by subj year month
+# data summarized by subj year month
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
-names(full_data_month)
-view(full_data_month)
-
 apply(full_data_month, 2, function(x) sum(is.na(x)))
 
 
-
-# H2- body condition and cellular immunity - neo cr_resid - viz and regression ----
-# - H2a neo/immunity prioritized over growth --- cr_resid ~ neo + age + sex  ----
+# A2- body condition and cellular immunity - neo cr_resid - viz and regression ----
+# - A2a neo/immunity prioritized over growth --- cr_resid ~ neo + age + sex  ----
 # iffy q-q plot
 # non-positive values can't be used with gamma and cant use log
 # pos corr btw med cr and med neo sg
@@ -41,7 +35,7 @@ qqline(residuals(cr_neo_lm_month))
 summary(cr_neo_lm_month)
 
 
-# - H2b neo/immunity constrained by body condition --- neo ~ cr_resid + age + sex ----
+# - A2b neo/immunity constrained by body condition --- neo ~ cr_resid + age + sex ----
 # iffy q-q plot
 # results - pos corr btw neo and cr: estimate = .273630 +- 1.96*0 .032827, p score = <2e-16
 
