@@ -33,6 +33,8 @@ cr_neo_lm_month <- lmer(avg_cr_resid ~ sex + mrank +
 qqnorm(residuals(cr_neo_lm_month))
 qqline(residuals(cr_neo_lm_month))
 summary(cr_neo_lm_month)
+vif.mer(cr_neo_lm_month) # all < 1.05
+
 
 
 # - A2b neo/immunity constrained by body condition --- neo ~ cr_resid + age + sex ----
@@ -48,6 +50,7 @@ neo_cr_glm_month <- glmer(avg_neo_sg ~ sex +
 qqnorm(residuals(neo_cr_glm_month))
 qqline(residuals(neo_cr_glm_month))
 summary(neo_cr_glm_month)
+vif.mer(neo_cr_glm_month) # all < 1.000002
 
 full_data_month %>% 
   filter(avg_neo_sg < 2000, avg_cr_resid < .75) %>% 
@@ -81,6 +84,7 @@ r_neo_glm_month <- glmer(r ~ sex +
 qqnorm(residuals(r_neo_glm_month))
 qqline(residuals(r_neo_glm_month))
 summary(r_neo_glm_month)
+vif.mer(r_neo_glm_month) # all < 1.02
 
 # viz
 full_data_month %>% filter(avg_neo_sg < 2000) %>% 
@@ -103,6 +107,7 @@ qqline(residuals(f_neo_lm_month_lmer))
 summary(f_neo_lm_month_lmer)
 
 hist(residuals(f_neo_lm_month_lmer))
+vif.mer(f_neo_lm_month_lmer) # all < 1.04
 
 neo_f_glm_month <- glmer(avg_neo_sg ~ sex +
                           log2(f) + 
@@ -113,7 +118,7 @@ neo_f_glm_month <- glmer(avg_neo_sg ~ sex +
 qqnorm(residuals(neo_f_glm_month))
 qqline(residuals(neo_f_glm_month))
 summary(neo_f_glm_month)
-
+vif.mer(neo_f_glm_month) # all < 1.01
 # graveyard ----
 
 hist(full_data_month$age)

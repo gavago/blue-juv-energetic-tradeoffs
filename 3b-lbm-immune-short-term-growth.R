@@ -74,6 +74,9 @@ plot(residuals(sample_lbm_change_neo_sg_lmer))
 
 summary(sample_lbm_change_neo_sg_lmer)
 
+vif.mer(sample_lbm_change_neo_sg_lmer) 
+# all < 90.6 with interaction and < 1.02 without it
+
 # viz - relationship neo and subsequent change in elbm -----
 full_data_short_term_lbm_change %>% 
   filter(neo_sg < 2000) %>% 
