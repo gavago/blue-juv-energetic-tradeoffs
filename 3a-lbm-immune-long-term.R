@@ -120,17 +120,3 @@ hist(full_data_month$age)
 hist(scale(full_data_month$age))
 hist(log2(full_data_month$age))
 
-hist(full_data_month$avg_neo_sg)
-hist(full_data_month$med_neo_sg)
-hist(scale(full_data_month$avg_neo_sg))
-hist(log2(full_data_month$avg_neo_sg))
-
-hist(full_data_month$avg_stdsg_CP)
-hist(full_data_month$med_stdsg_CP)
-hist(scale(full_data_month$avg_stdsg_CP))
-hist(log2(full_data_month$avg_stdsg_CP))
-
-hist(full_data_month$avg_fgc)
-hist(full_data_month$med_fgc)
-hist(scale(full_data_month$avg_fgc))
-hist(log2(full_data_month$avg_fgc))
