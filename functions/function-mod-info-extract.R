@@ -6,7 +6,8 @@ mod_info_extract <- function(mod){
   if(grepl("^r", mod_name)) {response <- "Time resting"}
   if(grepl("^f", mod_name)) {response <- "Time feeding"}
   if(grepl("^m", mod_name)) {response <- "Time moving"}
-  if(grepl("^lbm_change", mod_name)) {response <- "∆ LBM"}
+  if(grepl("^change", mod_name)) {response <- "∆ LBM"}
+  if(grepl("^lbm", mod_name)) {response <- "LBM"}
   
   if(grepl("_lm_", mod_name)) {mod_type <- "lmer"}
   if(grepl("_glm_", mod_name)) {mod_type <- "glmer"}
