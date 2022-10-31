@@ -21,7 +21,7 @@ mod_info_extract(change_lbm_neo_lm_sample)
 mod_info_extract(neo_cp_glm_month)
 
 # A2 - mechanism constraints
-
+summary(med_results)
 
 
 
