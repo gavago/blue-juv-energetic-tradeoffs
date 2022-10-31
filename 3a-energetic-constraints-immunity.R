@@ -2,7 +2,6 @@ library(tidyverse)
 library(lmerTest)
 
 source("functions/vif.mer function.R") # vif.mer
-
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
 
@@ -14,7 +13,8 @@ neo_cp_glm_month <- glmer(avg_neo_sg ~
                             log2(avg_stdsg_CP) +
                             (1|subj), 
                           family = Gamma("log"),
-                          data = full_data_month, control = glmerControl(optimizer ="Nelder_Mead"))
+                          data = full_data_month, 
+                          control = glmerControl(optimizer ="Nelder_Mead"))
 qqnorm(residuals(neo_cp_glm_month))
 qqline(residuals(neo_cp_glm_month))
 summary(neo_cp_glm_month)
@@ -37,7 +37,7 @@ full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
 neo_lbm_glm_month <- glmer(avg_neo_sg ~ 
                              sex +
                              age +
-                             log2(avg_cr_resid) + 
+                             avg_cr_resid + 
                              (1|subj), 
                            family = Gamma("log"), 
                            data = full_data_month)
@@ -57,7 +57,7 @@ full_data_month %>%
 
 
 # save models -----
-
+save(neo_cp_glm_month , neo_lbm_glm_month, file = "models/energetic-constraints-immune-broad.Rdata") 
 # graveyard ----
 
 hist(full_data_month$age)
