@@ -19,7 +19,8 @@ full_data_short_term_lbm_change <- full_data %>%
   # mutate(sample_interval = case_when(
   #   is.na(sample_interval) ~ NA_real_,
   #   TRUE ~ sample_interval)) %>% 
-  ungroup()
+  ungroup() %>%
+  mutate(log2_neo = log2(neo_sg))
 
 #check alignment of data within rows
 # full_data_short_term_lbm_change %>%
@@ -34,7 +35,6 @@ load("data/full_data_short_term_lbm_change.Rdata", verbose = T)
  
 
 # explore dataset ------
-view(full_data_short_term_lbm_change)
 hist(full_data_short_term_lbm_change$sample_lbm_change)
 # looks like normal dist
 
@@ -45,9 +45,6 @@ full_data_short_term_lbm_change %>%
   geom_smooth()
 
 
-dim(full_data_short_term_lbm_change)
-dim(full_data)
-
 full_data_short_term_lbm_change %>% 
   filter(neo_sg < 2000) %>% 
   ggplot(aes(x = neo_sg, 
@@ -57,24 +54,23 @@ full_data_short_term_lbm_change %>%
   geom_point()
 
 # change lbm t2-t1 ~ neo t1, regression ------
-sample_lbm_change_neo_sg_lmer <-  full_data_short_term_lbm_change %>%
-  mutate(log2_neo = log2(neo_sg)) %>%
-  lmer(sample_lbm_change ~
-         log2_neo + 
+lbm_change_neo_lm_sample <-
+  lmer(sample_lbm_change ~ 
          age + 
          sex +
+         log2_neo +
          sample_interval +
   log2_neo*sample_interval +
   (1|subj),
-  data = .)
-qqnorm(residuals(sample_lbm_change_neo_sg_lmer))
-qqline(residuals(sample_lbm_change_neo_sg_lmer))
-hist(residuals(sample_lbm_change_neo_sg_lmer))
-plot(residuals(sample_lbm_change_neo_sg_lmer))
+  data = full_data_short_term_lbm_change)
+qqnorm(residuals(lbm_change_neo_lm_sample))
+qqline(residuals(lbm_change_neo_lm_sample))
+hist(residuals(lbm_change_neo_lm_sample))
+plot(residuals(lbm_change_neo_lm_sample))
 
-summary(sample_lbm_change_neo_sg_lmer)
+summary(lbm_change_neo_lm_sample)
 
-vif.mer(sample_lbm_change_neo_sg_lmer) 
+vif.mer(lbm_change_neo_lm_sample) 
 # all < 90.6 with interaction and < 1.02 without it
 
 # viz - relationship neo and subsequent change in elbm -----
