@@ -1,106 +1,54 @@
-glmm_extract <- function(mod, behavior){
+mod_info_extract <- function(mod){
   mod_name <- deparse(substitute(mod))
-  if(grepl("_f", mod_name)) {sex <- "Female"}
-  if(grepl("_m", mod_name)) {sex <- "Male"}
-  if(grepl("_old", mod_name)) {age_class <- "Old"}
-  if(grepl("_yng", mod_name)) {age_class <- "Young"}
+  if(grepl("^neo", mod_name)) {response <- "Neopterin"}
+  if(grepl("^cp", mod_name)) {response <- "C-peptide"}
+  if(grepl("^cp", mod_name)) {response <- "C-peptide"}
+  if(grepl("^r", mod_name)) {response <- "Time resting"}
+  if(grepl("^f", mod_name)) {response <- "Time feeding"}
+  if(grepl("^m", mod_name)) {response <- "Time moving"}
+  if(grepl("^lbm_change", mod_name)) {response <- "∆ LBM"}
   
-  tab1 <- coef(summary(mod)) %>%
-    as.data.frame() %>%
-    rownames_to_column() %>%
-    mutate(Estimate = round(Estimate, 2)) %>%
-    mutate(`Pr(>|z|)`= round(`Pr(>|z|)`, 3)) %>%
-    #mutate_if(is.numeric, round, 3) %>%
-    mutate(CI_hi = round(Estimate + 1.96*`Std. Error`, 2), CI_lo = round(Estimate - 1.96*`Std. Error`, 2), CI = paste0("[", CI_lo, ",", CI_hi, "]"))
+  if(grepl("_lm_", mod_name)) {mod_type <- "lmer"}
+  if(grepl("_glm_", mod_name)) {mod_type <- "glmer"}
+
+  if(mod_type == "lmer"){
+    tab1 <- coef(summary(mod)) %>%
+      as.data.frame() %>%
+      rownames_to_column() %>%
+      mutate(Estimate = round(Estimate, 3)) %>%
+      mutate(SE = round(`Std. Error`, 3)) %>%
+      mutate(p_value = round(`Pr(>|t|)`, 3)) %>%
+      mutate(CI_hi = round(Estimate + 1.96*`Std. Error`, 2), CI_lo = round(Estimate - 1.96*`Std. Error`, 2), CI = paste0("[", CI_lo, ",", CI_hi, "]"))
+  }
   
-  if(grepl("received|given", behavior)){
-    df <- tab1 %>%
-      mutate(Predictor = case_when(
-        rowname == "(Intercept)" ~ "Intercept", 
-        rowname == "age_diff" ~ "Age diff", 
-        rowname == "rank_diff" ~ "Rank diff", 
-        rowname == "kin.L" ~ "Kinship", 
-        rowname == "kin.Q" ~ "Kinship^2",
-        rowname == "same_sexTRUE" ~ "Same sex" 
-      )) %>%
-      select(Predictor, Estimate, CI, `Pr(>|z|)`)
-  } else {
-      df <- tab1 %>%
-        mutate(Predictor = case_when(
-          rowname == "(Intercept)" ~ "Intercept", 
-          rowname == "age_diff" ~ "Age diff", 
-          rowname == "rank_diff" ~ "Rank diff", 
-          rowname == "kin.L" ~ "Kinship", 
-          rowname == "kin.Q" ~ "Kinship^2",
-          rowname == "same_sexTRUE" ~ "Same sex" 
-        )) %>%
-        select(Predictor, Estimate, CI, `Pr(>|z|)`)
-    }
+  if(mod_type == "glmer"){
+    tab1 <- coef(summary(mod)) %>%
+      as.data.frame() %>%
+      rownames_to_column() %>%
+      mutate(Estimate = round(Estimate, 3)) %>%
+      mutate(SE = round(`Std. Error`, 3)) %>%
+      mutate(p_value = round(`Pr(>|z|)`, 3)) %>%
+      mutate(CI_hi = round(Estimate + 1.96*`Std. Error`, 2), CI_lo = round(Estimate - 1.96*`Std. Error`, 2), CI = paste0("[", CI_lo, ",", CI_hi, "]"))
+  }
     
-  if(exists("age_class")){
-    df2 <- data.frame(`Dyadic Behavior` = behavior, Sex = sex, Age = age_class,  df) %>%
-      mutate(p.value = ifelse(`Pr...z..` < 0.05, paste0(`Pr...z..`, "*"), `Pr...z..`)) %>%
-      select(-Pr...z..)
-    } else {
-    df2 <- data.frame(`Dyadic Behavior` = behavior, Sex = sex,  df) %>%
-      mutate(p.value = ifelse(`Pr...z..` < 0.05, paste0(`Pr...z..`, "*"), `Pr...z..`)) %>%
-      select(-Pr...z..)
-  }
-
+    df <- tab1 %>%
+      mutate(Predictor = case_when(
+        rowname == "(Intercept)" ~ "Intercept", 
+        rowname == "age" ~ "Age", 
+        rowname == "sexM" ~ "Sex", 
+        rowname == "log2(avg_stdsg_CP)" ~ "log2 C-peptide", 
+        rowname == "log2(avg_neo_sg)" ~ "log2 Neopterin",
+        rowname == "log2_neo" ~ "log2 Neopterin",
+        rowname == "log2(avg_cr_resid)" ~ "log2 ELBM",
+        rowname == "sample_interval" ~ "sample interval",
+        rowname == "log2_neo:sample_interval" ~ "log2 Neo x sample interval",
+        TRUE ~ rowname
+      )) 
     
-  return(df2)
-}
-
-
-glmm_extract_bonf <- function(mod, behavior){
-  mod_name <- deparse(substitute(mod))
-  if(grepl("_f", mod_name)) {sex <- "Female"}
-  if(grepl("_m", mod_name)) {sex <- "Male"}
-  if(grepl("_old", mod_name)) {age_class <- "Old"}
-  if(grepl("_yng", mod_name)) {age_class <- "Young"}
-  
-  tab1 <- coef(summary(mod)) %>%
-    as.data.frame() %>%
-    rownames_to_column() %>%
-    mutate(Estimate = round(Estimate, 2)) %>%
-    mutate(`Pr(>|z|)`= round(`Pr(>|z|)`, 3)) %>%
-    #mutate_if(is.numeric, round, 3) %>%
-    mutate(CI_hi = round(Estimate + 1.96*`Std. Error`, 2), CI_lo = round(Estimate - 1.96*`Std. Error`, 2), CI = paste0("[", CI_lo, ",", CI_hi, "]"))
-  
-  if(grepl("received|given", behavior)){
-    df <- tab1 %>%
-      mutate(Predictor = case_when(
-        rowname == "(Intercept)" ~ "Intercept", 
-        rowname == "age_diff" ~ "Age diff", 
-        rowname == "rank_diff" ~ "Rank diff", 
-        rowname == "kin.L" ~ "Kinship", 
-        rowname == "kin.Q" ~ "Kinship^2",
-        rowname == "same_sexTRUE" ~ "Same sex" 
-      )) %>%
-      select(Predictor, Estimate, CI, `Pr(>|z|)`)
-  } else {
-    df <- tab1 %>%
-      mutate(Predictor = case_when(
-        rowname == "(Intercept)" ~ "Intercept", 
-        rowname == "age_diff" ~ "Age diff", 
-        rowname == "rank_diff" ~ "Rank diff", 
-        rowname == "kin.L" ~ "Kinship", 
-        rowname == "kin.Q" ~ "Kinship^2",
-        rowname == "same_sexTRUE" ~ "Same sex" 
-      )) %>%
-      select(Predictor, Estimate, CI, `Pr(>|z|)`)
-  }
-  
-  if(exists("age_class")){
-    df2 <- data.frame(`Dyadic Behavior` = behavior, Sex = sex, Age = age_class,  df) %>%
-      mutate(p.value = ifelse(`Pr...z..` < 0.05/6, paste0(`Pr...z..`, "*"), `Pr...z..`)) %>%
-      select(-Pr...z..) # 3 hypos agg r, pl, gm x 2 male female (not x 2 old young)
-  } else {
-    df2 <- data.frame(`Dyadic Behavior` = behavior, Sex = sex,  df) %>%
-      mutate(p.value = ifelse(`Pr...z..` < 0.05/6, paste0(`Pr...z..`, "*"), `Pr...z..`)) %>%
-      select(-Pr...z..)
-  }
-  
+    df2 <- data.frame(Response = response, df) %>%
+      mutate(p_value= ifelse(p_value < 0.05, paste0(p_value, "*"),
+                          p_value)) %>%
+      select(Response, Predictor, Estimate, SE, CI, p_value)
   
   return(df2)
 }
@@ -120,8 +68,6 @@ glmm_ext_coefplot <- function(mod){
   
   return(df)
 }
-
-print("functions: glmm_extract, glmm_extract_bonf, & glmm_ext_coefplot")
 
 # #glmm_extract_CI_adjust1 <- function(mod, behavior){
 #   mod_name <- deparse(substitute(mod))
