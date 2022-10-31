@@ -1,8 +1,8 @@
 library(tidyverse)
-
-library(lmerTest)
+detach("package:lmerTest", unload = T)
+library(lme4)
 library(mediation)
-library(lavaan)
+
 
 
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
@@ -13,9 +13,6 @@ colSums(is.na(full_data_month_mediate))
 
 # is energy constraint on neo mediated by GCs?
 # lmer - mediation package approach ----
-
-detach("package:lmerTest", unload = T)
-library(lme4)
 
 # total effect iv has on dv plus covariates
 fit.totaleffect <- lmer(log2(avg_neo_sg) ~ 
@@ -44,13 +41,12 @@ fit.dv <- lmer(log2(avg_neo_sg) ~
                  (1|subj),
                data = full_data_month_mediate)
 
-summary(fit.dv)
-summary(fit.totaleffect)
 
 set.seed(288)
-results = mediate(fit.mediator, fit.dv, treat='log2(avg_stdsg_CP)', mediator='log2(avg_fgc)')
+med_results = mediate(fit.mediator, fit.dv, treat='log2(avg_stdsg_CP)', mediator='log2(avg_fgc)')
 
-summary(results)
+save(med_results, file = "models/mechanism-constraints-on-immune.Rdata")
+
 # Total Effect = effect of CP on Neo broadly, no controls
 # ADE = Average Direct Effect = effect of CP on Neo independent of/controlling for FGC
 # ACME = Average Causal Mediated Effect = effect of CP on Neo via mediator FGC
