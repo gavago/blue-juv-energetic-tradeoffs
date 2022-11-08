@@ -36,7 +36,8 @@ mod_info_extract <- function(mod){
       mutate(Predictor = case_when(
         rowname == "(Intercept)" ~ "Intercept", 
         rowname == "age" ~ "Age", 
-        rowname == "sexM" ~ "Sex", 
+        rowname == "sexM" ~ "Sex",
+        rowname == "mrank" ~ "Maternal Rank",
         rowname == "log2(avg_stdsg_CP)" ~ "log2 C-peptide", 
         rowname == "log2(avg_neo_sg)" ~ "log2 Neopterin",
         rowname == "log2_neo" ~ "log2 Neopterin",
