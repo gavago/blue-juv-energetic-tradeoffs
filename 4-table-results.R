@@ -5,6 +5,8 @@ load("models/short-energetic-costs-immune.Rdata", verbose = T)
 load("models/energetic-constraints-immune.Rdata", verbose = T)
 load("models/mechanism-constraints-on-immune.Rdata", verbose = T)
 
+#test change
+
 # A1 - energetic costs neo
 costs1 <- mod_info_extract(cp_neo_glm_month)
 costs2 <- mod_info_extract(lbm_neo_lm_month)
