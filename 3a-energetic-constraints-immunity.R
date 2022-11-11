@@ -17,8 +17,8 @@ neo_cp_cr_glm_month <- glmer(avg_neo_sg ~
                              family = Gamma("log"),
                              data = full_data_month, 
                              control = glmerControl(optimizer ="Nelder_Mead"))
-qqnorm(residuals(neo_cp_glm_month))
-qqline(residuals(neo_cp_glm_month))
+qqnorm(residuals(neo_cp_cr_glm_month))
+qqline(residuals(neo_cp_cr_glm_month))
 summary(neo_cp_cr_glm_month)
 vif.mer(neo_cp_cr_glm_month)# all < 1.04
 
