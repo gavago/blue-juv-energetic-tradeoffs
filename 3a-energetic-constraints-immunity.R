@@ -6,22 +6,44 @@ load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
 
 # is neo energetically constrained? ------
-# -- energy balance ----
-neo_cp_glm_month <- glmer(avg_neo_sg ~ 
-                            sex +
-                            age +
-                            log2(avg_stdsg_CP) +
-                            (1|subj), 
-                          family = Gamma("log"),
-                          data = full_data_month, 
-                          control = glmerControl(optimizer ="Nelder_Mead"))
+# full predictors - lbm and energy balance -----
+neo_cp_cr_glm_month <- glmer(avg_neo_sg ~ 
+                               sex +
+                               age +
+                               mrank +
+                               avg_cr_resid +
+                               log2(avg_stdsg_CP) +
+                               (1|subj), 
+                             family = Gamma("log"),
+                             data = full_data_month, 
+                             control = glmerControl(optimizer ="Nelder_Mead"))
+qqnorm(residuals(neo_cp_glm_month))
+qqline(residuals(neo_cp_glm_month))
+summary(neo_cp_cr_glm_month)
+vif.mer(neo_cp_cr_glm_month)# all < 1.04
+
+# --- plot data points of neo against cp and lbm, and lm from predictions ------
+
+
+
+# save model -----
+save(neo_cp_cr_glm_month, file = "models/energetic-constraints-immune-broad.Rdata") 
+
+# graveyard ----
+# -- energy balance alone ----
+neo_cp_cr_glm_month <- glmer(avg_neo_sg ~ 
+                               sex +
+                               age +
+                               log2(avg_cr_resid) +
+                               log2(avg_stdsg_CP) +
+                               (1|subj), 
+                             family = Gamma("log"),
+                             data = full_data_month, 
+                             control = glmerControl(optimizer ="Nelder_Mead"))
 qqnorm(residuals(neo_cp_glm_month))
 qqline(residuals(neo_cp_glm_month))
 summary(neo_cp_glm_month)
 vif.mer(neo_cp_glm_month)# all < 1.02
-
-
-
 
 # visualization (mean and median look very similar in viz)
 
@@ -33,7 +55,7 @@ full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
   labs(x = "C-peptide ng/ml",
        y = "Neopterin ng/ml") #title = "Energetic Constraints on Neopterin"
 
-# -- lbm -----
+# -- lbm alone -----
 neo_lbm_glm_month <- glmer(avg_neo_sg ~ 
                              sex +
                              age +
@@ -55,10 +77,6 @@ full_data_month %>%
   labs(y = "avg. Neopterin ng/ml",
        x =  "avg. Estimated Lean Body Mass") # title = "Body Condition Constraint on Neopterin"
 
-
-# save models -----
-save(neo_cp_glm_month , neo_lbm_glm_month, file = "models/energetic-constraints-immune-broad.Rdata") 
-# graveyard ----
 
 hist(full_data_month$age)
 hist(scale(full_data_month$age))
