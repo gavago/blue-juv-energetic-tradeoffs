@@ -6,7 +6,7 @@ load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
 
 # is neo energetically constrained? ------
-# full predictors - lbm and energy balance -----
+# - by lbm and energy balance -----
 neo_cp_cr_glm_month <- glmer(avg_neo_sg ~ 
                                sex +
                                age +
@@ -22,7 +22,7 @@ qqline(residuals(neo_cp_cr_glm_month))
 summary(neo_cp_cr_glm_month)
 vif.mer(neo_cp_cr_glm_month)# all < 1.04
 
-# --- plot data points of neo against cp and lbm, and lm from predictions ------
+# --- plot data points of neo against cp and lbm (2 plots) where lm is marginal effect of each ------
 
 
 
