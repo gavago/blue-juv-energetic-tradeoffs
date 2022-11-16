@@ -68,3 +68,21 @@ ggplot(change_lbm_neo_marg_effect, aes(x, predicted)) +
   xlab(bquote(Neopterin(log[2])))
 # not logging predictor
 # no difference with interaction term removed
+
+# marginal effects f ~ neo ----
+f_neo_lm_month <- lmer(f ~ sex + 
+                         age +
+                         log2(avg_neo_sg) + 
+                         log2(avg_stdsg_CP) +
+                         (1|subj), 
+                       data = full_data_month)
+
+f_neo_lm_month_marg_effect <- ggemmeans(f_neo_lm_month, terms = "avg_neo_sg")
+
+ggplot(f_neo_lm_month_marg_effect, aes(x, predicted)) +
+  geom_line(color = "deeppink3") +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), 
+              alpha = .3, 
+              fill = "deeppink3") +
+  ylab("Predicted Feeding")+
+  xlab(bquote(Neopterin(log[2])))
