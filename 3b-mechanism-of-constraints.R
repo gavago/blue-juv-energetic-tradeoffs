@@ -16,7 +16,7 @@ colSums(is.na(full_data_month_mediate))
 
 # total effect iv has on dv plus covariates
 fit.totaleffect <- lmer(log2(avg_neo_sg) ~ 
-                          log2(avg_stdsg_CP) + 
+                          log2_avg_cp + 
                           age + 
                           sex + 
                           (1|subj),
@@ -24,8 +24,8 @@ fit.totaleffect <- lmer(log2(avg_neo_sg) ~
 
 
 # effect of iv on mediator
-fit.mediator <- lmer(log2(avg_fgc) ~ 
-                       log2(avg_stdsg_CP) + 
+fit.mediator <- lmer(log2_avg_neo ~ 
+                       log2_avg_cp + 
                        age +
                        sex +
                        (1|subj),
@@ -34,8 +34,8 @@ fit.mediator <- lmer(log2(avg_fgc) ~
 # effect of mediator on dv controlling for iv
 
 fit.dv <- lmer(log2(avg_neo_sg) ~ 
-                 log2(avg_fgc) + 
-                 log2(avg_stdsg_CP) +
+                 log2_avg_neo + 
+                 log2_avg_cp +
                  age +
                  sex +
                  (1|subj),
@@ -43,7 +43,7 @@ fit.dv <- lmer(log2(avg_neo_sg) ~
 
 
 set.seed(288)
-med_results = mediate(fit.mediator, fit.dv, treat='log2(avg_stdsg_CP)', mediator='log2(avg_fgc)')
+med_results = mediate(fit.mediator, fit.dv, treat='log2_avg_cp', mediator='log2_avg_neo')
 
 save(med_results, file = "models/mechanism-constraints-on-immune.Rdata")
 
@@ -68,7 +68,7 @@ full_data_month %>% filter(avg_neo_sg < 1000) %>%
 
 # DV and IV: neo ~ cp
 neo_cp_glm_month <- glmer(avg_neo_sg ~ 
-                            log2(avg_stdsg_CP) + 
+                            log2_avg_cp + 
                             age + 
                             sex + 
                             (1|subj),
@@ -76,7 +76,7 @@ neo_cp_glm_month <- glmer(avg_neo_sg ~
                           data = full_data_month,
                           control = glmerControl(optimizer ="Nelder_Mead"))
 neo_cp_lm_month <- lmer(log2(avg_neo_sg) ~ 
-                          log2(avg_stdsg_CP) + 
+                          log2_avg_cp + 
                           age + 
                           sex + 
                           (1|subj),
@@ -88,7 +88,7 @@ summary(neo_cp_lm_month)
 # mediator and IV: fgc ~ cp
 fgc_cp_lm_month <- lmer(avg_fgc ~ sex +
                           age +
-                          log2(avg_stdsg_CP) +
+                          log2_avg_cp +
                           (1|subj),
                         data = full_data_month)
 qqnorm(residuals(fgc_cp_lm_month))
@@ -98,7 +98,7 @@ summary(fgc_cp_lm_month)
 # mediatior and DV: neo ~ fgc
 neo_fgc_glm_month <- glmer(avg_neo_sg ~ sex +
                              age +
-                             log2(avg_fgc) +
+                             log2_avg_neo +
                              (1|subj),
                            family = Gamma("log"),
                            data = full_data_month)
@@ -107,7 +107,7 @@ neo_fgc_glm_month <- glmer(avg_neo_sg ~ sex +
 
 neo_fgc_lm_month <- lmer(log2(avg_neo_sg) ~ sex +
                            age +
-                           log2(avg_fgc) +
+                           log2_avg_neo +
                            (1|subj),
                          data = full_data_month)
 
@@ -122,8 +122,8 @@ summary(neo_fgc_lm_month)
 # DV mediator and IV: neo ~ fgc + cp
 neo_fgc_cp_glm_month <- glmer(avg_neo_sg ~ sex +
                                 age +
-                                log2(avg_fgc) + 
-                                log2(avg_stdsg_CP) +
+                                log2_avg_neo + 
+                                log2_avg_cp +
                                 (1|subj),
                               family = Gamma("log"),
                               data = full_data_month,
@@ -131,8 +131,8 @@ neo_fgc_cp_glm_month <- glmer(avg_neo_sg ~ sex +
 
 neo_fgc_cp_lm_month <- lmer(log2(avg_neo_sg) ~ sex +
                               age +
-                              log2(avg_fgc) + 
-                              log2(avg_stdsg_CP) +
+                              log2_avg_neo + 
+                              log2_avg_cp +
                               (1|subj),
                             data = full_data_month)
 
