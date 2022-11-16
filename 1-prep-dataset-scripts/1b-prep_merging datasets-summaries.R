@@ -101,7 +101,8 @@ view(udata_gc_month_avg)
 
 full_data_month <- full_join(udata_fgc_month_avg, behav_data_month, by = intersect(names(udata_fgc_month_avg), names(behav_data_month))) %>%
   left_join(., lh.mo_merge) %>%
-  mutate(age = as.numeric(mid - bday)/365.25)
+  mutate(age = as.numeric(mid - bday)/365.25) %>%
+  mutate(log2_avg_neo = log2(avg_neo_sg), log2_avg_cp = log2(avg_stdsg_CP))
 dim(full_data_month) # 323
 
 
