@@ -29,7 +29,7 @@ vif.mer(change_lbm_neo_lm_sample)
 # viz - relationship neo and subsequent change in elbm -----
 full_data_short_term_lbm_change %>% 
   filter(neo_sg < 2000) %>% 
-  ggplot(aes(x = log2(neo_sg), 
+  ggplot(aes(x = log2_neo, 
              y = sample_lbm_change, 
              color = sex)) +
   geom_jitter() +
