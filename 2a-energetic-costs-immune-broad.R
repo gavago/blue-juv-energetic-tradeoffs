@@ -11,7 +11,7 @@ load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 cp_neo_glm_month <- glmer(avg_stdsg_CP ~ sex +
                             age +
                             mrank +
-                            log2(avg_neo_sg) +
+                            log2_avg_neo +
                             (1|subj), 
                           family = Gamma("log"), 
                           data = full_data_month)
@@ -39,8 +39,8 @@ full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
 # feeding ~ neo 
 f_neo_lm_month <- lmer(f ~ sex + 
                          age +
-                         log2(avg_neo_sg) + 
-                         log2(avg_stdsg_CP) +
+                         log2_avg_neo + 
+                         log2_avg_cp +
                          (1|subj), 
                        data = full_data_month)
 qqnorm(residuals(f_neo_lm_month))
@@ -50,14 +50,14 @@ vif.mer(f_neo_lm_month) # all < 1.17
 
 #hist(full_data_month$f)
 full_data_month %>%
-  ggplot(aes(x = log2(avg_neo_sg) , y = f, color = sex)) +
+  ggplot(aes(x = log2_avg_neo, y = f, color = sex)) +
   geom_point()
 
 # resting ~ neo - see increased resting when neo is higher
 r_neo_lm_month <- lmer(r ~ sex + 
                          age +
-                         log2(avg_neo_sg) + 
-                         log2(avg_stdsg_CP) +
+                         log2_avg_neo+ 
+                         log2_avg_cp+
                          (1|subj), 
                        data = full_data_month)
 qqnorm(residuals(r_neo_lm_month))
@@ -67,14 +67,14 @@ vif.mer(r_neo_lm_month) # all < 1.16
 
 #hist(full_data_month$r)
 full_data_month %>%
-  ggplot(aes(x = log2(avg_neo_sg) , y = r, color = sex)) +
+  ggplot(aes(x = log2_avg_neo, y = r, color = sex)) +
   geom_point()
 
 # moving ~ neo 
 m_neo_lm_month <- lmer(m ~ sex + 
                          age +
-                         log2(avg_neo_sg) + 
-                         log2(avg_stdsg_CP) +
+                         log2_avg_neo + 
+                         log2_avg_cp +
                          (1|subj), 
                        data = full_data_month)
 qqnorm(residuals(m_neo_lm_month))
@@ -84,7 +84,7 @@ vif.mer(m_neo_lm_month) # all < 1.16
 
 #hist(full_data_month$m)
 full_data_month %>%
-  ggplot(aes(x = log2(avg_neo_sg) , y = m, color = sex)) +
+  ggplot(aes(x = log2_avg_neo, y = m, color = sex)) +
   geom_point()
 
 
@@ -94,7 +94,7 @@ lbm_neo_lm_month <- lmer(avg_cr_resid ~
                            age +
                            sex + 
                            mrank +
-                           log2(avg_neo_sg) +
+                           log2_avg_neo +
                            (1|subj),
                          data = full_data_month)
 qqnorm(residuals(lbm_neo_lm_month))
@@ -136,7 +136,7 @@ qqline(residuals(neo_fai_cp_glm_month_nolog))
 # neo_cp_fgc_glm_month <- glmer(avg_neo_sg ~ 
 #                                 sex +
 #                                 age +
-#                                 log2(avg_stdsg_CP) +
+#                                 log2_avg_cp+
 #                                 log2(avg_fgc) +
 #                                 (1|subj), 
 #                               family = Gamma("log"),
