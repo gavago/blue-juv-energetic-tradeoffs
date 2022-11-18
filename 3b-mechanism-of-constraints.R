@@ -15,7 +15,7 @@ colSums(is.na(full_data_month_mediate))
 # lmer - mediation package approach ----
 
 # total effect iv has on dv plus covariates
-fit.totaleffect <- lmer(log2(avg_neo_sg) ~ 
+fit.totaleffect <- lmer(log2_avg_neo ~ 
                           log2_avg_cp + 
                           age + 
                           sex + 
@@ -24,7 +24,7 @@ fit.totaleffect <- lmer(log2(avg_neo_sg) ~
 
 
 # effect of iv on mediator
-fit.mediator <- lmer(log2_avg_neo ~ 
+fit.mediator <- lmer(log2(avg_fgc) ~ 
                        log2_avg_cp + 
                        age +
                        sex +
@@ -33,8 +33,8 @@ fit.mediator <- lmer(log2_avg_neo ~
 
 # effect of mediator on dv controlling for iv
 
-fit.dv <- lmer(log2(avg_neo_sg) ~ 
-                 log2_avg_neo + 
+fit.dv <- lmer(log2_avg_neo ~ 
+                 log2(avg_fgc) + 
                  log2_avg_cp +
                  age +
                  sex +
@@ -43,7 +43,9 @@ fit.dv <- lmer(log2(avg_neo_sg) ~
 
 
 set.seed(288)
-med_results = mediate(fit.mediator, fit.dv, treat='log2_avg_cp', mediator='log2_avg_neo')
+med_results = mediate(fit.mediator, fit.dv, treat='log2_avg_cp', mediator='log2(avg_fgc)')
+summary(med_results)
+
 
 save(med_results, file = "models/mechanism-constraints-on-immune.Rdata")
 
@@ -75,7 +77,7 @@ neo_cp_glm_month <- glmer(avg_neo_sg ~
                           family = Gamma("log"),
                           data = full_data_month,
                           control = glmerControl(optimizer ="Nelder_Mead"))
-neo_cp_lm_month <- lmer(log2(avg_neo_sg) ~ 
+neo_cp_lm_month <- lmer(log2_avg_neo ~ 
                           log2_avg_cp + 
                           age + 
                           sex + 
@@ -98,16 +100,16 @@ summary(fgc_cp_lm_month)
 # mediatior and DV: neo ~ fgc
 neo_fgc_glm_month <- glmer(avg_neo_sg ~ sex +
                              age +
-                             log2_avg_neo +
+                             log2(avg_fgc) +
                              (1|subj),
                            family = Gamma("log"),
                            data = full_data_month)
 
 
 
-neo_fgc_lm_month <- lmer(log2(avg_neo_sg) ~ sex +
+neo_fgc_lm_month <- lmer(log2_avg_neo ~ sex +
                            age +
-                           log2_avg_neo +
+                           log2(avg_fgc) +
                            (1|subj),
                          data = full_data_month)
 
@@ -122,16 +124,16 @@ summary(neo_fgc_lm_month)
 # DV mediator and IV: neo ~ fgc + cp
 neo_fgc_cp_glm_month <- glmer(avg_neo_sg ~ sex +
                                 age +
-                                log2_avg_neo + 
+                                log2(avg_fgc) + 
                                 log2_avg_cp +
                                 (1|subj),
                               family = Gamma("log"),
                               data = full_data_month,
                               control = glmerControl(optimizer ="Nelder_Mead"))
 
-neo_fgc_cp_lm_month <- lmer(log2(avg_neo_sg) ~ sex +
+neo_fgc_cp_lm_month <- lmer(log2_avg_neo ~ sex +
                               age +
-                              log2_avg_neo + 
+                              log2(avg_fgc) + 
                               log2_avg_cp +
                               (1|subj),
                             data = full_data_month)
