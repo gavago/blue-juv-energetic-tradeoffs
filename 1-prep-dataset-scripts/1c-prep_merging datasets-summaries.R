@@ -39,21 +39,21 @@ str(full_udata)
 
 # Summarize udata and fgc data by month ------
 
-### summarize & save udata -----
+### summarize & save month udata -----
 
-full_udata <- load("data/urine_sample_dataset_juv_immune_energetics.Rdata")
+load("data/urine_sample_dataset_juv_immune_energetics.Rdata")
 View(full_udata)
 dim(full_udata)
-
+str(full_udata)
 
 udata_month_avg <- full_udata %>%
   group_by(subj, month, year) %>% 
   summarize(avg_neo_sg = mean(neo_sg, na.rm = T), 
             avg_cr_resid = mean(cr_resid, na.rm = T), 
-            avg_stdsg_CP = mean(stdsg_CP, na.rm = T),
+            avg_stdsg_cp_tar = mean(cp_tar, na.rm = T),
             med_neo_sg = median(neo_sg, na.rm = T), 
             med_cr_resid = median(cr_resid, na.rm = T), 
-            med_stdsg_CP = median(stdsg_CP, na.rm = T)) %>% 
+            med_stdsg_cp_tar = median(cp_tar, na.rm = T)) %>% 
   ungroup() 
 dim(udata_month_avg) # 299 rows
 
@@ -97,7 +97,7 @@ view(udata_gc_month_avg)
 full_data_month <- full_join(udata_fgc_month_avg, behav_data_month, by = intersect(names(udata_fgc_month_avg), names(behav_data_month))) %>%
   left_join(., lh.mo_merge) %>%
   mutate(age = as.numeric(mid - bday)/365.25) %>%
-  mutate(log2_avg_neo = log2(avg_neo_sg), log2_avg_cp = log2(avg_stdsg_CP))
+  mutate(log2_avg_neo = log2(avg_neo_sg), log2_avg_cp_tar = log2(avg_cp_tar))
 dim(full_data_month) # 323
 
 
