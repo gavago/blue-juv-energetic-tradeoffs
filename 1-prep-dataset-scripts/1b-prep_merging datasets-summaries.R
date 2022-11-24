@@ -1,20 +1,9 @@
 library(tidyverse)
-# library(readxl)
-# library(magrittr)
-# library(lubridate)
-# library(mgcv)
-library(lmerTest)
 
 load("data/neo-dataset-full.Rdata", verbose = T)
 load("data/cp-dataset-full.Rdata", verbose = T)
 load("data/behav-dataset-month.Rdata", verbose = T)
 load("data/fgc_data_by_sample.Rdata", verbose = T)
-
-
-# save each Rdata dataset to CV ----
-# write.csv(neo_data_full, file = "neo-dataset-full.csv", row.names = F)
-# write.csv(cp_raw, file = "cp-dataset-full.csv", row.names = F)
-# write.csv(behav_data_month, file = "behav-dataset-month.csv", row.names = F)
 
 
 
@@ -40,13 +29,13 @@ full_udata <- merged_udata %>%
 
 str(full_udata)
 
-#write_csv(full_udata, file = "data/urine_sample_dataset_juv_immune_energetics.csv")
+#save(full_udata, file = "data/urine_sample_dataset_juv_immune_energetics.Rdata")
 
 # Summarize udata and fgc data by month ------
 
 ### summarize & save udata -----
 
-full_udata <- read_csv("data/urine_sample_dataset_juv_immune_energetics.csv")
+full_udata <- load("data/urine_sample_dataset_juv_immune_energetics.Rdata")
 View(full_udata)
 dim(full_udata)
 
@@ -131,7 +120,10 @@ full_udata %>%
 
 
 # graveyard -----
-#merged_data <- read.csv("data/merged_data_no_lean_body_mass.csv", header = T)
+# save each Rdata dataset to CV ----
+# write.csv(neo_data_full, file = "neo-dataset-full.csv", row.names = F)
+# write.csv(cp_raw, file = "cp-dataset-full.csv", row.names = F)
+# write.csv(behav_data_month, file = "behav-dataset-month.csv", row.names = F)
 
 
 # check that time format is same
