@@ -33,7 +33,7 @@ summary(cp_time)
 gc_time <- glmer(fgc.ng_g.feces ~ hrs_midnight + (hrs_midnight|subj), family = Gamma("log"), data = gc_raw)
 summary(gc_time)
 
-# sig time effects for cp
+# sig time effects for cp ^
 
 
 # viz time effects for cp ----- 
@@ -58,16 +58,19 @@ cp_time_pred <- exp(cp_time_intercept + cp_time_slope * cp_raw$hrs_midnight)
 
 # compare ran slop and intercept pred to other pred values ------
 
-tar <- full_udata %>% # create time adjusted residuals
-  mutate(cp_tar1 = stdsg_CP - pred1) %>%
+tar <- cp_raw %>% # create time adjusted residuals
+  mutate(cp_tar1 = stdsg_CP - cp_time_pred) %>%
   mutate(cp_tar = cp_tar1 + abs(min(cp_tar1, na.rm = T)) + 0.0001)
 pred2 <- predict(cp_time, type = "response") # incorporates individ rand slope
 
 head(pred1)
 head(pred2)
-head(full_udata$stdsg_CP)
+head(cp_raw$stdsg_CP)
 head(tar$cp_tar)
 
+par(mfrow = c(1,2))
+hist(cp_raw$stdsg_CP)
+hist(tar$cp_tar)
 
 tar_test <- glmer(cp_tar ~ hrs_midnight + (hrs_midnight|subj), family = Gamma("log"), data = tar)
 summary(tar_test) # no time effect now.
