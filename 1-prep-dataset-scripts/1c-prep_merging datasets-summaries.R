@@ -51,6 +51,7 @@ udata_month_avg <- full_udata %>%
   summarize(avg_neo_sg = mean(neo_sg, na.rm = T), 
             avg_cr_resid = mean(cr_resid, na.rm = T), 
             avg_cp_sg_tar = mean(cp_tar, na.rm = T),
+            avg_cp_sg = mean(stdsg_CP, na.rm = T),
             med_neo_sg = median(neo_sg, na.rm = T), 
             med_cr_resid = median(cr_resid, na.rm = T), 
             med_cp_sg_tar = median(cp_tar, na.rm = T)) %>% 
