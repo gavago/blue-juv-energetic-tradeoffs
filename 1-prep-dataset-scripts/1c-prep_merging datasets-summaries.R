@@ -105,8 +105,8 @@ apply(full_data_month, 2, function(x) sum(is.na(x)))
 view(full_data_month)
 
 # save full month data -----
-#save(full_data_month, file = "data/full_data_month_udata_fgc_behav.RData")
-#load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
+# save(full_data_month, file = "data/full_data_month_udata_fgc_behav.RData")
+# load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
 # save csv
 # write.csv(full_data_month,  file = "data/full_data_month_udata_fgc_behav.csv", row.names = F)
