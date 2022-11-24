@@ -4,7 +4,7 @@ load("data/neo-dataset-full.Rdata", verbose = T)
 load("data/cp-dataset-full.Rdata", verbose = T)
 load("data/behav-dataset-month.Rdata", verbose = T)
 load("data/fgc_data_by_sample.Rdata", verbose = T)
-
+load("data/cp-time-of-day-model.Rdata", verbose = T)
 
 
 # Merging urine sample data (neo, cp, cr_resid)  -----
@@ -12,8 +12,9 @@ merged_udata <- left_join( neo_data_full, cp_raw, by = intersect(names(neo_data_
   select(group, subj, date, age, year, month, time, sample_number, stdsg_CP, neo_sg, everything())
 dim(merged_udata) # 620 rows
 
-# Add lean body mass - calculating cr-sg resids ------
+# Add lean body mass and cp time adjust residual (script 1b) ------
 
+# calculating cr-sg resids
 merged_udata %>%
   ggplot(., aes(y = Cr, x = SG/1000, color = sex)) +
   geom_point() +
@@ -24,8 +25,13 @@ m <- merged_udata %>%
   lm(Cr ~ I(SG/1000) + I((SG/1000)^2), data = ., na.action = na.exclude)
 resids <- as.numeric(resid(m))
 
+
+# add vars
 full_udata <- merged_udata %>%
-  mutate(cr_resid = resids)
+  mutate(cr_resid = resids) %>%
+  mutate(cp_tar1 = stdsg_CP - cp_time_pred) %>%
+  mutate(cp_tar = cp_tar1 + abs(min(cp_tar1, na.rm = T)) + 0.0001) %>%
+  select(-cp_tar1)
 
 str(full_udata)
 
