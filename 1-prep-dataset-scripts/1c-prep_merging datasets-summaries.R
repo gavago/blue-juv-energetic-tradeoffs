@@ -50,10 +50,10 @@ udata_month_avg <- full_udata %>%
   group_by(subj, month, year) %>% 
   summarize(avg_neo_sg = mean(neo_sg, na.rm = T), 
             avg_cr_resid = mean(cr_resid, na.rm = T), 
-            avg_stdsg_cp_tar = mean(cp_tar, na.rm = T),
+            avg_cp_sg_tar = mean(cp_tar, na.rm = T),
             med_neo_sg = median(neo_sg, na.rm = T), 
             med_cr_resid = median(cr_resid, na.rm = T), 
-            med_stdsg_cp_tar = median(cp_tar, na.rm = T)) %>% 
+            med_cp_sg_tar = median(cp_tar, na.rm = T)) %>% 
   ungroup() 
 dim(udata_month_avg) # 299 rows
 
@@ -84,7 +84,6 @@ load("/Users/nicolethompsongonzalez/Dropbox/2_R-projects/Juv-blues-diss/Juvenile
 lh.mo_merge <- lh.mo %>%
   mutate(year = lubridate::year(month), month = lubridate::month(month)) 
 
-
 names(behav_data_month)
 
 udata_fgc_month_avg <- full_join(udata_month_avg, fgc_month_avg, by = intersect(names(udata_month_avg), names(fgc_month_avg)))
@@ -97,7 +96,7 @@ view(udata_gc_month_avg)
 full_data_month <- full_join(udata_fgc_month_avg, behav_data_month, by = intersect(names(udata_fgc_month_avg), names(behav_data_month))) %>%
   left_join(., lh.mo_merge) %>%
   mutate(age = as.numeric(mid - bday)/365.25) %>%
-  mutate(log2_avg_neo = log2(avg_neo_sg), log2_avg_cp_tar = log2(avg_cp_tar))
+  mutate(log2_avg_neo = log2(avg_neo_sg), log2_avg_cp_tar = log2(avg_cp_sg_tar))
 dim(full_data_month) # 323
 
 
