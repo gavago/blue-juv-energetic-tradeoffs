@@ -1,8 +1,8 @@
 library(tidyverse)
 source("functions/function-mod-info-extract.R")
-load("models/energetic-costs-immune.Rdata", verbose = T)
+load("models/energetic-costs-immune-broad.Rdata", verbose = T)
 load("models/short-energetic-costs-immune.Rdata", verbose = T)
-load("models/energetic-constraints-immune.Rdata", verbose = T)
+load("models/energetic-constraints-immune-broad.Rdata", verbose = T)
 load("models/mechanism-constraints-on-immune.Rdata", verbose = T)
 
 
