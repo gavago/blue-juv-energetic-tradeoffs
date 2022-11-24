@@ -131,7 +131,7 @@ full_udata %>%
 
 
 # graveyard -----
-merged_data <- read.csv("data/merged_data_no_lean_body_mass.csv", header = T)
+#merged_data <- read.csv("data/merged_data_no_lean_body_mass.csv", header = T)
 
 
 # check that time format is same
