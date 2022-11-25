@@ -8,23 +8,25 @@ load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 # H1 - energetic costs cellular immunity -----
 
 # - does neo eat into energy balance? ----
-cp_neo_glm_month <- glmer(avg_stdsg_CP ~ sex +
-                            age +
-                            mrank +
-                            log2_avg_neo +
-                            (1|subj), 
-                          family = Gamma("log"), 
-                          data = full_data_month)
+cp_neo_lm_month <- full_data_month %>%
+  lmer(log2_avg_cp_tar ~  sex +
+                          age +
+                          mrank +
+                          log2_avg_neo +
+                          (1|subj), 
+                         data = .)
 
-qqnorm(residuals(cp_neo_glm_month))
-qqline(residuals(cp_neo_glm_month))
-summary(cp_neo_glm_month)
+qqnorm(residuals(cp_neo_lm_month))
+qqline(residuals(cp_neo_lm_month))  
+summary(cp_neo_lm_month)
 vif.mer(cp_neo_glm_month) # all < 1.04
 
 
 # viz
-full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
-  ggplot(aes(y = avg_stdsg_CP, x = avg_neo_sg, color = sex)) +
+full_data_month %>% 
+  filter(avg_cp_sg_tar < 40000, avg_neo_sg < 2000) %>%
+  #mutate(avg_cp_sg_tar_plot = avg_cp_sg_tar - 0.0001 - (min(avg_cp_sg_tar)/2)) %>%
+  ggplot(aes(y = avg_cp_sg, x = avg_neo_sg, color = sex)) +
   geom_point() +
   geom_smooth(method = "lm") +
   theme_minimal() +
@@ -40,49 +42,47 @@ full_data_month %>% filter(avg_stdsg_CP < 4000, avg_neo_sg < 2000) %>%
 f_neo_lm_month <- lmer(f ~ sex + 
                          age +
                          log2_avg_neo + 
-                         log2_avg_cp +
+                         log2_avg_cp_tar +
                          (1|subj), 
                        data = full_data_month)
 qqnorm(residuals(f_neo_lm_month))
 qqline(residuals(f_neo_lm_month))
-summary(f_neo_lm_month)
-vif.mer(f_neo_lm_month) # all < 1.17
-
-#hist(full_data_month$f)
-full_data_month %>%
-  ggplot(aes(x = log2_avg_neo, y = f, color = sex)) +
-  geom_point()
 
 # resting ~ neo - see increased resting when neo is higher
 r_neo_lm_month <- lmer(r ~ sex + 
                          age +
                          log2_avg_neo+ 
-                         log2_avg_cp+
+                         log2_avg_cp_tar +
                          (1|subj), 
                        data = full_data_month)
 qqnorm(residuals(r_neo_lm_month))
 qqline(residuals(r_neo_lm_month))
-summary(r_neo_lm_month)
-vif.mer(r_neo_lm_month) # all < 1.16
 
-#hist(full_data_month$r)
-full_data_month %>%
-  ggplot(aes(x = log2_avg_neo, y = r, color = sex)) +
-  geom_point()
 
 # moving ~ neo 
 m_neo_lm_month <- lmer(m ~ sex + 
                          age +
                          log2_avg_neo + 
-                         log2_avg_cp +
+                         log2_avg_cp_tar +
                          (1|subj), 
                        data = full_data_month)
 qqnorm(residuals(m_neo_lm_month))
 qqline(residuals(m_neo_lm_month))
+
+
+summary(f_neo_lm_month)
+vif.mer(f_neo_lm_month) # all < 1.17
+summary(r_neo_lm_month)
+vif.mer(r_neo_lm_month) # all < 1.14
 summary(m_neo_lm_month)
 vif.mer(m_neo_lm_month) # all < 1.16
 
-#hist(full_data_month$m)
+
+full_data_month %>%
+  ggplot(aes(x = log2_avg_neo, y = r, color = sex)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
 full_data_month %>%
   ggplot(aes(x = log2_avg_neo, y = m, color = sex)) +
   geom_point()
@@ -117,8 +117,6 @@ full_data_month %>%
 save(cp_neo_glm_month, f_neo_lm_month, r_neo_lm_month, m_neo_lm_month,
      lbm_neo_lm_month, file = "models/energetic-costs-immune-broad.Rdata")
 
-# H2b mechanism of limitation
-# mediation
 
 
 # graveyard ------
