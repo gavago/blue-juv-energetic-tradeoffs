@@ -7,11 +7,11 @@ source("functions/vif.mer function.R") # function is "vif.mer"
 
 
 # create dataset 
-full_data <- read.csv("data/full_dataset_juv_immune_energetics.csv", header = T)
+load("data/urine_sample_dataset_juv_immune_energetics.Rdata", verbose = T)
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
 #add sample lbm change
-full_data_short_term_lbm_change <- full_data %>% 
+full_data_short_term_lbm_change <- full_udata %>% 
   group_by(subj) %>% 
   mutate(sample_lbm_change = lead(cr_resid) - cr_resid) %>%
   mutate(sample_interval = as.numeric(difftime(lead(date), date, units = "days"))) %>%
