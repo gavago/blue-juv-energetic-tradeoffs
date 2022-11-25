@@ -114,7 +114,7 @@ view(full_data_month)
 
 
 # Sample counts for methods ------
-full_udata <- read_csv("data/urine_sample_dataset_juv_immune_energetics.csv")
+load("data/urine_sample_dataset_juv_immune_energetics.Rdata", verbose = T)
 load("data/fgc_data_by_sample.Rdata", verbose = T)
 
 nrow(full_udata) #620
