@@ -4,8 +4,36 @@ library(tidyverse)
 library(dplyr)
 
 # load datasets
-full_data <- read.csv("data/full_dataset_juv_immune_energetics.csv", header = T)
+load("data/urine_sample_dataset_juv_immune_energetics.Rdata", verbose = T)
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
+
+# group effects: -------
+lmer(log2_avg_neo ~ 
+       sex +
+       age +
+       mrank +
+       group +
+       (1|subj),
+     data = full_data_month) %>%
+  summary()
+
+lmer(avg_cr_resid ~ 
+       sex +
+       age +
+       mrank +
+       group +
+       (1|subj),
+     data = full_data_month) %>%
+  summary() # tws higher than twn
+
+lmer(log2_avg_cp_tar ~ 
+       sex +
+       age +
+       mrank +
+       group +
+       (1|subj),
+     data = full_data_month) %>%
+  summary()
 
 # viz: look at fluctuations in cr_resid ----
 full_data_rownum <- full_data %>% 
