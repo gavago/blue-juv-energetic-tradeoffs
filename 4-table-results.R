@@ -19,10 +19,10 @@ mod_info_extract(r_neo_lm_month)
 mod_info_extract(m_neo_lm_month)
 
 # A2 - energetic limitations neo
-mod_info_extract(neo_cp_cr_glm_month)
+mod_info_extract(neo_cp_cr_lm_month)
 
 # A2 - mechanism constraints
-summary(med_results)
+med_results
 
 
 tab1_costs <- do.call("rbind", list(costs1, costs2, costs3))
