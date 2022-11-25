@@ -42,7 +42,7 @@ interplot(m = change_lbm_neo_lm_sample, var1 = "log2_neo", var2 = "sample_interv
 
 
 # save model -----
-#save(change_lbm_neo_lm_sample, file = "models/short-energetic-costs-immune.Rdata")
+#save(change_lbm_neo_lm_sample, file = "models/energetic-costs-immune-short.Rdata")
 
 
 
