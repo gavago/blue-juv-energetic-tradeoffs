@@ -9,16 +9,15 @@ load("models/energetic-costs-immune-broad.Rdata", verbose = T)
 
 # raw data points w marginal effects smooth, cp ~ neo ----
 
-summary(cp_neo_glm_month)
-cp_neo_glm_marg_effect <- ggemmeans(cp_neo_glm_month, terms = "log2_avg_neo")
+summary(cp_neo_lm_month)
+cp_neo_lm_marg_effect <- ggemmeans(cp_neo_lm_month, terms = "log2_avg_neo")
 
-cp_neo_glm_marg_effect
+cp_neo_lm_marg_effect
 
-
-ggplot() +
-  geom_point(data = full_data_month, aes(x = log2_avg_neo, y = avg_stdsg_CP)) +
-  geom_line(data = cp_neo_glm_marg_effect, aes(x, predicted), color = "deepskyblue4") +
-  geom_ribbon(data = cp_neo_glm_marg_effect, aes(x= x, y = predicted, ymin = conf.low, ymax = conf.high), 
+ggplot() + # eek doesn't seem to be on same scale anymore
+  geom_point(data = full_data_month, aes(x = log2_avg_neo, y = avg_cp_sg_tar)) +
+  geom_line(data = cp_neo_lm_marg_effect, aes(x, predicted), color = "deepskyblue4") +
+  geom_ribbon(data = cp_neo_lm_marg_effect, aes(x= x, y = predicted, ymin = conf.low, ymax = conf.high), 
               alpha = .3, 
               fill = "deepskyblue4") +
   ylab("Predicted C-peptide") +
