@@ -88,8 +88,8 @@ full_data_month %>%
   geom_point()
 
 
-# - is neo/immunity prioritized over body mass/growth?  ----
-
+# - does neo detract from estimated lbm / growth  ----
+# aka is neo/immunity prioritized over body mass/growth?
 lbm_neo_lm_month <- lmer(avg_cr_resid ~ 
                            age +
                            sex + 
