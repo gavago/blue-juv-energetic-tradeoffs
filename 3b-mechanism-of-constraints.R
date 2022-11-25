@@ -7,7 +7,7 @@ library(mediation)
 
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 full_data_month_mediate <- full_data_month %>% 
-  drop_na(avg_fgc, avg_stdsg_CP, avg_neo_sg)
+  drop_na(avg_fgc, avg_cp_sg_tar, avg_neo_sg)
 colSums(is.na(full_data_month_mediate))
 
 
@@ -16,7 +16,7 @@ colSums(is.na(full_data_month_mediate))
 
 # total effect iv has on dv plus covariates
 fit.totaleffect <- lmer(log2_avg_neo ~ 
-                          log2_avg_cp + 
+                          log2_avg_cp_tar + 
                           age + 
                           sex + 
                           (1|subj),
@@ -25,7 +25,7 @@ fit.totaleffect <- lmer(log2_avg_neo ~
 
 # effect of iv on mediator
 fit.mediator <- lmer(log2(avg_fgc) ~ 
-                       log2_avg_cp + 
+                       log2_avg_cp_tar + 
                        age +
                        sex +
                        (1|subj),
@@ -35,7 +35,7 @@ fit.mediator <- lmer(log2(avg_fgc) ~
 
 fit.dv <- lmer(log2_avg_neo ~ 
                  log2(avg_fgc) + 
-                 log2_avg_cp +
+                 log2_avg_cp_tar +
                  age +
                  sex +
                  (1|subj),
@@ -43,7 +43,7 @@ fit.dv <- lmer(log2_avg_neo ~
 
 
 set.seed(288)
-med_results = mediate(fit.mediator, fit.dv, treat='log2_avg_cp', mediator='log2(avg_fgc)')
+med_results = mediate(fit.mediator, fit.dv, treat='log2_avg_cp_tar', mediator='log2(avg_fgc)')
 summary(med_results)
 
 

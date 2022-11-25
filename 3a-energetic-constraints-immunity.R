@@ -5,29 +5,35 @@ source("functions/vif.mer function.R") # vif.mer
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
 
+hist(full_data_month$log2_avg_cp_tar, binwidth = 0.2)
+hist(log2(full_data_month$avg_cp_sg))
+
+
+
 # is neo energetically constrained? ------
 # - by lbm and energy balance -----
-neo_cp_cr_glm_month <- glmer(avg_neo_sg ~ 
+neo_cp_cr_lm_month <- lmer(log2_avg_neo ~ 
                                sex +
                                age +
                                mrank +
                                avg_cr_resid +
-                               log2(avg_stdsg_CP) +
-                               (1|subj), 
-                             family = Gamma("log"),
-                             data = full_data_month, 
-                             control = glmerControl(optimizer ="Nelder_Mead"))
-qqnorm(residuals(neo_cp_cr_glm_month))
-qqline(residuals(neo_cp_cr_glm_month))
-summary(neo_cp_cr_glm_month)
-vif.mer(neo_cp_cr_glm_month)# all < 1.04
+                               log2_avg_cp_tar +
+                               (1|subj),
+                             data = full_data_month)
+
+
+
+qqnorm(residuals(neo_cp_cr_lm_month))
+qqline(residuals(neo_cp_cr_lm_month))
+summary(neo_cp_cr_lm_month)
+vif.mer(neo_cp_cr_lm_month)# all < 1.16
 
 # --- plot data points of neo against cp and lbm (2 plots) where lm is marginal effect of each ------
 
 
 
 # save model -----
-save(neo_cp_cr_glm_month, file = "models/energetic-constraints-immune-broad.Rdata") 
+save(neo_cp_cr_lm_month, file = "models/energetic-constraints-immune-broad.Rdata") 
 
 # graveyard ----
 # -- energy balance alone ----
