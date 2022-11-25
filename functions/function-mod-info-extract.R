@@ -6,8 +6,8 @@ mod_info_extract <- function(mod){
   if(grepl("^r", mod_name)) {response <- "Time resting"}
   if(grepl("^f", mod_name)) {response <- "Time feeding"}
   if(grepl("^m", mod_name)) {response <- "Time moving"}
-  if(grepl("^change", mod_name)) {response <- "∆ LBM"}
-  if(grepl("^lbm", mod_name)) {response <- "LBM"}
+  if(grepl("^change", mod_name)) {response <- "∆ ELBM"}
+  if(grepl("^lbm", mod_name)) {response <- "ELBM"}
   
   if(grepl("_lm_", mod_name)) {mod_type <- "lmer"}
   if(grepl("_glm_", mod_name)) {mod_type <- "glmer"}
@@ -38,10 +38,10 @@ mod_info_extract <- function(mod){
         rowname == "age" ~ "Age", 
         rowname == "sexM" ~ "Sex",
         rowname == "mrank" ~ "Maternal Rank",
-        rowname == "log2_avg_cp" ~ "log2 C-peptide", 
+        rowname == "log2_avg_cp_tar" ~ "log2 C-peptide", 
         rowname == "log2_avg_neo" ~ "log2 Neopterin",
         rowname == "log2_neo" ~ "log2 Neopterin",
-        rowname == "log2(avg_cr_resid)" ~ "log2 ELBM",
+        rowname == "avg_cr_resid" ~ "ELBM",
         rowname == "sample_interval" ~ "sample interval",
         rowname == "log2_neo:sample_interval" ~ "log2 Neo x sample interval",
         TRUE ~ rowname
