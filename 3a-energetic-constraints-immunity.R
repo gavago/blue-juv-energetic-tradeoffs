@@ -21,8 +21,6 @@ neo_cp_cr_lm_month <- lmer(log2_avg_neo ~
                                (1|subj),
                              data = full_data_month)
 
-
-
 qqnorm(residuals(neo_cp_cr_lm_month))
 qqline(residuals(neo_cp_cr_lm_month))
 summary(neo_cp_cr_lm_month)
