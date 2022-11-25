@@ -114,8 +114,8 @@ full_data_month %>%
 
 
 # save models ----
-save(cp_neo_glm_month, f_neo_lm_month, r_neo_lm_month, m_neo_lm_month,
-     lbm_neo_lm_month, file = "models/energetic-costs-immune-broad.Rdata")
+# save(cp_neo_lm_month, f_neo_lm_month, r_neo_lm_month, m_neo_lm_month,
+#      lbm_neo_lm_month, file = "models/energetic-costs-immune-broad.Rdata")
 
 
 
