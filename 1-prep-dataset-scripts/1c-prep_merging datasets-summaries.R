@@ -29,9 +29,8 @@ resids <- as.numeric(resid(m))
 # add vars
 full_udata <- merged_udata %>%
   mutate(cr_resid = resids) %>%
-  mutate(cp_tar1 = stdsg_CP - cp_time_pred) %>%
-  mutate(cp_tar = cp_tar1 + abs(min(cp_tar1, na.rm = T)) + 0.0001) %>%
-  select(-cp_tar1)
+  mutate(cp_tar_viz = stdsg_CP - cp_time_pred) %>% # try var for viz w negative values...
+  mutate(cp_tar = cp_tar_viz + abs(min(cp_tar_viz, na.rm = T)) + 0.0001)
 
 str(full_udata)
 
@@ -51,6 +50,7 @@ udata_month_avg <- full_udata %>%
   summarize(avg_neo_sg = mean(neo_sg, na.rm = T), 
             avg_cr_resid = mean(cr_resid, na.rm = T), 
             avg_cp_sg_tar = mean(cp_tar, na.rm = T),
+            avg_cp_sg_tar_viz = mean(cp_tar_viz, na.rm = T),
             avg_cp_sg = mean(stdsg_CP, na.rm = T),
             med_neo_sg = median(neo_sg, na.rm = T), 
             med_cr_resid = median(cr_resid, na.rm = T), 
