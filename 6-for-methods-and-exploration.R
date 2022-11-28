@@ -11,7 +11,6 @@ load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 # total urine
 nrow(full_udata)
 
-
 # neopterin
 full_udata %>%
   filter(!is.na(neo_sg)) %>% nrow()
@@ -58,6 +57,7 @@ gc_raw %>%
 mean(full_udata$neo_CV, na.rm = T)
 sd(full_udata$neo_CV, na.rm = T)
 
+
 # inter-assay CV neo ----
 neo_qchl <- read_csv("Neo_shared_w_Josh_C/QCH-QCL-assays.csv") %>%
   clean_names() %>% 
@@ -76,8 +76,12 @@ neo_qchl %>%
   filter(control == "QCL") %>%
   pull(mean_result) %>% hist()
 
-neo_qchl %>%
-  pivot_wider(id_cols = c("plate","group"),names_from = "control", values_from = "mean_result") %>%
+neo_qchl_wide <- neo_qchl %>%
+  pivot_wider(id_cols = c("plate","group"),names_from = "control", values_from = "mean_result") 
+
+neo_qchl_wide
+
+neo_qchl_wide %>%
   filter(QCL < 7, QCH <= 20) %>%
   pivot_longer(cols = c("QCL","QCH"), names_to = "control",values_to = "mean_result") %>%
   group_by(control) %>%
@@ -85,7 +89,20 @@ neo_qchl %>%
             sd_qc = sd(mean_result, na.rm = T),
             cv_qc = sd_qc/mean_qc)
 
+# how many plates determined QCs
+neo_qchl %>%
+  filter(!is.na(mean_result)) %>%
+  distinct(plate) %>%
+  nrow()
 
+# how many wells determined QCL, each mean result is 2 wells
+neo_qchl %>%
+  filter(control == "QCL", !is.na(mean_result)) %>%
+  nrow()*2
+# how many wells determined QCH
+neo_qchl %>%
+  filter(control == "QCH", !is.na(mean_result)) %>%
+  nrow()*2
 
 # group effects: -------
 lmer(log2_avg_neo ~ 
