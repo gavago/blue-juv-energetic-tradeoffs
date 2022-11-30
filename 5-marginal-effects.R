@@ -17,7 +17,7 @@ cp_neo_lm_marg_effect
 
 # both axes logged
 ggplot() + 
-  geom_point(data = full_data_month, aes(x = log2_avg_neo, y = log2_avg_cp_tar)) +
+  geom_point(data = full_data_month, aes(x = log2_avg_neo, y = log2_avg_cp_tar), alpha = .3) +
   geom_line(data = cp_neo_lm_marg_effect, aes(x, predicted), color = "deepskyblue4") +
   geom_ribbon(data = cp_neo_lm_marg_effect, aes(x= x, y = predicted, ymin = conf.low, ymax = conf.high), 
               alpha = .3, 
@@ -30,10 +30,10 @@ ggplot() +
 
 # neo logged
 ggplot() + 
-  geom_point(data = full_data_month, aes(x = log2_avg_neo, y = avg_cp_sg_tar)) +
+  geom_point(data = full_data_month, aes(x = log2_avg_neo, y = avg_cp_sg_tar), alpha = .3) +
   geom_line(data = cp_neo_lm_marg_effect, aes(x, 2^predicted), color = "deepskyblue4") +
   geom_ribbon(data = cp_neo_lm_marg_effect, aes(x= x, y = 2^predicted, ymin = conf.low, ymax = conf.high), 
-              alpha = .3, 
+              alpha = .4, 
               fill = "deepskyblue4") +
   ylab("C-peptide ng/ml (time-adjusted)") +
   xlab(expression(log[2]~Neopterin~"ng/ml")) +
@@ -47,45 +47,52 @@ ggplot() +
 # marginal effects lbm ~ neo ----
 lbm_neo_marg_effect <- ggemmeans(lbm_neo_lm_month, terms = "log2_avg_neo")
 
-ggplot(lbm_neo_marg_effect, aes(x, predicted)) +
-  geom_line(color = "coral3") +
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), 
-              alpha = .3, 
+ggplot() +
+  geom_point(data = full_data_month, aes(x = log2_avg_neo, y = avg_cr_resid), alpha = .3) +
+  geom_line(data = lbm_neo_marg_effect, aes(x, predicted), color = "coral3") +
+  geom_ribbon(data = lbm_neo_marg_effect, aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high),
+              alpha = .4,
               fill = "coral3") +
-  ylab("Predicted Estimated Lean Body Mass")+
-  xlab(bquote(Neopterin(log[2])))
+  ylab("Creatinine residuals") +
+  xlab(expression(log[2]~Neopterin~"ng/ml")) +
+  theme_minimal()
+
 
 # marginal effects short term lbm change ~ neo ----
 
 change_lbm_neo_marg_effect <- ggemmeans(change_lbm_neo_lm_sample, terms = "log2_neo")
 # NOTE: Results may be misleading due to involvement in interactions 
 
-ggplot(change_lbm_neo_marg_effect, aes(x, predicted)) +
-  geom_line(color = "deeppink3") +
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), 
+ggplot() +
+  geom_point(data = full_data_short_term_lbm_change, aes(x = log2_neo, y = sample_lbm_change), alpha = .3) +
+  geom_line(data = change_lbm_neo_marg_effect, aes(x, predicted), color = "deeppink3") +
+  geom_ribbon(data = change_lbm_neo_marg_effect, aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high), 
               alpha = .3, 
-              fill = "deeppink3") +
-  ylab("Predicted Change in Lean Body Mass")+
-  xlab(bquote(Neopterin(log[2])))
+              fill = "deeppink2") +
+  ylab("Change in creatinine residuals") +
+  xlab(expression(log[2]~Neopterin~"ng/ml")) +
+  theme_minimal()
+  
 # not logging predictor
 # no difference with interaction term removed
 
-
 # Supplemental exploratory ---------
-# marginal effects f ~ neo ----
+# marginal effects r ~ neo ----
 r_neo_lm_month <- lmer(r ~ sex + 
                          age +
                          log2_avg_neo+ 
-                         log2_avg_stdsg_CP +
+                         log2_avg_cp_tar +
                          (1|subj), 
                        data = full_data_month)
 
-f_neo_lm_month_marg_effect <- ggemmeans(f_neo_lm_month, terms = "avg_neo_sg")
+r_neo_lm_month_marg_effect <- ggemmeans(r_neo_lm_month, terms = "log2_avg_neo")
 
-ggplot(f_neo_lm_month_marg_effect, aes(x, predicted)) +
-  geom_line(color = "deeppink3") +
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), 
+ggplot() +
+  geom_point(data = full_data_month, aes(x = log2_avg_neo, y = r), alpha = .3) +
+  geom_line(data = r_neo_lm_month_marg_effect, aes(x, predicted), color = "dark green") +
+  geom_ribbon(data = r_neo_lm_month_marg_effect, aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high), 
               alpha = .3, 
-              fill = "deeppink3") +
-  ylab("Predicted Feeding")+
+              fill = "dark green") +
+  ylab("Time resting")+
   xlab(bquote(Neopterin(log[2])))
+
