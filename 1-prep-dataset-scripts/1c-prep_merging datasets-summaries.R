@@ -7,10 +7,11 @@ load("data/fgc_data_by_sample.Rdata", verbose = T)
 load("data/cp-time-of-day-model.Rdata", verbose = T)
 
 
-# Merging urine sample data (neo, cp, cr_resid)  -----
+# Merging urine sample data (neo, cp, cr_resid) + remove low SG -----
 merged_udata <- left_join( neo_data_full, cp_raw, by = intersect(names(neo_data_full), names(cp_raw))) %>%
-  select(group, subj, date, age, year, month, time, sample_number, stdsg_CP, neo_sg, everything())
-dim(merged_udata) # 620 rows
+  select(group, subj, date, age, year, month, time, sample_number, stdsg_CP, neo_sg, everything()) %>%
+  filter(SG >= 3) # removes 5 NA and one SG of 2
+dim(merged_udata) # 614 rows
 
 # Add lean body mass and cp time adjust residual (script 1b) ------
 
@@ -92,7 +93,7 @@ dim(udata_fgc_month_avg) # 317, 5 urine subj-months where no fgc data
 
 str(udata_fgc_month_avg)
 
-view(udata_gc_month_avg)
+view(udata_fgc_month_avg)
 
 full_data_month <- full_join(udata_fgc_month_avg, behav_data_month, by = intersect(names(udata_fgc_month_avg), names(behav_data_month))) %>%
   left_join(., lh.mo_merge) %>%
@@ -108,21 +109,6 @@ view(full_data_month)
 # save full month data -----
 # save(full_data_month, file = "data/full_data_month_udata_fgc_behav.RData")
 # load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
-
-# save csv
-# write.csv(full_data_month,  file = "data/full_data_month_udata_fgc_behav.csv", row.names = F)
-
-
-# Sample counts for methods ------
-load("data/urine_sample_dataset_juv_immune_energetics.Rdata", verbose = T)
-load("data/fgc_data_by_sample.Rdata", verbose = T)
-
-nrow(full_udata) #620
-nrow(gc_raw) #627
-
-full_udata %>%
-  distinct(subj, .keep_all = T) %>%
-  count(sex)
 
 
 # graveyard -----
