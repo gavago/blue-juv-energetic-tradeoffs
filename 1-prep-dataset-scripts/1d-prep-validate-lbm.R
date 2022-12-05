@@ -1,6 +1,7 @@
 library(tidyverse)
 library(lmerTest)
 
+load("data/urine_sample_dataset_juv_immune_energetics.Rdata", verbose = T)
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
 
@@ -40,11 +41,14 @@ full_data %>%
   geom_point() +
   geom_smooth(method = "lm")
 
-crsg_cp_lm <- lmer(cr_resid ~ sex + scale(stdsg_CP) + scale(age) + (1|subj), data = full_data)
-qqnorm(residuals(crsg_cp_lm))
-summary(crsg_cp_lm)
+# by sample
+lbm_by_age_samp <- lmer(cr_resid ~ sex + log2(cp_tar) + age + (1|subj), data = full_udata)
+qqnorm(residuals(lbm_by_age_samp))
+qqline(residuals(lbm_by_age_samp))
+summary(lbm_by_age_samp)
 
-library(lme4)
-lmer(neo_sg ~ sex + scale(age) + scale(gm) + scale(stdsg_CP) + +  (1|subj), data = full_data)
+# by monthly avg
+lbm_by_age_mo <- lmer(avg_cr_resid ~ sex + log2_avg_cp_tar + age + (1|subj), data = full_data_month)
+summary(lbm_by_age_mo)
 
 
