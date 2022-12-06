@@ -45,7 +45,7 @@ fit.dv <- lmer(log2_avg_neo ~
 set.seed(288)
 med_results = mediate(fit.mediator, fit.dv, treat='log2_avg_cp_tar', mediator='log2(avg_fgc)')
 summary(med_results)
-
+class(med_results)
 
 #save(med_results, file = "models/mechanism-constraints-on-immune.Rdata")
 

@@ -24,14 +24,14 @@ neo_cp_cr_lm_month <- lmer(log2_avg_neo ~
 qqnorm(residuals(neo_cp_cr_lm_month))
 qqline(residuals(neo_cp_cr_lm_month))
 summary(neo_cp_cr_lm_month)
-vif.mer(neo_cp_cr_lm_month)# all < 1.16
+vif.mer(neo_cp_cr_lm_month)# all < 1.17
 
 # --- plot data points of neo against cp and lbm (2 plots) where lm is marginal effect of each ------
 
 
 
 # save model -----
-save(neo_cp_cr_lm_month, file = "models/energetic-constraints-immune-broad.Rdata") 
+#save(neo_cp_cr_lm_month, file = "models/energetic-constraints-immune-broad.Rdata") 
 
 # graveyard ----
 # -- energy balance alone ----

@@ -19,7 +19,7 @@ cp_neo_lm_month <- full_data_month %>%
 qqnorm(residuals(cp_neo_lm_month))
 qqline(residuals(cp_neo_lm_month))  
 summary(cp_neo_lm_month)
-vif.mer(cp_neo_glm_month) # all < 1.04
+vif.mer(cp_neo_lm_month) # all < 1.04
 
 
 # viz
@@ -71,11 +71,11 @@ qqline(residuals(m_neo_lm_month))
 
 
 summary(f_neo_lm_month)
-vif.mer(f_neo_lm_month) # all < 1.17
+vif.mer(f_neo_lm_month) # all < 1.15
 summary(r_neo_lm_month)
-vif.mer(r_neo_lm_month) # all < 1.14
+vif.mer(r_neo_lm_month) # all < 1.13
 summary(m_neo_lm_month)
-vif.mer(m_neo_lm_month) # all < 1.16
+vif.mer(m_neo_lm_month) # all < 1.14
 
 
 full_data_month %>%
