@@ -1,4 +1,5 @@
 library(tidyverse)
+library(mediation)
 source("functions/function-mod-info-extract.R")
 source("functions/function-prettify-result-table.R")
 load("models/energetic-costs-immune-broad.Rdata", verbose = T)
@@ -30,8 +31,17 @@ constraints <- mod_info_extract(neo_cp_cr_lm_month) %>% prettify_table()
 summary(neo_cp_cr_lm_month)
 
 # A2 - mechanism constraints
-summary(med_results) #figure out how to save these
+set.seed(288)
+med_results = mediate(fit.mediator, fit.dv, treat='log2_avg_cp_tar', mediator='log2(avg_fgc)')
+med_summ<- summary(med_results)
 
 
+# save tabs ---------
 tab1_costs <- do.call("rbind", list(costs1, costs2, costs3))
 write.table(tab1_costs, file = "results/tables/tab1-costs.txt", quote = FALSE, sep = "/", row.names = F)
+
+activity_tabs <- do.call("rbind", list(sup1, sup2, sup3))
+write.table(activity_tabs, file = "results/tables/supp_tables.txt", quote = FALSE, sep = "/", row.names = F)
+
+write.table(constraints, file = "results/tables/constraint_table.txt", quote = FALSE, sep = "/", row.names = F)
+
