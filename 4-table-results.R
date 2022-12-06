@@ -11,8 +11,14 @@ load("models/mechanism-constraints-on-immune.Rdata", verbose = T)
 costs1 <- mod_info_extract(cp_neo_lm_month) %>% prettify_table()
 costs2 <- mod_info_extract(lbm_neo_lm_month) %>% prettify_table()
 
+summary(cp_neo_lm_month)
+summary(lbm_neo_lm_month)
+
+
 # A1 - energetic costs neo short term
 costs3 <- mod_info_extract(change_lbm_neo_lm_sample) %>% prettify_table()
+
+summary(change_lbm_neo_lm_sample)
 
 # A1 - modify behavior in light of costs? (Supplementary) 
 sup1 <- mod_info_extract(f_neo_lm_month) %>% prettify_table()
@@ -21,9 +27,10 @@ sup3 <- mod_info_extract(m_neo_lm_month) %>% prettify_table()
 
 # A2 - energetic limitations neo
 constraints <- mod_info_extract(neo_cp_cr_lm_month) %>% prettify_table()
+summary(neo_cp_cr_lm_month)
 
 # A2 - mechanism constraints
-med_results
+summary(med_results) #figure out how to save these
 
 
 tab1_costs <- do.call("rbind", list(costs1, costs2, costs3))

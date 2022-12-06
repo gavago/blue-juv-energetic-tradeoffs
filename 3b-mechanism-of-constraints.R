@@ -47,7 +47,7 @@ med_results = mediate(fit.mediator, fit.dv, treat='log2_avg_cp_tar', mediator='l
 summary(med_results)
 class(med_results)
 
-#save(med_results, file = "models/mechanism-constraints-on-immune.Rdata")
+#save(fit.mediator, fit.dv, med_results, file = "models/mechanism-constraints-on-immune.Rdata")
 
 # Total Effect = effect of CP on Neo broadly, no controls
 # ADE = Average Direct Effect = effect of CP on Neo independent of/controlling for FGC
