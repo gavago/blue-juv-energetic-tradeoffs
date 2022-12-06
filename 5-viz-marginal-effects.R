@@ -10,7 +10,6 @@ load("models/energetic-costs-immune-short.Rdata", verbose = T)
 
 # raw data points w marginal effects smooth, cp ~ neo ----
 
-summary(cp_neo_lm_month)
 cp_neo_lm_marg_effect <- ggemmeans(cp_neo_lm_month, terms = "log2_avg_neo")
 
 cp_neo_lm_marg_effect
@@ -32,7 +31,7 @@ ggplot() +
 ggplot() + 
   geom_point(data = full_data_month, aes(x = log2_avg_neo, y = avg_cp_sg_tar), alpha = .3) +
   geom_line(data = cp_neo_lm_marg_effect, aes(x, 2^predicted), color = "deepskyblue4") +
-  geom_ribbon(data = cp_neo_lm_marg_effect, aes(x= x, y = 2^predicted, ymin = conf.low, ymax = conf.high), 
+  geom_ribbon(data = cp_neo_lm_marg_effect, aes(x= x, y = 2^predicted, ymin = 2^conf.low, ymax = 2^conf.high), 
               alpha = .4, 
               fill = "deepskyblue4") +
   ylab("C-peptide ng/ml (time-adjusted)") +
@@ -53,12 +52,14 @@ ggplot() +
   geom_ribbon(data = lbm_neo_marg_effect, aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high),
               alpha = .4,
               fill = "coral3") +
-  ylab("Creatinine residuals") +
+  ylab("Estimated Lean Body Mass") +
   xlab(expression(log[2]~Neopterin~"ng/ml")) +
   theme_minimal()
 
 
-# marginal effects short term lbm change ~ neo ----
+# PAPER/POSTER FIGURES --------
+# fig 1 - validation - elbm by age -------
+# fig 2a - costs - short term lbm change ~ neo ----
 
 change_lbm_neo_marg_effect <- ggemmeans(change_lbm_neo_lm_sample, terms = "log2_neo")
 # NOTE: Results may be misleading due to involvement in interactions 
@@ -69,12 +70,17 @@ ggplot() +
   geom_ribbon(data = change_lbm_neo_marg_effect, aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high), 
               alpha = .3, 
               fill = "deeppink2") +
-  ylab("Change in creatinine residuals") +
-  xlab(expression(log[2]~Neopterin~"ng/ml")) +
+  ylab(expression("∆t"[2]-t[1]~"in"~Estimated~Lean~Body~Mass)) +
+  xlab(expression(log[2]~Neopterin[t1]~"ng/ml")) +
   theme_minimal()
   
+
 # not logging predictor
 # no difference with interaction term removed
+
+# fig 2b - costs - interaction lbm change ~ sample interval*neo ------
+# fig 3a - constraints - neo ~ cp marg effect --------
+# fig 3b - constraints - neo ~ lbm marg effect --------
 
 # Supplemental exploratory ---------
 # marginal effects r ~ neo ----
