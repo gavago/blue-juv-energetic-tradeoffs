@@ -91,9 +91,9 @@ dev.off()
   
 # fig 2a - costs - short term lbm change ~ neo ----
 
-change_lbm_neo_interaction_marg_effect <- ggemmeans(change_lbm_neo_lm_sample, terms = "log2_neo*sample_interval")
+change_lbm_neo_marg_effect <- ggemmeans(change_lbm_neo_lm_sample, terms = "log2_neo")
 
-ggplot() +
+change_lbm_neo_marg_effect_plot <- ggplot() +
   geom_point(data = full_data_short_term_lbm_change, 
              aes(x = log2_neo, y = sample_lbm_change), 
              alpha = .4) +
@@ -106,8 +106,15 @@ ggplot() +
               alpha = .4, 
               fill = "deepskyblue4") +
   ylab(expression("∆t"[2]-t[1]~"in"~Estimated~Lean~Body~Mass)) +
-  xlab(expression(log[2]~Neopterin[t1]~"ng/ml")) +
-  theme_minimal()
+  xlab(expression(log[2]~Neopterin[t1]~"ng/ml")) + 
+  theme_minimal ()
+
+change_lbm_neo_marg_effect_plot
+
+pdf("change_lbm_neo_marg_effect_plot")
+print(change_lbm_neo_marg_effect_plot)
+dev.off()
+  
 # no difference with interaction term removed
 
 # fig 2b - costs - interaction lbm change ~ sample interval*neo ------
@@ -123,7 +130,7 @@ ggplot() +
 # fig 3a - constraints - neo ~ cp marg effect --------
 cp_neo_lm_marg_effect <- ggemmeans(cp_neo_lm_month, terms = "log2_avg_neo")
 
-ggplot() + 
+cp_neo_lm_marg_effect_plot <- ggplot() + 
   geom_point(data = full_data_month, aes(x = log2_avg_neo, y = log2_avg_cp_tar), alpha = .3) +
   geom_line(data = cp_neo_lm_marg_effect, aes(x, predicted), color = "deeppink4") +
   geom_ribbon(data = cp_neo_lm_marg_effect, aes(x= x, y = predicted, ymin = conf.low, ymax = conf.high), 
@@ -133,10 +140,17 @@ ggplot() +
   xlab(expression(log[2]~Neopterin~"ng/ml")) +
   theme_minimal()
 
+cp_neo_lm_marg_effect_plot
+
+# export pdf
+pdf("cp_neo_lm_marg_effect_plot")
+print(cp_neo_lm_marg_effect_plot)
+dev.off()
+
 # fig 3b - constraints - neo ~ lbm marg effect --------
 lbm_neo_marg_effect <- ggemmeans(lbm_neo_lm_month, terms = "log2_avg_neo")
 
-ggplot() +
+lbm_neo_marg_effect_plot <- ggplot() +
   geom_point(data = full_data_month, aes(x = log2_avg_neo, y = avg_cr_resid), alpha = .3) +
   geom_line(data = lbm_neo_marg_effect, aes(x, predicted), color = "deeppink2") +
   geom_ribbon(data = lbm_neo_marg_effect, aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high),
@@ -146,6 +160,10 @@ ggplot() +
   xlab(expression(log[2]~Neopterin~"ng/ml")) +
   theme_minimal()
 
+# export pdf
+pdf("lbm_neo_marg_effect_plot")
+print(lbm_neo_marg_effect_plot)
+dev.off()
 
 # Supplemental exploratory ---------
 # marginal effects r ~ neo ----
