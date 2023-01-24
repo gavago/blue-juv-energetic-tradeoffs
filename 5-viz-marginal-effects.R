@@ -84,6 +84,7 @@ age_lbm_plot <- ggplot() +
   ylab(expression("Estimated Lean Body Mass")) +
   xlab(expression("Age"))
 
+
 # export as pdf
 pdf("age_lbm_plot.pdf")
 print(age_lbm_plot)
@@ -131,39 +132,66 @@ dev.off()
 cp_neo_lm_marg_effect <- ggemmeans(cp_neo_lm_month, terms = "log2_avg_neo")
 
 cp_neo_lm_marg_effect_plot <- ggplot() + 
-  geom_point(data = full_data_month, aes(x = log2_avg_neo, y = log2_avg_cp_tar), alpha = .3) +
-  geom_line(data = cp_neo_lm_marg_effect, aes(x, predicted), color = "deeppink4") +
-  geom_ribbon(data = cp_neo_lm_marg_effect, aes(x= x, y = predicted, ymin = conf.low, ymax = conf.high), 
-              alpha = .3, 
-              fill = "deeppink4") +
+  geom_point(data = full_data_month, 
+             aes(x = log2_avg_neo, y = log2_avg_cp_tar), alpha = .3) +
+  geom_line(data = cp_neo_lm_marg_effect, 
+           aes(x, predicted), color = "deeppink4") +
+  geom_ribbon(data = cp_neo_lm_marg_effect, 
+             aes(x, predicted, ymin = conf.low, ymax = conf.high), 
+             alpha = .3, 
+             fill = "deeppink4") +
+  #geom_smooth(data = full_data_month, 
+             #aes(x = log2_avg_neo, y = log2_avg_cp_tar), 
+             #alpha = .3, color = "blue", method = lm) +
   ylab(expression(log[2]~"C-peptide" ~ "ng/ml")) +
   xlab(expression(log[2]~Neopterin~"ng/ml")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(axis.title = element_text(size = 15))
 
-cp_neo_lm_marg_effect_plot
-
-# export pdf
-pdf("cp_neo_lm_marg_effect_plot")
-print(cp_neo_lm_marg_effect_plot)
-dev.off()
+# w cp on x axis
+cp_neo_lm_plot_smooth <- 
+  ggplot(data = full_data_month, aes(x = log2_avg_cp_tar, y = log2_avg_neo), 
+         alpha = .3) +
+  geom_point(alpha = .3) + 
+  geom_smooth(method = lm, color = "deeppink4", fill = "deeppink4", alpha = .3) + 
+  xlab(expression(log[2]~"C-peptide" ~ "ng/ml")) +
+  ylab(expression(log[2]~Neopterin~"ng/ml")) +
+  theme_minimal() + 
+  theme(axis.title = element_text(size = 15))
 
 # fig 3b - constraints - neo ~ lbm marg effect --------
 lbm_neo_marg_effect <- ggemmeans(lbm_neo_lm_month, terms = "log2_avg_neo")
 
 lbm_neo_marg_effect_plot <- ggplot() +
-  geom_point(data = full_data_month, aes(x = log2_avg_neo, y = avg_cr_resid), alpha = .3) +
-  geom_line(data = lbm_neo_marg_effect, aes(x, predicted), color = "deeppink2") +
-  geom_ribbon(data = lbm_neo_marg_effect, aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high),
-              alpha = .2,
-              fill = "deeppink2") +
+  geom_point(data = full_data_month, 
+             aes(x = log2_avg_neo, y = avg_cr_resid), alpha = .3) +
+  geom_line(data = lbm_neo_marg_effect, 
+            aes(x, predicted), color = "deeppink2") +
+  geom_ribbon(data = lbm_neo_marg_effect, 
+              aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high), 
+              alpha = .2,fill = "deeppink2") +
+  #geom_smooth(data = full_data_month, 
+              #aes(x = log2_avg_neo, y = avg_cr_resid), alpha = .3, method = lm) +
   ylab("Creatinine residuals") +
   xlab(expression(log[2]~Neopterin~"ng/ml")) +
   theme_minimal()
+
 
 # export pdf
 pdf("lbm_neo_marg_effect_plot")
 print(lbm_neo_marg_effect_plot)
 dev.off()
+
+# with cr on x axis
+lbm_neo_lm_plot_smooth <- 
+  ggplot(data = full_data_month, aes(x = avg_cr_resid, y = log2_avg_neo)) +
+  geom_point(alpha = .3) +
+  geom_smooth(color = "deeppink2", fill = "deeppink2", alpha = .3, method = lm) +
+  xlab("Creatinine residuals") +
+  ylab(expression(log[2]~Neopterin~"ng/ml")) +
+  theme_minimal() + 
+  theme(axis.title = element_text(size = 15))
+                                  
 
 # Supplemental exploratory ---------
 # marginal effects r ~ neo ----
@@ -185,3 +213,5 @@ ggplot() +
   ylab("Time resting")+
   xlab(bquote(Neopterin(log[2])))
 
+
+# graveyard ----
