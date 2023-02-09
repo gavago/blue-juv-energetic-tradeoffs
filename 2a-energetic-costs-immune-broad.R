@@ -36,7 +36,7 @@ full_data_month %>%
 
 
 
-# - - -  does feeding, moving, or resting compensate for the cost of neo? ----
+# - - - compensatory behavior - does feeding, moving, or resting compensate for the cost of neo? ----
 
 # feeding ~ neo 
 f_neo_lm_month <- lmer(f ~ sex + 
