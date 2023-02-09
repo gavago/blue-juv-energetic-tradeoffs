@@ -9,6 +9,22 @@ hist(full_data_month$log2_avg_cp_tar, binwidth = 0.2)
 hist(log2(full_data_month$avg_cp_sg))
 
 
+full_data_month %>%
+  mutate(month = as.factor(month)) %>%
+  ggplot(aes(x = month, y = avg_cp_sg)) +
+  geom_boxplot()
+full_data_month %>%
+  mutate(month = as.factor(month)) %>%
+  ggplot(aes(x = month, y = avg_neo_sg)) +
+  geom_boxplot()
+full_data_month %>%
+  mutate(month = as.factor(month)) %>%
+  ggplot(aes(x = month, y = avg_cr_resid)) +
+  geom_boxplot()
+full_data_month %>%
+  mutate(month = as.factor(month)) %>%
+  ggplot(aes(x = month, y = avg_rain)) +
+  geom_boxplot()
 
 # is neo energetically constrained? ------
 # - by lbm and energy balance -----
@@ -16,6 +32,7 @@ neo_cp_cr_lm_month <- lmer(log2_avg_neo ~
                                sex +
                                age +
                                mrank +
+                              avg_rain +
                                avg_cr_resid +
                                log2_avg_cp_tar +
                                (1|subj),
