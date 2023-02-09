@@ -83,6 +83,11 @@ load("data/udata_month_avg.Rdata", verbose = T)
 load("data/fgc_month_avg.Rdata", verbose = T)
 load("data/behav-dataset-month.Rdata", verbose = T)
 load("/Users/nicolethompsongonzalez/Dropbox/2_R-projects/Juv-blues-diss/Juvenile data and field/Data/3. Behavior data by month/Rdata files month/Juv LH month.Rdata", verbose = T)
+
+#add monthly rainfall
+#add monthly partner number (gm, r, or c), after prep in 1a
+
+
 lh.mo_merge <- lh.mo %>%
   mutate(year = lubridate::year(month), month = lubridate::month(month)) 
 
