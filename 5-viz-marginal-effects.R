@@ -48,10 +48,10 @@ lbm_neo_marg_effect <- ggemmeans(lbm_neo_lm_month, terms = "log2_avg_neo")
 
 ggplot() +
   geom_point(data = full_data_month, aes(x = log2_avg_neo, y = avg_cr_resid), alpha = .3) +
-  geom_line(data = lbm_neo_marg_effect, aes(x, predicted), color = "coral3") +
+  geom_line(data = lbm_neo_marg_effect, aes(x, predicted), color = "tomato3") +
   geom_ribbon(data = lbm_neo_marg_effect, aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high),
               alpha = .4,
-              fill = "coral3") +
+              fill = "tomato3") +
   ylab("Estimated Lean Body Mass") +
   xlab(expression(log[2]~Neopterin~"ng/ml")) +
   theme_minimal()
@@ -59,28 +59,93 @@ ggplot() +
 
 # PAPER/POSTER FIGURES --------
 # fig 1 - validation - elbm by age -------
+age_cr_lm_month <- lmer(avg_cr_resid ~ age + 
+                          sex +  
+                          mrank +
+                          avg_cp_sg +
+                          (1|subj),
+                        data = full_data_month)
+
+qqnorm(residuals(age_cr_lm_month))
+qqline(residuals(age_cr_lm_month))
+
+age_lbm_marg_effect <- ggemmeans(age_cr_lm_month, terms = "age")
+
+age_lbm_plot <- ggplot() + 
+  geom_point(data = full_data_month,
+             aes(x = age, y = avg_cr_resid),
+             alpha = .3) + 
+  geom_line(data = age_lbm_marg_effect, 
+               aes(x, predicted), 
+               alpha = .3, color = "green4") +
+  geom_ribbon(data = age_lbm_marg_effect, 
+              aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high), 
+              alpha = .3, fill = "darkgreen") + 
+  ylab(expression("Estimated Lean Body Mass")) +
+  xlab(expression("Age"))
+
+# export as pdf
+pdf("age_lbm_plot.pdf")
+print(age_lbm_plot)
+dev.off()
+  
 # fig 2a - costs - short term lbm change ~ neo ----
 
-change_lbm_neo_marg_effect <- ggemmeans(change_lbm_neo_lm_sample, terms = "log2_neo")
-# NOTE: Results may be misleading due to involvement in interactions 
+change_lbm_neo_interaction_marg_effect <- ggemmeans(change_lbm_neo_lm_sample, terms = "log2_neo*sample_interval")
 
 ggplot() +
-  geom_point(data = full_data_short_term_lbm_change, aes(x = log2_neo, y = sample_lbm_change), alpha = .3) +
-  geom_line(data = change_lbm_neo_marg_effect, aes(x, predicted), color = "deeppink3") +
-  geom_ribbon(data = change_lbm_neo_marg_effect, aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high), 
-              alpha = .3, 
-              fill = "deeppink2") +
+  geom_point(data = full_data_short_term_lbm_change, 
+             aes(x = log2_neo, y = sample_lbm_change), 
+             alpha = .4) +
+  geom_line(data = change_lbm_neo_marg_effect, 
+            aes(x, predicted), 
+            color = "deepskyblue4") +
+  geom_ribbon(data = change_lbm_neo_marg_effect, 
+              aes(x = x, y = predicted, 
+              ymin = conf.low, ymax = conf.high), 
+              alpha = .4, 
+              fill = "deepskyblue4") +
   ylab(expression("∆t"[2]-t[1]~"in"~Estimated~Lean~Body~Mass)) +
   xlab(expression(log[2]~Neopterin[t1]~"ng/ml")) +
   theme_minimal()
-  
-
-# not logging predictor
 # no difference with interaction term removed
 
 # fig 2b - costs - interaction lbm change ~ sample interval*neo ------
+# still working on this one...
+
+#ggplot() + 
+   #geom_s(data = full_data_short_term_lbm_change, 
+         #aes(x = log2_neo, y = sample_lbm_change, 
+         #color = sample_interval)) + 
+         #theme_minimal()
+
+  
 # fig 3a - constraints - neo ~ cp marg effect --------
+cp_neo_lm_marg_effect <- ggemmeans(cp_neo_lm_month, terms = "log2_avg_neo")
+
+ggplot() + 
+  geom_point(data = full_data_month, aes(x = log2_avg_neo, y = log2_avg_cp_tar), alpha = .3) +
+  geom_line(data = cp_neo_lm_marg_effect, aes(x, predicted), color = "deeppink4") +
+  geom_ribbon(data = cp_neo_lm_marg_effect, aes(x= x, y = predicted, ymin = conf.low, ymax = conf.high), 
+              alpha = .3, 
+              fill = "deeppink4") +
+  ylab(expression(log[2]~"C-peptide" ~ "ng/ml")) +
+  xlab(expression(log[2]~Neopterin~"ng/ml")) +
+  theme_minimal()
+
 # fig 3b - constraints - neo ~ lbm marg effect --------
+lbm_neo_marg_effect <- ggemmeans(lbm_neo_lm_month, terms = "log2_avg_neo")
+
+ggplot() +
+  geom_point(data = full_data_month, aes(x = log2_avg_neo, y = avg_cr_resid), alpha = .3) +
+  geom_line(data = lbm_neo_marg_effect, aes(x, predicted), color = "deeppink2") +
+  geom_ribbon(data = lbm_neo_marg_effect, aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high),
+              alpha = .2,
+              fill = "deeppink2") +
+  ylab("Creatinine residuals") +
+  xlab(expression(log[2]~Neopterin~"ng/ml")) +
+  theme_minimal()
+
 
 # Supplemental exploratory ---------
 # marginal effects r ~ neo ----
@@ -95,10 +160,10 @@ r_neo_lm_month_marg_effect <- ggemmeans(r_neo_lm_month, terms = "log2_avg_neo")
 
 ggplot() +
   geom_point(data = full_data_month, aes(x = log2_avg_neo, y = r), alpha = .3) +
-  geom_line(data = r_neo_lm_month_marg_effect, aes(x, predicted), color = "dark green") +
+  geom_line(data = r_neo_lm_month_marg_effect, aes(x, predicted), color = "coral2") +
   geom_ribbon(data = r_neo_lm_month_marg_effect, aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high), 
               alpha = .3, 
-              fill = "dark green") +
+              fill = "coral2") +
   ylab("Time resting")+
   xlab(bquote(Neopterin(log[2])))
 
