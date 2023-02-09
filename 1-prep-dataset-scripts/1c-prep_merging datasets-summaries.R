@@ -1,5 +1,8 @@
 library(tidyverse)
 
+
+
+# initial sample data load ---------
 load("data/neo-dataset-full.Rdata", verbose = T)
 load("data/cp-dataset-full.Rdata", verbose = T)
 load("data/behav-dataset-month.Rdata", verbose = T)
@@ -7,13 +10,13 @@ load("data/fgc_data_by_sample.Rdata", verbose = T)
 load("data/cp-time-of-day-model.Rdata", verbose = T)
 
 
-# Merging urine sample data (neo, cp, cr_resid) + remove low SG -----
+# Urine sample data (neo, cp, cr_resid) merge + remove low SG -----
 merged_udata <- left_join( neo_data_full, cp_raw, by = intersect(names(neo_data_full), names(cp_raw))) %>%
   select(group, subj, date, age, year, month, time, sample_number, stdsg_CP, neo_sg, everything()) %>%
   filter(SG >= 3) # removes 5 NA and one SG of 2
 dim(merged_udata) # 614 rows
 
-# Add lean body mass and cp time adjust residual (script 1b) ------
+# Lean body mass and cp time adjust residual merge (script 1b) ------
 
 # calculating cr-sg resids
 merged_udata %>%
@@ -78,32 +81,24 @@ dim(fgc_month_avg)
 
 view(fgc_month_avg)
 
-# Merge monthly data - urine, feces, behavior, lh bday -----
+# Monthly data merge- urine, feces, behavior, lh bday -----
 load("data/udata_month_avg.Rdata", verbose = T)
 load("data/fgc_month_avg.Rdata", verbose = T)
 load("data/behav-dataset-month.Rdata", verbose = T)
 load("/Users/nicolethompsongonzalez/Dropbox/2_R-projects/Juv-blues-diss/Juvenile data and field/Data/3. Behavior data by month/Rdata files month/Juv LH month.Rdata", verbose = T)
-
-#add monthly rainfall
-#add monthly partner number (gm, r, or c), after prep in 1a
-
+load("data/monthly-partners-data.Rdata", verbose = T)
 
 lh.mo_merge <- lh.mo %>%
   mutate(year = lubridate::year(month), month = lubridate::month(month)) 
-
-names(behav_data_month)
-
 udata_fgc_month_avg <- full_join(udata_month_avg, fgc_month_avg, by = intersect(names(udata_month_avg), names(fgc_month_avg)))
 dim(udata_fgc_month_avg) # 317, 5 urine subj-months where no fgc data
 
-str(udata_fgc_month_avg)
-
-view(udata_fgc_month_avg)
 
 full_data_month <- full_join(udata_fgc_month_avg, behav_data_month, by = intersect(names(udata_fgc_month_avg), names(behav_data_month))) %>%
   left_join(., lh.mo_merge) %>%
   mutate(age = as.numeric(mid - bday)/365.25) %>%
-  mutate(log2_avg_neo = log2(avg_neo_sg), log2_avg_cp_tar = log2(avg_cp_sg_tar))
+  mutate(log2_avg_neo = log2(avg_neo_sg), log2_avg_cp_tar = log2(avg_cp_sg_tar)) %>%
+  left_join(., partner_df, by = c("month", "subj"))
 dim(full_data_month) # 323
 
 
