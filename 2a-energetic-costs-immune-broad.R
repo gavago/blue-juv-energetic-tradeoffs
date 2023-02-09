@@ -95,6 +95,7 @@ lbm_neo_lm_month <- lmer(avg_cr_resid ~
                            sex + 
                            mrank +
                            log2_avg_neo +
+                           log2_avg_cp_tar +
                            (1|subj),
                          data = full_data_month)
 qqnorm(residuals(lbm_neo_lm_month))
