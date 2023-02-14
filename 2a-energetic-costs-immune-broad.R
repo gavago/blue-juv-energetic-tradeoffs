@@ -13,7 +13,7 @@ cp_neo_lm_month <- full_data_month %>%
                           age +
                           mrank +
                           log2_avg_neo +
-                          (1|subj), 
+                          (1|subj) + (1|month), 
                          data = .)
 
 qqnorm(residuals(cp_neo_lm_month))
@@ -36,14 +36,14 @@ full_data_month %>%
 
 
 
-# - - -  does feeding, moving, or resting compensate for the cost of neo? ----
+# - - - compensatory behavior - does feeding, moving, or resting compensate for the cost of neo? ----
 
 # feeding ~ neo 
 f_neo_lm_month <- lmer(f ~ sex + 
                          age +
                          log2_avg_neo + 
                          log2_avg_cp_tar +
-                         (1|subj), 
+                         (1|subj) + (1|month), 
                        data = full_data_month)
 qqnorm(residuals(f_neo_lm_month))
 qqline(residuals(f_neo_lm_month))
@@ -53,7 +53,7 @@ r_neo_lm_month <- lmer(r ~ sex +
                          age +
                          log2_avg_neo+ 
                          log2_avg_cp_tar +
-                         (1|subj), 
+                         (1|subj) + (1|month), 
                        data = full_data_month)
 qqnorm(residuals(r_neo_lm_month))
 qqline(residuals(r_neo_lm_month))
@@ -64,18 +64,18 @@ m_neo_lm_month <- lmer(m ~ sex +
                          age +
                          log2_avg_neo + 
                          log2_avg_cp_tar +
-                         (1|subj), 
+                         (1|subj) + (1|month), 
                        data = full_data_month)
 qqnorm(residuals(m_neo_lm_month))
 qqline(residuals(m_neo_lm_month))
 
 
 summary(f_neo_lm_month)
-vif.mer(f_neo_lm_month) # all < 1.15
+vif.mer(f_neo_lm_month) # all < 1.11
 summary(r_neo_lm_month)
-vif.mer(r_neo_lm_month) # all < 1.13
+vif.mer(r_neo_lm_month) # all < 1.09
 summary(m_neo_lm_month)
-vif.mer(m_neo_lm_month) # all < 1.14
+vif.mer(m_neo_lm_month) # all < 1.11
 
 
 full_data_month %>%
@@ -95,12 +95,13 @@ lbm_neo_lm_month <- lmer(avg_cr_resid ~
                            sex + 
                            mrank +
                            log2_avg_neo +
-                           (1|subj),
+                           log2_avg_cp_tar +
+                           (1|subj) + (1|month),
                          data = full_data_month)
 qqnorm(residuals(lbm_neo_lm_month))
 qqline(residuals(lbm_neo_lm_month))
 summary(lbm_neo_lm_month)
-vif.mer(lbm_neo_lm_month) # all < 1.05
+vif.mer(lbm_neo_lm_month) # all < 1.11
 
 full_data_month %>% 
   filter(avg_neo_sg < 2000) %>% 

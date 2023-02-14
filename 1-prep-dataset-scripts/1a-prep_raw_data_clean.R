@@ -181,7 +181,7 @@ left_join(cp_sample_sgcr, neo_sample_sgcr, by = "sample_number") %>%
 #save(cp_raw, file = "data/cp-dataset-full.Rdata")
 
 
-# 3. BEHAVIOR -----
+# 3. BEHAVIOR - activity -----
 load("/Users/nicolethompsongonzalez/Dropbox/2_R-projects/Juv-blues-diss/Rewrite chapter 3 2021/scripts of Juv social preferences for rewrite/data/juv monthly activity budgets.Rdata", verbose = T)
 nrow(act_budget) #323
 head(act_budget)
@@ -195,9 +195,73 @@ behav_data_month <- act_budget %>%
 
 #save(behav_data_month, file = "data/behav-dataset-month.Rdata")
 
+# 4. BEHAVIOR - partner number -----
+psp <- read_csv("/Users/nicolethompsongonzalez/Dropbox/2_R-projects/Juv-blues-diss/Rewrite chapter 3 2021/scripts of Juv social preferences for rewrite/data/3. Behavior data by month/all month PS for partners.csv") %>%
+  mutate(month = lubridate::mdy(month))
+
+# fix: in psp there are two rows where focal is NA
+rows <- psp %>%
+ filter(is.na(Focal)) %>%
+  pull(X)
+#see focals
+# psp %>%
+#   filter(X %in% (rows[1]-5):(rows[1]+5) | X %in% (rows[2]-5):(rows[2]+5)) %>%
+#   View()
+psp[rows[1],"Focal"] <- "stre"
 
 
-# 4. fGCs -------
+# feeding partners
+avg_f_partners <- psp %>%
+  filter(!is.na(Focal)) %>% #one line Focal empty
+  group_by(month, Focal) %>%
+  summarise(avg_f_part = mean(X.7m, na.rm = T)) %>%
+  ungroup() %>%
+  mutate(month = lubridate::month(month))
+
+# distinct grooming, play, contact, and resting partners total
+
+total_partners <- psp %>%
+  select(ag, se, everything()) %>% # move ag & sexual partners out of the way
+  pivot_longer(cols = gm.gmd:X1m, names_to = "partner_type", values_to = "partner") %>%
+  select(month, Focal, partner_type, partner) %>%
+  filter(!is.na(Focal)) %>%
+  group_by(month, Focal) %>%
+  summarise(n_partners = n_distinct(partner, na.rm = T)) %>%
+  ungroup() %>%
+  mutate(month = lubridate::month(month))
+
+beh_partners <- psp %>%
+  select(ag, se, everything()) %>%
+  pivot_longer(cols = gm.gmd:X1m, names_to = "partner_type", values_to = "partner") %>%
+  select(month, Focal, partner_type, partner) %>%
+  filter(!is.na(Focal)) %>% 
+  group_by(month, Focal, partner_type) %>%
+  summarise(n = n_distinct(partner, na.rm = T)) %>%
+  ungroup() %>%
+  pivot_wider(names_from = partner_type, values_from = n) %>%
+  rename(n_contact = X0.m, n_rest = X1m, n_grooming = gm.gmd, n_play = pl) %>%
+  mutate(month = lubridate::month(month))
+
+dim(avg_f_partners) #323
+dim(total_partners) # 323
+dim(beh_partners) #323
+
+
+# #check typos
+# head(psp)
+# sort(unique(psp$gm.gmd))
+# sort(unique(psp$pl))
+# sort(unique(psp$X0.m))
+# sort(unique(psp$X1m))
+
+
+partner_df <- left_join(avg_f_partners, total_partners) %>%
+  left_join(., beh_partners) %>%
+  rename(subj = Focal)
+
+#save(partner_df, avg_f_partners, total_partners, beh_partners, file = "data/monthly-partners-data.Rdata")
+
+# 5. fGCs -------
 gc_raw <- read_csv("/Users/nicolethompsongonzalez/Dropbox/2_R projects/Juvenile blues diss/Juv analysis/Lab work/DPZ - fgcs/Final GC concentrations per sample.csv") %>%
   select(-type) %>%
   mutate(date = mdy(date),
