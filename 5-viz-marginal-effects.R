@@ -115,17 +115,20 @@ change_lbm_neo_marg_effect_plot
 pdf("change_lbm_neo_marg_effect_plot")
 print(change_lbm_neo_marg_effect_plot)
 dev.off()
+
+# geom_smooth version
+ggplot(data = full_data_short_term_lbm_change, aes(x = log2_neo, y = sample_lbm_change), 
+       alpha = .3) +
+  geom_point(alpha = .3) + 
+  geom_smooth(method = lm, color = "deepskyblue4", fill = "deepskyblue4", alpha = .3) + 
+  ylab(expression("∆t"[2]-t[1]~"in"~Estimated~Lean~Body~Mass)) +
+  xlab(expression(log[2]~Neopterin[t1]~"ng/ml")) + 
+  theme_minimal() + 
+  theme(axis.title = element_text(size = 15))
   
 # no difference with interaction term removed
 
 # fig 2b - costs - interaction lbm change ~ sample interval*neo ------
-# still working on this one...
-
-#ggplot() + 
-   #geom_s(data = full_data_short_term_lbm_change, 
-         #aes(x = log2_neo, y = sample_lbm_change, 
-         #color = sample_interval)) + 
-         #theme_minimal()
 
   
 # fig 3a - constraints - neo ~ cp marg effect --------
