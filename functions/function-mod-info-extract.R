@@ -50,7 +50,7 @@ mod_info_extract <- function(mod){
     df2 <- data.frame(Response = response, df) %>%
       mutate(p_value= ifelse(p_value < 0.05, paste0(p_value, "*"),
                           p_value)) %>%
-      select(Response, Predictor, Estimate, SE, CI, p_value)
+      dplyr::select(Response, Predictor, Estimate, SE, CI, p_value)
   
   return(df2)
 }
