@@ -15,7 +15,7 @@ change_lbm_neo_lm_sample <-
          log2_neo +
          sample_interval +
   log2_neo*sample_interval +
-  (1|subj),
+  (1|subj) + (1|month),
   data = full_data_short_term_lbm_change)
 qqnorm(residuals(change_lbm_neo_lm_sample))
 qqline(residuals(change_lbm_neo_lm_sample))
