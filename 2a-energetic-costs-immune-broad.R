@@ -36,7 +36,7 @@ full_data_month %>%
 
 
 
-# - - - compensatory behavior - does feeding, moving, or resting compensate for the cost of neo? ----
+# - - - compensatory behavior - does feeding, moving, or resting compensate for the energetic cost of neo? ----
 
 # feeding ~ neo 
 f_neo_lm_month <- lmer(f ~ sex + 
@@ -90,33 +90,63 @@ full_data_month %>%
 
 # - does neo detract from estimated lbm / growth  ----
 # aka is neo/immunity prioritized over body mass/growth?
-lbm_neo_lm_month <- lmer(avg_cr_resid ~ 
-                           age +
-                           sex + 
-                           mrank +
-                           log2_avg_neo +
-                           log2_avg_cp_tar +
-                           (1|subj) + (1|month),
-                         data = full_data_month)
-qqnorm(residuals(lbm_neo_lm_month))
-qqline(residuals(lbm_neo_lm_month))
-summary(lbm_neo_lm_month)
-vif.mer(lbm_neo_lm_month) # all < 1.11
 
-full_data_month %>% 
+change_lbm_neo_lm_month <-full_data_month %>%
+  group_by(subj) %>%
+  mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
+  lmer(month_lbm_change ~ 
+         age +
+         sex + 
+         mrank +
+         log2_avg_neo +
+         log2_avg_cp_tar +
+         (1|subj) + (1|month),
+       data = .)
+qqnorm(residuals(change_lbm_neo_lm_month))
+qqline(residuals(change_lbm_neo_lm_month))
+summary(change_lbm_neo_lm_month)
+vif.mer(change_lbm_neo_lm_month) 
+
+
+full_data_month %>%
+  group_by(subj) %>%
+  mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
   filter(avg_neo_sg < 2000) %>% 
-  ggplot(aes(x = avg_neo_sg, y = avg_cr_resid, color = sex)) +
+  ggplot(aes(x =  log2_avg_neo, y = month_lbm_change, color = sex)) +
   geom_smooth(method = "lm") + 
   geom_point() +
   theme_minimal() + 
-  labs(x = "Median Neopterin by Month",
-       y =  "Median Creatinine Residuals by Month",
-       title = "Neopterin Relationship with Lean Tissue")
+  labs(x = "log 2 Avg monthly Neopterin",
+       y =  "Change monthly LBM",
+       title = "Neopterin Relationship with Growth Lean Mass")
 
+# lbm_neo_lm_month <- lmer(avg_cr_resid ~ 
+#                            age +
+#                            sex + 
+#                            mrank +
+#                            log2_avg_neo +
+#                            log2_avg_cp_tar +
+#                            (1|subj) + (1|month),
+#                          data = full_data_month)
+# qqnorm(residuals(lbm_neo_lm_month))
+# qqline(residuals(lbm_neo_lm_month))
+# summary(lbm_neo_lm_month)
+# vif.mer(lbm_neo_lm_month) # all < 1.11
+
+# full_data_month %>% 
+#   filter(avg_neo_sg < 2000) %>% 
+#   ggplot(aes(x = avg_neo_sg, y = avg_cr_resid, color = sex)) +
+#   geom_smooth(method = "lm") + 
+#   geom_point() +
+#   theme_minimal() + 
+#   labs(x = "Median Neopterin by Month",
+#        y =  "Median Creatinine Residuals by Month",
+#        title = "Neopterin Relationship with Lean Tissue")
+# 
 
 # save models ----
 # save(cp_neo_lm_month, f_neo_lm_month, r_neo_lm_month, m_neo_lm_month,
-#      lbm_neo_lm_month, file = "models/energetic-costs-immune-broad.Rdata")
+#      change_lbm_neo_lm_month, file = "models/energetic-costs-immune-broad.Rdata")
 
 
 
