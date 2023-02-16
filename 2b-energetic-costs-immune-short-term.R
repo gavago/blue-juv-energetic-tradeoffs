@@ -63,7 +63,7 @@ full_data_short_term_lbm_change %>%
   geom_smooth(method = "lm") + 
   geom_point()
 
-# graveyard ----
+# graveyard --------------------------
 # boundary (singular) fit: see help('isSingular') --> extreme collinearity?
 
 cor.test(full_data_short_term_lbm_change$sample_lbm_change, 
