@@ -7,7 +7,7 @@ load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
 # H1 - energetic costs cellular immunity -----
 
-# - does neo eat into energy balance? ----
+# - does neo eat into energy balance? NO, reverse ----
 cp_neo_lm_month <- full_data_month %>%
   lmer(log2_avg_cp_tar ~  sex +
                           age +
@@ -88,8 +88,7 @@ full_data_month %>%
   geom_point()
 
 
-# - does neo detract from estimated lbm / growth  ----
-# aka is neo/immunity prioritized over body mass/growth?
+# - does neo detract from monthly growth? NO, no relationship ----
 
 change_lbm_neo_lm_month <-full_data_month %>%
   group_by(subj) %>%
@@ -147,7 +146,7 @@ full_data_month %>%
 # save models ----
 # save(cp_neo_lm_month, f_neo_lm_month, r_neo_lm_month, m_neo_lm_month,
 #      change_lbm_neo_lm_month, file = "models/energetic-costs-immune-broad.Rdata")
-
+# 
 
 
 # graveyard ------
