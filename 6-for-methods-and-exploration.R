@@ -36,22 +36,41 @@ nrow(gc_raw)
 # samples per subj/month ------
 
 #neo
-full_udata %>%
+neo_subj_month <- full_udata %>%
+  filter(!is.na(neo_sg)) %>%
   count(subj, month) %>%
-  summarise(mean = mean(n, na.rm = T), sd = sd(n, na.rm = T))
+  summarise(mean = mean(n, na.rm = T), sd = sd(n, na.rm = T)) %>%
+  mutate(biomarker = "neopterin")
 
 #cp
-full_udata %>%
+cp_subj_month <-full_udata %>%
   filter(!is.na(stdsg_CP)) %>%
   count(subj, month) %>%
-  summarise(mean = mean(n, na.rm = T), sd = sd(n, na.rm = T))
+  summarise(mean = mean(n, na.rm = T), sd = sd(n, na.rm = T))  %>%
+  mutate(biomarker = "C-peptide")
+
+
+#lbm
+lbm_subj_month <-full_udata %>%
+  filter(!is.na(cr_resid)) %>%
+  count(subj, month) %>%
+  summarise(mean = mean(n, na.rm = T), sd = sd(n, na.rm = T))  %>%
+  mutate(biomarker = "LBM")
+
 
 #gc
-gc_raw %>%
+gc_subj_month <- gc_raw %>%
   #filter(!is.na(fgc.ng_g.feces)) %>%
   count(subj, month) %>%
-  summarise(mean = mean(n, na.rm = T), sd = sd(n, na.rm = T))
+  summarise(mean = mean(n, na.rm = T), sd = sd(n, na.rm = T))  %>%
+  mutate(biomarker = "fGCs")
 
+all <- list(neo_subj_month, cp_subj_month, lbm_subj_month, gc_subj_month)
+monthly_biomarker_tab <- do.call("rbind", all) %>%
+  dplyr::select(biomarker, mean, sd) %>%
+  rename(mean_samples = mean)
+
+#write.table(monthly_biomarker_tab, file = "results/tables/month_biomarker_counts.txt", sep = "/", quote = F)
 
 # intra-assay CV neo ----
 mean(full_udata$neo_CV, na.rm = T)
