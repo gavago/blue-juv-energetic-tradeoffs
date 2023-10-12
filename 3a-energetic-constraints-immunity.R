@@ -3,7 +3,7 @@ library(lmerTest)
 
 source("functions/vif.mer function.R") # vif.mer
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
-
+names(full_data_month)
 
 hist(full_data_month$log2_avg_cp_tar, binwidth = 0.2)
 hist(log2(full_data_month$avg_cp_sg))
@@ -20,6 +20,7 @@ neo_cp_cr_lm_month <- full_data_month %>%
          mrank +
          avg_cr_resid +
          log2_avg_cp_tar +
+         avg_rain +
          (1|subj) + (1|month),
        data = .)
 
