@@ -93,6 +93,7 @@ full_data_month %>%
 change_lbm_neo_lm_month <-full_data_month %>%
   group_by(subj) %>%
   mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
+  ungroup() %>%
   lmer(month_lbm_change ~ 
          age +
          sex + 
@@ -117,7 +118,22 @@ full_data_month %>%
   theme_minimal() + 
   labs(x = "log 2 Avg monthly Neopterin",
        y =  "Change monthly LBM",
-       title = "Neopterin Relationship with Growth Lean Mass")
+       title = "Monthly Neopterin Relationship with Growth Lean Mass")
+
+
+#explore relationship monthly growth and CP - kinda makes sense, when more growth is happening, lower energy balance...
+full_data_month %>%
+  group_by(subj) %>%
+  mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
+  filter(avg_neo_sg < 2000) %>% 
+  ggplot(aes(x =  log2_avg_cp_tar, y = month_lbm_change, color = sex)) +
+  geom_smooth(method = "lm") + 
+  geom_point() +
+  theme_minimal() + 
+  labs(x = "log 2 Avg monthly CP",
+       y =  "Change monthly LBM",
+       title = "Monthly CP Relationship with Growth Lean Mass")
+
 
 # lbm_neo_lm_month <- lmer(avg_cr_resid ~ 
 #                            age +
