@@ -14,8 +14,10 @@ change_lbm_neo_lm_sample <-
          age + 
          sex +
          log2_neo +
+         log2_cp +
          sample_interval +
   log2_neo*sample_interval +
+    log2_cp*sample_interval +
   (1|subj) + (1|month),
   data = full_data_short_term_lbm_change)
 qqnorm(residuals(change_lbm_neo_lm_sample))
@@ -26,7 +28,7 @@ plot(residuals(change_lbm_neo_lm_sample))
 summary(change_lbm_neo_lm_sample)
 
 vif.mer(change_lbm_neo_lm_sample) 
-# all < 90.5 with interaction and < 1.03 in terms not included
+# all < 90.5 with interaction and < 2.88 in terms not included
 
 # viz - relationship neo and subsequent change in elbm -----
 full_data_short_term_lbm_change %>% 
@@ -41,6 +43,8 @@ full_data_short_term_lbm_change %>%
 # change in relationship neo & change elbm according to change interval
 interplot(m = change_lbm_neo_lm_sample, var1 = "log2_neo", var2 = "sample_interval")
 
+#just check relationship of cp and coefficient on short term growth change
+#interplot(m = change_lbm_neo_lm_sample, var1 = "log2_cp", var2 = "sample_interval")
 
 
 # save model -----
