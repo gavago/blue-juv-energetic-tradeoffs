@@ -9,7 +9,7 @@ load("models/energetic-constraints-immune-broad.Rdata", verbose = T)
 load("models/mechanism-constraints-on-immune.Rdata", verbose = T)
 
 
-# A1 - energetic costs neo
+# A1 - energetic costs neo -----
 costs1 <- mod_info_extract(cp_neo_lm_month) %>% prettify_table()
 costs2 <- mod_info_extract(change_lbm_neo_lm_month) %>% prettify_table()
 
@@ -17,21 +17,21 @@ summary(cp_neo_lm_month)
 summary(change_lbm_neo_lm_month)
 
 
-# A1 - energetic costs neo short term
+# A1 - energetic costs neo short term -----
 costs3 <- mod_info_extract(change_lbm_neo_lm_sample) %>% prettify_table()
 
 summary(change_lbm_neo_lm_sample)
 
-# A1 - modify behavior in light of costs? (Supplementary) 
+# A1 - compensatory behavior in light of costs? (Supplementary)  -----
 sup1 <- mod_info_extract(f_neo_lm_month) %>% prettify_table()
 sup2 <- mod_info_extract(r_neo_lm_month) %>% prettify_table()
 sup3 <- mod_info_extract(m_neo_lm_month) %>% prettify_table()
 
-# A2 - energetic limitations neo
+# A2 - energetic limitations neo -----
 constraints <- mod_info_extract(neo_cp_cr_lm_month) %>% prettify_table()
 summary(neo_cp_cr_lm_month)
 
-# A2 - mechanism constraints
+# A2 - mechanism of constraint ----
 set.seed(288)
 med_results = mediate(fit.mediator, fit.dv, treat='log2_avg_cp_tar', mediator='log2(avg_fgc)')
 med_summ<- summary(med_results)
