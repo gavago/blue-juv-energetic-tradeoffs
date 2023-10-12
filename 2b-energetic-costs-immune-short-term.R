@@ -5,7 +5,8 @@ select <- dplyr::select
 
 source("functions/vif.mer function.R") # function is "vif.mer"
 load("data/full_data_short_term_lbm_change.Rdata", verbose = T)
- 
+names(full_data_short_term_lbm_change) 
+
 
 # change lbm t2-t1 ~ neo t1, regression ------
 change_lbm_neo_lm_sample <-
