@@ -21,18 +21,18 @@ neo_cp_cr_lm_month <- full_data_month %>%
          avg_cr_resid +
          log2_avg_cp_tar +
          avg_rain +
+         n_partners + #distinct grooming, play, contact, and resting partners total
          (1|subj) + (1|month),
        data = .)
 
-#avg_rain +
-#n_partners +
+
 #avg_f_part +
 
 
 qqnorm(residuals(neo_cp_cr_lm_month))
 qqline(residuals(neo_cp_cr_lm_month))
 summary(neo_cp_cr_lm_month)
-vif.mer(neo_cp_cr_lm_month)# all < 1.17
+vif.mer(neo_cp_cr_lm_month)# all < 1.29
 
 # --- plot data points of neo against cp and lbm (2 plots) where lm is marginal effect of each ------
 
