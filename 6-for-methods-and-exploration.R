@@ -65,12 +65,29 @@ gc_subj_month <- gc_raw %>%
   summarise(mean = mean(n, na.rm = T), sd = sd(n, na.rm = T))  %>%
   mutate(biomarker = "fGCs")
 
+
 all <- list(neo_subj_month, cp_subj_month, lbm_subj_month, gc_subj_month)
 monthly_biomarker_tab <- do.call("rbind", all) %>%
   dplyr::select(biomarker, mean, sd) %>%
   rename(mean_samples = mean)
 
 #write.table(monthly_biomarker_tab, file = "results/tables/month_biomarker_counts.txt", sep = "/", quote = F)
+# average biomarker values per subject ------
+
+avg_sd <- list(
+  avg = ~mean(.x, na.rm = T),
+  sd = ~sd(.x, na.rm = T))
+
+full_udata %>%
+  summarise(across(c(neo_sg, stdsg_CP, cr_resid), avg_sd)) #~ mean(.x, na.rm = T)
+#pivot longer so Neo, Cp, cr resid each a row
+
+gc_raw %>%
+  summarise(avg = mean(fgc.ng_g.feces, na.rm =T), sd = sd(fgc.ng_g.feces, na.rm =T)) %>%
+  mutate(marker = "fGCs") %>%
+  dplyr::select(marker, everything())
+  
+
 
 # intra-assay CV neo ----
 mean(full_udata$neo_CV, na.rm = T)
