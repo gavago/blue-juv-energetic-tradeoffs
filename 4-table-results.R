@@ -46,6 +46,6 @@ tab1_costs <- do.call("rbind", list(costs1, costs2, costs3))
 compensatory_tabs <- do.call("rbind", list(sup1, sup2, sup3))
 #write.table(compensatory_tabs, file = "results/tables/supp_tables.txt", quote = FALSE, sep = "/", row.names = F)
 
-write.table(constraints, file = "results/tables/tab2-constraint_table.txt", quote = FALSE, sep = "/", row.names = F)
+#write.table(constraints, file = "results/tables/tab2-constraint_table.txt", quote = FALSE, sep = "/", row.names = F)
 
 
