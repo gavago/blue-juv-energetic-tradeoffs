@@ -43,11 +43,11 @@ mod_info_extract <- function(mod){
         rowname == "log2_avg_cp_tar" ~ "log2 C-peptide", 
         rowname == "log2_avg_neo" ~ "log2 Neopterin",
         rowname == "log2_neo" ~ "log2 Neopterin",
-        rowname == "log2_cp" ~ "log2 C-peptide",
+        rowname == "log2_cp_tar" ~ "log2 C-peptide",
         rowname == "avg_cr_resid" ~ "ELBM",
         rowname == "sample_interval" ~ "sample interval",
         rowname == "log2_neo:sample_interval" ~ "log2 Neo x sample interval",
-        rowname == "log2_cp:sample_interval" ~ "log2 CP x sample interval",
+        rowname == "log2_cp_tar:sample_interval" ~ "log2 CP x sample interval",
         TRUE ~ rowname
       )) 
     
