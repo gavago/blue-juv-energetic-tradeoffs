@@ -19,12 +19,13 @@ full_data_short_term_lbm_change <- full_udata %>%
   #   is.na(sample_interval) ~ NA_real_,
   #   TRUE ~ sample_interval)) %>% 
   ungroup() %>%
-  mutate(log2_neo = log2(neo_sg))
+  mutate(log2_neo = log2(neo_sg)) %>%
+  mutate(log2_cp = log2(stdsg_CP))
 
 #check alignment of data within rows
-# full_data_short_term_lbm_change %>%
-#     select(subj, date, sample_interval, sample_lbm_change, cr_resid, neo_sg) %>%
-#     arrange(subj, date) %>%
-#     view()
+full_data_short_term_lbm_change %>%
+    select(subj, date, sample_interval, sample_lbm_change, cr_resid, neo_sg) %>%
+    arrange(subj, date) %>%
+    View()
 
 #save(full_data_short_term_lbm_change, file="data/full_data_short_term_lbm_change.Rdata")
