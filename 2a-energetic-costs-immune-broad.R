@@ -121,7 +121,7 @@ full_data_month %>%
        title = "Monthly Neopterin Relationship with Growth Lean Mass")
 
 
-#explore relationship monthly growth and CP - kinda makes sense, when more growth is happening, lower energy balance...
+#explore relationship monthly growth M1-M0 and CP M0
 full_data_month %>%
   group_by(subj) %>%
   mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
@@ -130,9 +130,26 @@ full_data_month %>%
   geom_smooth(method = "lm") + 
   geom_point() +
   theme_minimal() + 
-  labs(x = "log 2 Avg monthly CP",
-       y =  "Change monthly LBM",
+  labs(x = "log 2 Avg CP M0",
+       y =  "Change monthly LBM M1-M0",
        title = "Monthly CP Relationship with Growth Lean Mass")
+
+# 
+
+full_data_month %>%
+  group_by(subj) %>%
+  mutate(month_lbm_change_prev = avg_cr_resid - lag(avg_cr_resid)) %>%
+  filter(avg_neo_sg < 2000) %>% 
+  ggplot(aes(x =  log2_avg_cp_tar, y = month_lbm_change_prev, color = sex)) +
+  geom_smooth(method = "lm") + 
+  geom_point() +
+  theme_minimal() + 
+  labs(x = "log 2 Avg CP M0",
+       y =  "Change monthly LBM M-1 to M0",
+       title = "Monthly CP Relationship with Growth Lean Mass")
+
+# add trend lines by individual
+# also trend lines
 
 
 # lbm_neo_lm_month <- lmer(avg_cr_resid ~ 
