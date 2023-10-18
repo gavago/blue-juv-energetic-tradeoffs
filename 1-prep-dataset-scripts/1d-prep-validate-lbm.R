@@ -51,4 +51,7 @@ summary(lbm_by_age_samp)
 lbm_by_age_mo <- lmer(avg_cr_resid ~ sex + log2_avg_cp_tar + age + (1|subj), data = full_data_month)
 summary(lbm_by_age_mo)
 
+# does monthly moving and resting predict monthly avg cr resid? no.
+# lbm_by_age_mo1 <- lmer(avg_cr_resid ~ sex + log2_avg_cp_tar + age + r + m + (1|subj), data = full_data_month)
+
 
