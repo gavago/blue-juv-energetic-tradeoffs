@@ -7,6 +7,10 @@ source("functions/vif.mer function.R") # function is "vif.mer"
 load("data/full_data_short_term_lbm_change.Rdata", verbose = T)
 names(full_data_short_term_lbm_change) 
 
+#Descriptive stats on sampling interval
+full_data_short_term_lbm_change %>%
+  summarise(mean = mean(sample_interval, na.rm = T), sd = sd(sample_interval, na.rm = T))
+
 
 # change lbm t2-t1 ~ neo t1, regression ------
 change_lbm_neo_lm_sample <-
