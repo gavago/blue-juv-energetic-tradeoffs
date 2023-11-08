@@ -4,6 +4,12 @@ library(lmerTest)
 load("data/urine_sample_dataset_juv_immune_energetics.Rdata", verbose = T)
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
+# Validation - Cr influenced by monthly physical activity?
+names(full_data_month)
+
+cr_activity <- lmer(avg_cr_resid ~ log2(avg_cp_sg_tar) + age + m + f + r + (1|subj), data = full_data_month)
+summary(cr_activity)
+
 
 # Validation of cr_resid by relationship with age, sex, and c-peptide ------
 
