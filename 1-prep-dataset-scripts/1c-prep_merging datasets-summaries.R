@@ -16,7 +16,7 @@ merged_udata <- left_join( neo_data_full, cp_raw, by = intersect(names(neo_data_
   filter(SG >= 3) # removes 5 NA and one SG of 2
 dim(merged_udata) # 614 rows
 
-# Lean body mass and cp time adjust residual merge (script 1b) ------
+# Lean body mass and cp time adjust residual merge ------
 
 # calculating cr-sg resids
 merged_udata %>%
