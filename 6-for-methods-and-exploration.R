@@ -208,7 +208,7 @@ full_data_month_rownum %>% filter(rowid > 200, rowid < 300) %>%
   ggplot() + 
   geom_line(aes(x = rowid, y = avg_cr_resid, color = subj))
 
-# viz: fluctuations in neo
+# viz: fluctuations in neo ----
 
 full_data_month_rownum %>% filter(rowid > 200, rowid < 300) %>% 
   ggplot() + 
@@ -220,6 +220,50 @@ full_data_month_rownum %>% filter(rowid > 200, rowid < 300) %>%
 
 
 
+
+
+# Distributions of c peptide tar, elbm, monthly change elbm -------
+
+
+full_udata %>% # dist of all cp data
+  pull(cp_tar) %>% hist()
+
+full_data_month %>% #monthly cp data
+  pull(avg_cp_sg_tar) %>% hist()
+
+# - cp age
+full_data_month %>%
+  ggplot(aes(x = age, y = avg_cp_sg_tar)) +
+  geom_point(aes(color = sex))
+# could negative relationship between cp and growth be
+# because cp higher among older individuals?
+
+# - elbm age
+full_data_month %>%
+  ggplot(aes(x = age, y = avg_cr_resid)) +
+  geom_point(aes(color = sex))
+
+# - cp and elbm
+full_data_month %>%
+  ggplot(aes(x = avg_cp_sg_tar, y = avg_cr_resid)) +
+  geom_point(aes(color = sex))
+
+# - distribution monthly growth
+full_data_month %>%
+  group_by(subj) %>%
+  mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
+  ungroup() %>%
+  pull(month_lbm_change) %>%
+  hist()
+
+# - monthly growth by age
+full_data_month %>%
+  group_by(subj) %>%
+  mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
+  ungroup() %>%
+  ggplot(aes(x = age, y = month_lbm_change)) +
+  geom_point(aes(color = sex))
+# monthly growth isn't increasing with age.
 
 
 # graveyard -------
