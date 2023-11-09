@@ -1,5 +1,7 @@
 library(tidyverse)
 library(janitor)
+library(lmerTest)
+
 
 # load datasets
 load("data/urine_sample_dataset_juv_immune_energetics.Rdata", verbose = T)
@@ -168,6 +170,7 @@ lmer(log2_avg_cp_tar ~
      data = full_data_month) %>%
   summary()
 
+
 # viz: look at within individ fluctuations in cr_resid ----
 full_data_rownum <- full_data %>% 
   arrange(subj, date) %>% 
@@ -220,6 +223,7 @@ full_data_month_rownum %>% filter(rowid > 200, rowid < 300) %>%
 
 
 # graveyard -------
+lmer(m ~ r + (1|subj), data = full_data_month) %>% summary()
 # make new dataset for regression ----
 
 full_data_chng_lbm <- full_data_month_rownum %>% 
