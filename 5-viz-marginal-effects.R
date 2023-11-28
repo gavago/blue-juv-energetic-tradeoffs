@@ -16,11 +16,11 @@ load("models/energetic-costs-immune-short.Rdata", verbose = T)
 
 age_lbm_plot <- ggplot(data = full_data_month, aes(x = age, y = avg_cr_resid), 
        alpha = .3) +
-  geom_point(aes(color = sex), alpha = .8) + 
+  geom_point(aes(color = sex), alpha = .5) + 
   scale_shape_manual(values = c(15, 16)) +
   geom_smooth(method = lm, color = "darkgray", fill = "darkgray", alpha = .3) + 
   theme_minimal() 
-  
+age_lbm_plot
 
 # export as pdf
 pdf("age_lbm_plot.pdf")
@@ -33,32 +33,38 @@ dev.off()
 sample_lbm_chng_neo_plot <- 
   ggplot(data = full_data_short_term_lbm_change, 
          aes(x = log2_neo, y = sample_lbm_change, color = sex)) +
-  geom_point() + 
+  geom_point(alpha = .5) + 
   geom_smooth(method = lm, color = "green4", fill = "green4", alpha = .3) + 
   ylab(expression("∆t"[2]-t[1]~"in"~Estimated~Lean~Body~Mass)) +
-  xlab(expression(log[2]~Neopterin[t1]~"ng/ml")) + 
+  xlab(expression(t[1]~log[2]~Neopterin~"ng/ml")) + 
   theme_classic() + 
   theme(legend.position = "none") +
-  theme(axis.title = element_text(size = 15))
+  theme(axis.title = element_text(size = 10))
 
 sample_lbm_chng_neo_plot
 
 # no difference with interaction term removed
 
 # fig 2b - costs - interaction lbm change ~ sample interval*neo ------
+# still working on this...
+full_data_short_term_lbm_change %>% 
+  ggplot(aes(y = sample_lbm_change, x = sample_interval)) +
+  geom_smooth(method = lm) + 
+  geom_point(alpha = .5) 
+
 # fig 3a - constraints - neo ~ cp marg effect --------
 
 # w cp on x axis
 cp_neo_plot <- 
   ggplot(data = full_data_month, aes(x = log2_avg_cp_tar, y = log2_avg_neo, color = sex),
          alpha = .3) +
-  geom_point() + 
+  geom_point(alpha = .5) + 
   geom_smooth(method = lm, color = "steelblue3", fill = "steelblue3", alpha = .5) + 
-  xlab(expression(log[2]~"C-peptide" ~ "ng/ml")) +
+  xlab(expression(log[2]~"C-peptide" ~ "pg/ml")) +
   ylab(expression(log[2]~Neopterin~"ng/ml")) +
   theme_classic() + 
   theme(legend.position = "none")  +
-  theme(axis.title = element_text(size = 15))
+  theme(axis.title = element_text(size = 10))
 cp_neo_plot
 
 # export pdf
@@ -71,13 +77,13 @@ dev.off()
 
 lbm_neo_plot <- 
   ggplot(data = full_data_month, aes(x = avg_cr_resid, y = log2_avg_neo, color = sex)) +
-  geom_point() +
+  geom_point(alpha = .5) +
   geom_smooth(method = lm, color = "steelblue4", fill = "steelblue4", alpha = .5) + 
-  xlab("Creatinine residuals") +
+  xlab("Estimated Lean Body Mass") +
   ylab(expression(log[2]~Neopterin~"ng/ml")) +
     theme_classic() + 
     theme(legend.position = "none")  +
-    theme(axis.title = element_text(size = 15))
+    theme(axis.title = element_text(size = 10))
 lbm_neo_plot
 
 # export pdf
@@ -107,7 +113,7 @@ ggplot() +
 
 
 
-# graveyard ----
+# graveyard -----
 # raw data points w marginal effects smooth, cp ~ neo ----
 # marginal effects: change lbm ~ neo ----
 change_lbm_neo_marg_effect <- ggemmeans(change_lbm_neo_lm_sample, terms = "log2_neo")
