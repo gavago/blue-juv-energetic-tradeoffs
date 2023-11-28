@@ -46,11 +46,33 @@ sample_lbm_chng_neo_plot
 # no difference with interaction term removed
 
 # fig 2b - costs - interaction lbm change ~ sample interval*neo ------
-# still working on this...
-full_data_short_term_lbm_change %>% 
-  ggplot(aes(y = sample_lbm_change, x = sample_interval)) +
-  geom_smooth(method = lm) + 
-  geom_point(alpha = .5) 
+
+
+# find each quartile
+quantile(full_data_short_term_lbm_change$sample_interval, na.rm = T, 
+         probs=c(.25,.5,.75,1))
+
+#create new column with sample quartiles
+full_interaction_data <- full_data_short_term_lbm_change %>% 
+  mutate(sample_int_quart = case_when(
+    sample_interval <= 6 ~ "q1",
+    sample_interval <= 12 ~"q2",
+    sample_interval <= 22 ~ "q3",
+    sample_interval <= 73 ~ "q4"))
+
+#plot
+change_lbm_sample_int_neo_plot <- full_interaction_data %>% 
+  ggplot(aes(x = neo_sg, y = sample_lbm_change, color = sample_int_quart)) +
+           geom_smooth(method = lm, alpha = .3) + xlim(0,2000) + 
+  ylab(expression("∆t"[2]-t[1]~"in"~Estimated~Lean~Body~Mass)) +
+  xlab(expression(t[1]~log[2]~Neopterin~"ng/ml")) +
+  scale_color_discrete(name="Sample Interval Quartile",
+                      labels=c("Q1 (0-6 days)", 
+                               "Q2 (7-12 days)", 
+                               "Q3 (13 - 22 days)", 
+                               "Q4 (23 - 73 days)"))
+change_lbm_sample_int_neo_plot 
+  
 
 # fig 3a - constraints - neo ~ cp marg effect --------
 
