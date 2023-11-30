@@ -13,37 +13,21 @@ summary(cr_activity)
 
 # Validation of cr_resid by relationship with age, sex, and c-peptide ------
 
-#sex == "M"
-# ggplot() +
-# geom_point(data = full_data %>% filter(subj == "allo"), 
-#            aes(x = age, y = cr_resid), color = "red") +
-# geom_smooth(data = full_data %>% filter(subj == "allo"), 
-#             aes(x = age, y = cr_resid), color = "red",
-#             method = "lm") +
-# geom_point(data = full_data %>% filter(subj == "brog"), 
-#            aes(x = age, y = cr_resid), color = "green") +
-# geom_smooth(data = full_data %>% filter(subj == "brog"), 
-#             aes(x = age, y = cr_resid),color = "green",
-#             method = "lm") +
-# geom_point(data = full_data, 
-#            aes(x = age, y = cr_resid), alpha = 0.1) +
-# geom_smooth(data = full_data, 
-#             aes(x = age, y = cr_resid),
-#             method = "lm")
 
-full_data %>% 
+# Visualize
+full_data_month%>% 
   ggplot() +
-  geom_point(aes(x = age, y = cr_resid, color = sex), alpha = 0.3) +
-  geom_smooth(aes(x = age, y = cr_resid, color = sex), method = "lm") +
+  geom_point(aes(x = age, y =avg_ cr_resid, color = sex), alpha = 0.3) +
+  geom_smooth(aes(x = age, y =avg_ cr_resid, color = sex), method = "lm") +
   theme_minimal()
 
 df_cr_resid %>%
-  ggplot(., aes(x = sex, y = cr_resid)) +
+  ggplot(., aes(x = sex, y = avg_ cr_resid)) +
   geom_point() +
   geom_boxplot()
 
-full_data %>%
-  ggplot(., aes(y = cr_resid, x = stdsg_CP, color = sex)) +
+full_data_month%>%
+  ggplot(., aes(y = avg_ cr_resid, x = stdsg_CP, color = sex)) +
   geom_point() +
   geom_smooth(method = "lm")
 
@@ -60,4 +44,23 @@ summary(lbm_by_age_mo)
 # does monthly moving and resting predict monthly avg cr resid? no.
 # lbm_by_age_mo1 <- lmer(avg_cr_resid ~ sex + log2_avg_cp_tar + age + r + m + (1|subj), data = full_data_month)
 
+
+# gravevyard ----
+sex == "M"
+ggplot() +
+geom_point(data = full_data_month %>% filter(subj == "allo"),
+           aes(x = age, y = avg_ cr_resid), color = "red") +
+geom_smooth(data = full_data_month %>% filter(subj == "allo"),
+            aes(x = age, y = avg_ cr_resid), color = "red",
+            method = "lm") +
+geom_point(data = full_data_month %>% filter(subj == "brog"),
+           aes(x = age, y = avg_ cr_resid), color = "green") +
+geom_smooth(data = full_data_month %>% filter(subj == "brog"),
+            aes(x = age, y = avg_ cr_resid),color = "green",
+            method = "lm") +
+geom_point(data = full_data_month,
+           aes(x = age, y = avg_ cr_resid), alpha = 0.1) +
+geom_smooth(data = full_data_month,
+            aes(x = age, y = avg_ cr_resid),
+            method = "lm")
 
