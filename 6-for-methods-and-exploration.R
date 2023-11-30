@@ -266,6 +266,8 @@ full_data_month %>%
 # monthly growth isn't increasing with age.
 
 
+# distribution of urine sampling intervals -----
+
 # graveyard -------
 lmer(m ~ r + (1|subj), data = full_data_month) %>% summary()
 # make new dataset for regression ----
@@ -336,3 +338,23 @@ cor.test(full_data_growth_neo$change_lbm,
 full_data_growth_neo %>% ggplot(aes(x = avg_neo_all_months, y = change_lbm, 
                                     color = sex, size = age)) + 
   geom_jitter() 
+# effect of log2 -----
+
+beta = .2
+
+x = 16 
+
+y = beta*log2(x)
+
+x2 = 32 # difference is a 1 unit increase in log2(x)
+
+y2 = beta*log2(x2)
+
+y
+y2 # a doubling of x yields a ß change in Y 
+
+y2-y
+
+# when Y is also log2, what is change in raw change in Y? a doubling * ß?
+
+2^y2 - 2^y
