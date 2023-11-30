@@ -7,6 +7,7 @@ library(lmerTest)
 load("data/urine_sample_dataset_juv_immune_energetics.Rdata", verbose = T)
 load("data/fgc_data_by_sample.Rdata", verbose = T)
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
+load("data/full_data_short_term_lbm_change.Rdata", verbose = T)
 
 # Ns and samples per subject month -----
 
@@ -267,6 +268,13 @@ full_data_month %>%
 
 
 # distribution of urine sampling intervals -----
+
+full_data_short_term_lbm_change %>%
+  pull(sample_interval) %>%
+  hist()
+  
+
+
 
 # graveyard -------
 lmer(m ~ r + (1|subj), data = full_data_month) %>% summary()
