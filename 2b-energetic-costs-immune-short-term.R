@@ -34,6 +34,25 @@ summary(change_lbm_neo_lm_sample)
 vif.mer(change_lbm_neo_lm_sample) 
 # all < 90.5 with interaction and < 4.9 in terms not included
 
+# test - short term change for intervals < 30 days
+change_lbm_neo_lm_sample_test <-
+  full_data_short_term_lbm_change %>%
+  filter(sample_interval < 30) %>%
+  lmer(sample_lbm_change ~ 
+         age + 
+         sex +
+         log2_neo +
+         log2_cp_tar +
+         sample_interval +
+         log2_neo*sample_interval +
+         log2_cp_tar*sample_interval +
+         (1|subj) + (1|month),
+       data = .)
+qqnorm(residuals(change_lbm_neo_lm_sample_test))
+summary(change_lbm_neo_lm_sample_test)
+
+# neo still sig neg effect but the interval interaction not sig
+
 # viz - relationship neo and subsequent change in elbm -----
 full_data_short_term_lbm_change %>% 
   filter(neo_sg < 2000) %>% 
