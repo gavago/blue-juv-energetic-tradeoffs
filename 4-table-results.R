@@ -26,6 +26,10 @@ summary(change_lbm_neo_lm_sample)
 sup1 <- mod_info_extract(f_neo_lm_month) %>% prettify_table()
 sup2 <- mod_info_extract(r_neo_lm_month) %>% prettify_table()
 sup3 <- mod_info_extract(m_neo_lm_month) %>% prettify_table()
+summary(f_neo_lm_month)
+summary(r_neo_lm_month)
+summary(m_neo_lm_month)
+
 
 # A2 - energetic limitations neo -----
 constraints <- mod_info_extract(neo_cp_cr_lm_month) %>% prettify_table()
