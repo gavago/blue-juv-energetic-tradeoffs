@@ -41,6 +41,9 @@ fit.dv <- lmer(log2_avg_neo ~
                  (1|subj),
                data = full_data_month_mediate)
 
+full_data_month_mediate %>%
+  distinct(subj) %>%
+  nrow() #how many subjects present
 
 set.seed(288)
 med_results = mediate(fit.mediator, fit.dv, treat='log2_avg_cp_tar', mediator='log2(avg_fgc)')
