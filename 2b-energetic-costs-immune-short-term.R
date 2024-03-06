@@ -17,6 +17,7 @@ change_lbm_neo_lm_sample <-
   lmer(sample_lbm_change ~ 
          age + 
          sex +
+         mrank +
          log2_neo +
          log2_cp_tar +
          sample_interval +
