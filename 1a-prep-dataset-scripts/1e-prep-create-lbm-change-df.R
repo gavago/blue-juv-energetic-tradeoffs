@@ -10,6 +10,11 @@ source("functions/vif.mer function.R") # function is "vif.mer"
 load("data/urine_sample_dataset_juv_immune_energetics.Rdata", verbose = T)
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
+load("data/behav-dataset-month.Rdata", verbose = T)
+mrank_df <- behav_data_month %>%
+  distinct(subj, mrank)
+
+
 #add sample lbm change
 full_data_short_term_lbm_change <- full_udata %>% 
   group_by(subj) %>% 
@@ -20,11 +25,12 @@ full_data_short_term_lbm_change <- full_udata %>%
   #   TRUE ~ sample_interval)) %>% 
   ungroup() %>%
   mutate(log2_neo = log2(neo_sg)) %>%
-  mutate(log2_cp_tar = log2(cp_tar))
+  mutate(log2_cp_tar = log2(cp_tar)) %>%
+  left_join(., mrank_df, by = "subj")
 
 #check alignment of data within rows
 full_data_short_term_lbm_change %>%
-    select(subj, date, sample_interval, sample_lbm_change, cr_resid, neo_sg) %>%
+    select(subj, date, sample_interval, sample_lbm_change, cr_resid, neo_sg, mrank) %>%
     arrange(subj, date) %>%
     View()
 
