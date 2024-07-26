@@ -1,3 +1,6 @@
+library(tidyverse)
+
+
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
 load("data/full_data_short_term_lbm_change.Rdata", verbose = T)
@@ -7,13 +10,14 @@ names(full_data_month)
 names(full_data_short_term_lbm_change)
 
 
-full_data_month %>%
+data_month <- full_data_month %>%
   select(subj, group, year, month, sex, age, mrank, log2_avg_neo, log2_avg_cp_tar, avg_cr_resid, avg_rain, n_partners, r, f, m)
 
-full_data_short_term_lbm_change %>%
+data_lbm_change <- full_data_short_term_lbm_change %>%
   select(subj, group, year, month, sex, age, mrank, log2_neo, log2_cp_tar, cr_resid, sample_interval)
 
-
+write_csv(data_month, file = "data/full_data_month.csv")
+write_csv(data_lbm_change, file = "data/full_data_short_term_lbm_change.csv")
 
 
 
