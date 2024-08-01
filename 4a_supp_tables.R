@@ -36,3 +36,8 @@ s1_table <- bind_cols(s1_udata, s1_fgc)[,-8]
 write.table(s1_table, file = "results/tables/s1_table.txt", 
             quote = FALSE, sep = "/", row.names = F)
 
+
+# Table S2 
+load("models/energetic-costs-immune-broad.Rdata", verbose = T)
+
+
