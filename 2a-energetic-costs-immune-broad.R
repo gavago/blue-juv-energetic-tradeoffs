@@ -5,9 +5,9 @@ source("functions/vif.mer function.R") # vif.mer
 
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 
-# H1 - energetic costs cellular immunity -----
+# Cost models - energetic costs cellular immunity -----
 
-# - does neo eat into energy balance? NO, reverse ----
+# 1 - does neo eat into energy balance? NO, reverse ----
 cp_neo_lm_month <- full_data_month %>%
   lmer(log2_avg_cp_tar ~  sex +
                           age +
@@ -36,7 +36,81 @@ full_data_month %>%
 
 
 
-# - - - compensatory behavior - does feeding, moving, or resting compensate for the energetic cost of neo? ----
+# 2 - does neo detract from monthly growth? NO, no relationship ----
+
+change_lbm_neo_lm_month <-full_data_month %>%
+  group_by(subj) %>%
+  mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
+  ungroup() %>%
+  lmer(month_lbm_change ~ 
+         age +
+         sex + 
+         mrank +
+         log2_avg_neo +
+         log2_avg_cp_tar +
+         (1|subj) + (1|month),
+       data = .)
+qqnorm(residuals(change_lbm_neo_lm_month))
+qqline(residuals(change_lbm_neo_lm_month))
+summary(change_lbm_neo_lm_month)
+vif.mer(change_lbm_neo_lm_month) 
+
+
+full_data_month %>%
+  group_by(subj) %>%
+  mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
+  filter(avg_neo_sg < 2000) %>% 
+  ggplot(aes(x =  log2_avg_neo, y = month_lbm_change, color = sex)) +
+  geom_smooth(method = "lm") + 
+  geom_point() +
+  theme_minimal() + 
+  labs(x = "log 2 Avg monthly Neopterin",
+       y =  "Change monthly LBM",
+       title = "Monthly Neopterin Relationship with Growth Lean Mass")
+
+
+#explore relationship monthly growth M1-M0 and CP M0
+full_data_month %>%
+  group_by(subj) %>%
+  mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
+  filter(avg_neo_sg < 2000) %>% 
+  ggplot(aes(x =  log2_avg_cp_tar, y = month_lbm_change, color = sex)) +
+  geom_smooth(method = "lm") + 
+  geom_point() +
+  theme_minimal() + 
+  labs(x = "log 2 Avg CP M0",
+       y =  "Change monthly LBM M1-M0",
+       title = "Monthly CP Relationship with Growth Lean Mass")
+
+# 2a - does neo detract from monthly growth in low energy individuals? -----
+
+change_lbm_neo_lm_month_quartcp <- full_data_month %>%
+  group_by(subj) %>%
+  mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
+  ungroup() %>%
+  mutate(quart_cp = cut(log2_avg_cp_tar, breaks = quantile(log2_avg_cp_tar, na.rm = T))) %>%
+  mutate(quart_cp = relevel(quart_cp, 4)) %>%
+  lmer(month_lbm_change ~ 
+         age +
+         sex + 
+         mrank +
+         log2_avg_neo +
+         quart_cp +
+         log2_avg_neo*quart_cp +
+         (1|subj) + (1|month),
+       data = .)
+
+summary(change_lbm_neo_lm_month_quartcp) # why 252 obs when there are 298 CP values (25 missing CP values)?
+vif.mer(change_lbm_neo_lm_month_quartcp)
+
+
+full_data_month %>%
+  mutate(quart_cp = cut(log2_avg_cp_tar, breaks = quantile(log2_avg_cp_tar, na.rm = T))) %>%
+  count(quart_cp)
+nrow(full_data_month)
+
+# 3 - short term growth in script 2c ------
+# 4-6 - compensatory behavior - does feeding, moving, or resting compensate for the energetic cost of neo? ----
 
 # feeding ~ neo 
 f_neo_lm_month <- lmer(f ~ sex + 
@@ -88,53 +162,6 @@ full_data_month %>%
   geom_point()
 
 
-# - does neo detract from monthly growth? NO, no relationship ----
-
-change_lbm_neo_lm_month <-full_data_month %>%
-  group_by(subj) %>%
-  mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
-  ungroup() %>%
-  lmer(month_lbm_change ~ 
-         age +
-         sex + 
-         mrank +
-         log2_avg_neo +
-         log2_avg_cp_tar +
-         (1|subj) + (1|month),
-       data = .)
-qqnorm(residuals(change_lbm_neo_lm_month))
-qqline(residuals(change_lbm_neo_lm_month))
-summary(change_lbm_neo_lm_month)
-vif.mer(change_lbm_neo_lm_month) 
-
-
-full_data_month %>%
-  group_by(subj) %>%
-  mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
-  filter(avg_neo_sg < 2000) %>% 
-  ggplot(aes(x =  log2_avg_neo, y = month_lbm_change, color = sex)) +
-  geom_smooth(method = "lm") + 
-  geom_point() +
-  theme_minimal() + 
-  labs(x = "log 2 Avg monthly Neopterin",
-       y =  "Change monthly LBM",
-       title = "Monthly Neopterin Relationship with Growth Lean Mass")
-
-
-#explore relationship monthly growth M1-M0 and CP M0
-full_data_month %>%
-  group_by(subj) %>%
-  mutate(month_lbm_change = lead(avg_cr_resid) - avg_cr_resid) %>%
-  filter(avg_neo_sg < 2000) %>% 
-  ggplot(aes(x =  log2_avg_cp_tar, y = month_lbm_change, color = sex)) +
-  geom_smooth(method = "lm") + 
-  geom_point() +
-  theme_minimal() + 
-  labs(x = "log 2 Avg CP M0",
-       y =  "Change monthly LBM M1-M0",
-       title = "Monthly CP Relationship with Growth Lean Mass")
-
-# 
 
 full_data_month %>%
   group_by(subj) %>%
@@ -178,11 +205,17 @@ full_data_month %>%
 
 # save models ----
 # save(cp_neo_lm_month, f_neo_lm_month, r_neo_lm_month, m_neo_lm_month,
-#      change_lbm_neo_lm_month, file = "models/energetic-costs-immune-broad.Rdata")
-# 
+#      change_lbm_neo_lm_month, change_lbm_neo_lm_month_quartcp, file = "models/energetic-costs-immune-broad.Rdata")
+
+# load("models/energetic-costs-immune-broad.Rdata", verbose = T)
+
 
 
 # graveyard ------
+
+
+
+
 neo_fai_cp_glm_month_nolog <- glmer(avg_neo_sg ~ sex +
                                       scale(age) + scale(fai) +
                                       scale(avg_stdsg_CP) +
