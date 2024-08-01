@@ -6,8 +6,8 @@ mod_info_extract <- function(mod){
   if(grepl("^r", mod_name)) {response <- "Time resting"}
   if(grepl("^f", mod_name)) {response <- "Time feeding"}
   if(grepl("^m", mod_name)) {response <- "Time moving"}
-  if(grepl("^change.*sample$", mod_name)) {response <- "∆ ELBM sample"}
-  if(grepl("^change.*month$", mod_name)) {response <- "∆ ELBM month"}
+  if(grepl("^change.*sample", mod_name)) {response <- "∆ ELBM sample"}
+  if(grepl("^change.*month", mod_name)) {response <- "∆ ELBM month"}
   
   if(grepl("_lm_", mod_name)) {mod_type <- "lmer"}
   if(grepl("_glm_", mod_name)) {mod_type <- "glmer"}
@@ -48,6 +48,14 @@ mod_info_extract <- function(mod){
         rowname == "sample_interval" ~ "sample interval",
         rowname == "log2_neo:sample_interval" ~ "log2 Neo x sample interval",
         rowname == "log2_cp_tar:sample_interval" ~ "log2 CP x sample interval",
+        rowname == "quart_cp(8.72,11.8]" ~ "CP quartile 1",
+        rowname == "quart_cp(11.8,12.8]" ~ "CP quartile 2",
+        rowname == "quart_cp(12.8,13.4]" ~ "CP quartile 3",
+        rowname == "quart_cp(13.4,15.8]" ~ "CP quartile 4",
+        rowname == "log2_avg_neo:quart_cp(8.72,11.8]" ~ "log2 Neo x CP quartile 1",
+        rowname == "log2_avg_neo:quart_cp(11.8,12.8]" ~ "log2 Neo x CP quartile 2",
+        rowname == "log2_avg_neo:quart_cp(12.8,13.4]" ~ "log2 Neo x CP quartile 3",
+        rowname == "log2_avg_neo:quart_cp(13.4,15.8]" ~ "log2 Neo x CP quartile 4",
         TRUE ~ rowname
       )) 
     
