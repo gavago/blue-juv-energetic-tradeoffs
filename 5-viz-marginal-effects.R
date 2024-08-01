@@ -7,27 +7,74 @@ load("data/full_data_short_term_lbm_change.Rdata", verbose = T)
 load("data/full_data_month_udata_fgc_behav.RData", verbose = T)
 load("models/energetic-costs-immune-broad.Rdata", verbose = T)
 load("models/energetic-costs-immune-short.Rdata", verbose = T)
+load("data/urine_sample_dataset_juv_immune_energetics.Rdata", verbose = T)
+
+# actually chose to make the viz var one that includes negative time adjusted residuals...
+# the positive transformation was to be able to take the log of the response var, not for viz.
+
+#  actual marginal effects are visualized...?
 
 
 # PAPER/POSTER FIGURES --------
-# fig 1 - validation - elbm by age -------
+# fig 1A - validation - monthly elbm by age -------
 
 # geom_smooth version
 
-age_lbm_plot <- ggplot(data = full_data_month, aes(x = age, y = avg_cr_resid), 
-       alpha = .3) +
+age_lbm_plot <- ggplot(data = full_data_month, aes(x = age, y = avg_cr_resid)) +
+  geom_point(aes(color = sex), alpha = .5) + 
+  scale_shape_manual(values = c(15, 16)) +
+  geom_smooth(method = lm, color = "darkgrey", alpha = .3) + 
+  theme_minimal() +
+  labs(x = "Age (yrs)", y = "Residual creatinine (mg/ml)\nrelative to expected by specific gravity\n(Estimated lean body mass)")+
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5, size = 10)) +
+  theme(legend.position = "none")
+
+age_lbm_plot
+# put together w labels A and B, export as figure
+
+ggplot(data = full_data_month, aes(x = age, y = avg_cr_resid)) +
+  geom_point(aes(color = sex), alpha = .5) + 
+  scale_shape_manual(values = c(15, 16)) +
+  geom_smooth(method = lm, color = "darkgrey", alpha = .3) + 
+  labs(x = "Age (yrs)", y = "") +
+  theme_minimal() +
+  theme(legend.position = "none")
+ggsave(file = "results/fig-1a-age-lbm-plot.png", height = 5, width = 5)
+
+
+
+# age_lbm_sample_plot <- ggplot(data = full_udata, aes(x = age, y = cr_resid)) +
+#   geom_point(aes(color = sex), alpha = .5) + 
+#   scale_shape_manual(values = c(15, 16)) +
+#   geom_smooth(method = lm, color = "darkgray", fill = "darkgray", alpha = .3) + 
+#   theme_minimal() 
+# age_lbm_sample_plot
+
+
+
+# fig 1B - validation - monthly elbm by monthly energy balance -------
+
+ggplot(data = full_data_month, aes(x = log2_avg_cp_tar, y = avg_cr_resid)) +
   geom_point(aes(color = sex), alpha = .5) + 
   scale_shape_manual(values = c(15, 16)) +
   geom_smooth(method = lm, color = "darkgray", fill = "darkgray", alpha = .3) + 
-  theme_minimal() 
-age_lbm_plot
+  theme_minimal() +
+  labs(x = expression(log[2]~"C-peptide" ~ "pg/ml (Energy balance)"), y = "") +
+  theme(legend.position = "none")
+ggsave(file = "results/fig-1b-lbm-plot.png", height = 5, width = 5)
 
-# export as pdf
-pdf("age_lbm_plot.pdf")
-print(age_lbm_plot)
-dev.off()
+
+
+
+# ucp_lbm_sample_plot <- ggplot(data = full_udata, aes(x = cp_tar, y = cr_resid)) +
+#   geom_point(aes(color = sex), alpha = .5) + 
+#   scale_shape_manual(values = c(15, 16)) +
+#   geom_smooth(method = lm, color = "darkgray", fill = "darkgray", alpha = .3) + 
+#   theme_minimal() 
+# ucp_lbm_sample_plot
+
   
-# fig 2a - costs - short term lbm change ~ neo ----
+# fig 2 - costs - short term lbm change ~ neo ----
 
 
 sample_lbm_chng_neo_plot <- 
