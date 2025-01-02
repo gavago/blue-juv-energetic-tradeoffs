@@ -21,7 +21,7 @@ fit.totaleffect <- lmer(log2_avg_neo ~
                           sex + 
                           (1|subj),
                         full_data_month_mediate)
-
+summary(fit.totaleffect)
 
 # effect of iv on mediator 
 fit.mediator <- lmer(log2(avg_fgc) ~ 
@@ -30,6 +30,8 @@ fit.mediator <- lmer(log2(avg_fgc) ~
                        sex +
                        (1|subj),
                      data = full_data_month_mediate)
+
+summary(fit.mediator)
 
 # effect of mediator on dv controlling for iv, direct effect
 
@@ -40,6 +42,7 @@ fit.dv <- lmer(log2_avg_neo ~
                  sex +
                  (1|subj),
                data = full_data_month_mediate)
+summary(fit.dv)
 
 full_data_month_mediate %>%
   distinct(subj) %>%
