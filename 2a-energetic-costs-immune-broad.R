@@ -103,7 +103,6 @@ change_lbm_neo_lm_month_quartcp <- full_data_month %>%
 summary(change_lbm_neo_lm_month_quartcp) # why 252 obs when there are 298 CP values (25 missing CP values)?
 vif.mer(change_lbm_neo_lm_month_quartcp)
 
-
 full_data_month %>%
   mutate(quart_cp = cut(log2_avg_cp_tar, breaks = quantile(log2_avg_cp_tar, na.rm = T))) %>%
   count(quart_cp)
