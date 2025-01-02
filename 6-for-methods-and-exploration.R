@@ -13,6 +13,10 @@ load("data/full_data_short_term_lbm_change.Rdata", verbose = T)
 
 # total urine
 nrow(full_udata)
+# total fecal - fgc
+gc_raw %>%
+  filter(!is.na(fgc.ng_g.feces)) %>% nrow()
+
 
 # neopterin
 full_udata %>%
@@ -29,14 +33,20 @@ full_udata %>%
   filter(!is.na(stdsg_CP)) %>% nrow()
 
 
-# fgc
-gc_raw %>%
-  filter(!is.na(fgc.ng_g.feces)) %>% nrow()
-
-
 nrow(gc_raw)
 
 # samples per subj/month ------
+
+# total urine
+full_udata %>% 
+  count(subj, month) %>%
+  summarise(mean = mean(n, na.rm = T), sd = sd(n, na.rm = T)) 
+# total fecal
+gc_raw %>%
+  count(subj, month) %>%
+  summarise(mean = mean(n, na.rm = T), sd = sd(n, na.rm = T))
+
+
 
 #neo
 neo_subj_month <- full_udata %>%
